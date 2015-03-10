@@ -1,0 +1,10 @@
+applications:
+- services:
+  - concept-insights
+  disk_quota: 1024M
+  host: watsonmatchmyjob
+  name: watsonmatchmyjob
+  path: .
+  domain: stage1.mybluemix.net
+  instances: 1
+  memory: 256M

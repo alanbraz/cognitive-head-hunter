@@ -38,8 +38,8 @@ $(document).ready(function() {
       autocomplete.abort();
 
     autocomplete = $.get('/label_search', {
-      corpus:'testmatchmyjob',
-      user: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+      corpus:'match-my-job',
+      user: credentials.username,
       query: keyword,
       limit: 4
     }, function(results) {
@@ -114,8 +114,8 @@ $(document).ready(function() {
 
     var dataObj = {
       ids: ids,
-      corpus: 'testmatchmyjob',
-      user: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+      corpus: 'match-my-job',
+      user: credentials.username,
       limit: 20
     };
 
@@ -180,7 +180,6 @@ $(document).ready(function() {
       htmlString += '<div class="overflow-container">'
       htmlString += '<div class="expert-image col-lg-3 col-md-3 col-xs-3">';
       htmlString += '<div class="img-container">';
-      htmlString += '<img src="'+ results[i].user.thumbnail + '"/>';
       htmlString += '</div>';
       htmlString += '</div>';
       htmlString += '<div class="expert-info col-lg-9 col-md-9 col-xs-9">';
@@ -239,9 +238,9 @@ $(document).ready(function() {
    */
   var createSuggestion = function (item) {
       var htmlString = '<a href="javascript:void(0);" data-id="';
-
-      if (item.type === '/58236fbc-904e-4317-ad6d-c98a34744e9c/testmatchmyjob') {
-        htmlString += '/corpus/58236fbc-904e-4317-ad6d-c98a34744e9c/testmatchmyjob/'; // if researcher
+      
+      if (item.type === (credentials.username+'/match-my-job') {
+        htmlString += ('/corpus/'+credentials.username+'/match-my-job')'; // if researcher
       } else {
         htmlString += '/graph/wikipedia/en-20120601/'; // if concept
       }
@@ -253,7 +252,7 @@ $(document).ready(function() {
       htmlString += item.label;
       htmlString += '</h4>';
       htmlString += '<span class="concept-type '+ (item.type === 'concept' ? 'type-concept' : 'type-researcher')+'">';
-      if (item.type == '/58236fbc-904e-4317-ad6d-c98a34744e9c/testmatchmyjob') {
+      if (item.type == (credentials.username+'/match-my-job')) {
         htmlString += '(IBM Researcher)';
       } else {
         htmlString += '(' + item.type + ')';

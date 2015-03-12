@@ -28,9 +28,10 @@ require('./config/express')(app);
 // if bluemix credentials exists, then override local
 var credentials = extend({
   version: 'v1',
-  username: '<username>',
-  password: '<password>'
-}, bluemix.getServiceCreds('concept_insights')); // VCAP_SERVICES
+  url: 'https://gateway-s.watsonplatform.net/concept-insights-beta/api',
+  username: '128ee64b-f3cf-47c1-abe6-a30e8f6e39a0',
+  password: 'hVDkrMx75De9'
+}, bluemix.getServiceCreds('concept-insights')); // VCAP_SERVICES
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(credentials);
@@ -70,6 +71,31 @@ app.get('/semantic_search', function (req, res) {
       return res.json(result);
   });
 });
+
+app.put('/jobs', function(req, res) {
+	console.log('inside .put /jobs');
+	console.log();
+	
+	  conceptInsights.createDocument(req.body, function(error, result) {
+	    if (error)
+	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	    else
+	      return res.json(result);
+	  });
+});
+
+app.get('/jobs', function(req, res) {
+	console.log('inside .get /jobs');
+	console.log(credentials);
+	
+	  conceptInsights.getCorpus(req.query, function(error, result) {
+	    if (error)
+	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	    else
+	      return res.json(result);
+	  });
+});
+
 
 var port = process.env.VCAP_APP_PORT || 3000;
 app.listen(port);

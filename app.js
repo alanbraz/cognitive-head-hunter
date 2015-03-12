@@ -26,12 +26,23 @@ var express = require('express'),
 require('./config/express')(app);
 
 // if bluemix credentials exists, then override local
-var credentials = extend({
+var credentialsStage1 = extend({
   version: 'v1',
   url: 'https://gateway-s.watsonplatform.net/concept-insights-beta/api',
   username: '128ee64b-f3cf-47c1-abe6-a30e8f6e39a0',
   password: 'hVDkrMx75De9'
 }, bluemix.getServiceCreds('concept-insights')); // VCAP_SERVICES
+
+var credentials = {
+  version: 'v1',
+  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+  password: 'J4DjaOigWNuU',
+  use_vcap_services: false,
+  corpus_jobs: 'testmatchmyjob'
+  corpus_candidates: 'candidates'
+}; // Bluemix externo, bind manual
+
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(credentials);
@@ -72,11 +83,33 @@ app.get('/semantic_search', function (req, res) {
   });
 });
 
-app.put('/jobs', function(req, res) {
-	console.log('inside .put /jobs');
+// TODO put candidate
+
+app.put('/job', function(req, res) {
 	console.log();
-	
-	  conceptInsights.createDocument(req.body, function(error, result) {
+	/* { code: 'RES-91203213', title: 'Software intern',
+    description: 'la la la' } */
+  // TODO transform body 
+  // TODO test
+  var input = req.body;
+  var params = {
+    document: {
+        id: input.code,
+        label: input.title,
+        type: 'job',
+        parts: [
+            {
+                data: input.description,
+                name: "Job description",
+                type: "text"
+            }
+        ]
+    },
+    user: credentials.username,
+    corpus: credentials.corpusname,
+    documentid: input.code
+}  ;
+	  conceptInsights.createDocument(params, function(error, result) {
 	    if (error)
 	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
 	    else
@@ -87,14 +120,37 @@ app.put('/jobs', function(req, res) {
 app.get('/jobs', function(req, res) {
 	console.log('inside .get /jobs');
 	console.log(credentials);
+  console.log(req.query);
+
+  var params = { 
+      user: credentials.username,
+      corpus: credentials.corpusname
+  };
 	
-	  conceptInsights.getCorpus(req.query, function(error, result) {
+	  conceptInsights.getDocumentIds(params, function(error, result) {
 	    if (error)
 	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
 	    else
 	      return res.json(result);
 	  });
 });
+
+app.get('/job/:id', function(req, res) {
+  var params = { 
+      user: credentials.username,
+      corpus: credentials.corpusname,
+      documentid: req.params.id
+  };
+  
+    conceptInsights.getDocument(params, function(error, result) {
+      if (error)
+        return res.status(error.error ? error.error.code || 500 : 500).json(error);
+      else
+        return res.json(result);
+    });
+});
+
+// TODO get searchalble 
 
 
 var port = process.env.VCAP_APP_PORT || 3000;

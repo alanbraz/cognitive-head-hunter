@@ -39,7 +39,7 @@ var credentials = {
   username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
   password: 'J4DjaOigWNuU',
   use_vcap_services: false,
-  corpus_jobs: 'testmatchmyjob'
+  corpus_jobs: 'testmatchmyjob',
   corpus_candidates: 'candidates'
 }; // Bluemix externo, bind manual
 
@@ -51,7 +51,7 @@ app.get('/', function(req, res){
     res.render('index');
 });
 
-app.get('/label_search', function (req, res) {
+/*app.get('/label_search', function (req, res) {
   var payload = extend({
     func:'labelSearch',
     limit: 4,
@@ -81,12 +81,10 @@ app.get('/semantic_search', function (req, res) {
     else
       return res.json(result);
   });
-});
+});*/
 
-// TODO put candidate
 
 app.put('/job', function(req, res) {
-	console.log();
 	/* { code: 'RES-91203213', title: 'Software intern',
     description: 'la la la' } */
   // TODO transform body 
@@ -96,7 +94,6 @@ app.put('/job', function(req, res) {
     document: {
         id: input.code,
         label: input.title,
-        type: 'job',
         parts: [
             {
                 data: input.description,
@@ -124,7 +121,7 @@ app.get('/jobs', function(req, res) {
 
   var params = { 
       user: credentials.username,
-      corpus: credentials.corpusname
+      corpus: credentials.corpus_jobs
   };
 	
 	  conceptInsights.getDocumentIds(params, function(error, result) {
@@ -138,7 +135,7 @@ app.get('/jobs', function(req, res) {
 app.get('/job/:id', function(req, res) {
   var params = { 
       user: credentials.username,
-      corpus: credentials.corpusname,
+      corpus: credentials.corpus_jobs,
       documentid: req.params.id
   };
   
@@ -150,7 +147,88 @@ app.get('/job/:id', function(req, res) {
     });
 });
 
-// TODO get searchalble 
+app.get('/candidates', function(req, res) {
+	console.log('inside .get /jobs');
+	console.log(credentials);
+  console.log(req.query);
+
+  var params = { 
+      user: credentials.username,
+      corpus: credentials.corpus_candidates
+  };
+	
+	  conceptInsights.getDocumentIds(params, function(error, result) {
+	    if (error)
+	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	    else
+	      return res.json(result);
+	  });
+});
+
+app.get('/candidate/:id', function(req, res) {
+  var params = { 
+      user: credentials.username,
+      corpus: credentials.corpus_candidates,
+      documentid: req.params.id
+  };
+  
+    conceptInsights.getDocument(params, function(error, result) {
+      if (error)
+        return res.status(error.error ? error.error.code || 500 : 500).json(error);
+      else
+        return res.json(result);
+    });
+});
+
+app.put('/candidate', function(req, res) {
+
+  var input = req.body;
+  var params = {
+    document: {
+        id: input.id,
+        label: input.full-name,
+        parts: [
+            {
+                data: input.data,
+                name: "Candidate",
+                type: "text"
+            }
+        ],
+        candidatePictureUrl: input.picture-url;
+        candidatePublicProfileUrl: input.public-profile-url;
+    },
+    user: credentials.username,
+    corpus: credentials.corpus_candidates,
+    documentid: input.id
+};
+	  conceptInsights.createDocument(params, function(error, result) {
+	    if (error)
+	      return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	    else
+	      return res.json(result);
+	  });
+});
+	
+app.get('/semantic_search/:corpus', function (req, res) {
+  var payload = extend({
+    func:'semanticSearch',
+    user: credentials.username,
+    corpus: req.params.corpus
+  }, req.query);
+  console.log(req.params);
+  console.log(req.query);
+  console.log(payload);
+
+  // ids needs to be stringify
+  payload.ids = JSON.stringify(payload.ids);
+
+  conceptInsights.semanticSearch(payload, function(error, result) {
+    if (error)
+      return res.status(error.error ? error.error.code || 500 : 500).json(error);
+    else
+      return res.json(result);
+  });
+});
 
 
 var port = process.env.VCAP_APP_PORT || 3000;

@@ -25,15 +25,63 @@ var express = require('express'),
 // Bootstrap application settings
 require('./config/express')(app);
 
-// if bluemix credentials exists, then override local
-var credentialsStage1 = extend({
-  version: 'v1',
-  url: 'https://gateway-s.watsonplatform.net/concept-insights-beta/api',
-  username: '128ee64b-f3cf-47c1-abe6-a30e8f6e39a0',
-  password: 'hVDkrMx75De9'
-}, bluemix.getServiceCreds('concept-insights')); // VCAP_SERVICES
+var appKey = '781og0rurwqsom', 
+    appSecret = '9FnyK7slh4CuPxFo', 
+    token = {
+      oauth_token: '812992a9-6e42-4ba3-8c47-3eb6309a8c1a', 
+      oauth_token_secret: '4ab51366-ddd9-461e-b09a-e144810de822'
+    };
 
-var credentials = {
+
+var linkedin_client = require('linkedin-js')(appKey, appSecret, 'http://localhost:3000/');
+
+//var Linkedin = require('node-linkedin')(appKey, appSecret, '/oauth/linkedin/callback');
+
+//var linkedin = Linkedin.init(token, {
+  //  timeout: 10000 /* 10 seconds */
+//});
+
+app.get('/auth', function (req, res) {
+  // the first time will redirect to linkedin
+  linkedin_client.getAccessToken(req, res, function (error, token) {
+    // will enter here when coming back from linkedin
+    req.session.token = token;
+
+    if ( err )
+            return console.error(err);
+        
+        /**
+         * Results have something like:
+         * {"expires_in":5184000,"access_token":". . . ."}
+         */
+ 
+        console.log(token);
+        return res.redirect('/');
+  });
+});
+
+app.get('/oauth/linkedin', function(req, res) {
+    // This will ask for permisssions etc and redirect to callback url. 
+    Linkedin.auth.authorize(res, ['r_basicprofile', 'r_fullprofile', 'r_emailaddress', 
+      'r_network', 'r_contactinfo', 'rw_nus', 'rw_groups', 'w_messages']);
+});
+ 
+app.get('/oauth/linkedin/callback', function(req, res) {
+    Linkedin.auth.getAccessToken(res, req.query.code, function(err, results) {
+        if ( err )
+            return console.error(err);
+        
+        /**
+         * Results have something like:
+         * {"expires_in":5184000,"access_token":". . . ."}
+         */
+ 
+        console.log(results);
+        return res.redirect('/');
+    });
+});
+
+var ci_credentials = {
   version: 'v1',
   url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
   username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
@@ -45,7 +93,7 @@ var credentials = {
 
 
 // Create the service wrapper
-var conceptInsights = watson.concept_insights(credentials);
+var conceptInsights = watson.concept_insights(ci_credentials);
 
 app.get('/', function(req, res){
     res.render('index');
@@ -102,8 +150,8 @@ app.put('/job', function(req, res) {
             }
         ]
     },
-    user: credentials.username,
-    corpus: credentials.corpusname,
+    user: ci_credentials.username,
+    corpus: ci_credentials.corpus_jobs,
     documentid: input.code
 }  ;
 	  conceptInsights.createDocument(params, function(error, result) {
@@ -116,12 +164,12 @@ app.put('/job', function(req, res) {
 
 app.get('/jobs', function(req, res) {
 	console.log('inside .get /jobs');
-	console.log(credentials);
+	console.log(ci_credentials);
   console.log(req.query);
 
   var params = { 
-      user: credentials.username,
-      corpus: credentials.corpus_jobs
+      user: ci_credentials.username,
+      corpus: ci_credentials.corpus_jobs
   };
 	
 	  conceptInsights.getDocumentIds(params, function(error, result) {
@@ -134,8 +182,8 @@ app.get('/jobs', function(req, res) {
 
 app.get('/job/:id', function(req, res) {
   var params = { 
-      user: credentials.username,
-      corpus: credentials.corpus_jobs,
+      user: ci_credentials.username,
+      corpus: ci_credentials.corpus_jobs,
       documentid: req.params.id
   };
   
@@ -148,13 +196,9 @@ app.get('/job/:id', function(req, res) {
 });
 
 app.get('/candidates', function(req, res) {
-	console.log('inside .get /jobs');
-	console.log(credentials);
-  console.log(req.query);
-
   var params = { 
-      user: credentials.username,
-      corpus: credentials.corpus_candidates
+      user: ci_credentials.username,
+      corpus: ci_credentials.corpus_candidates
   };
 	
 	  conceptInsights.getDocumentIds(params, function(error, result) {
@@ -167,8 +211,8 @@ app.get('/candidates', function(req, res) {
 
 app.get('/candidate/:id', function(req, res) {
   var params = { 
-      user: credentials.username,
-      corpus: credentials.corpus_candidates,
+      user: ci_credentials.username,
+      corpus: ci_credentials.corpus_candidates,
       documentid: req.params.id
   };
   
@@ -194,11 +238,11 @@ app.put('/candidate', function(req, res) {
                 type: "text"
             }
         ],
-        candidatePictureUrl: input.picture-url;
-        candidatePublicProfileUrl: input.public-profile-url;
+        candidatePictureUrl: input.picture-url,
+        candidatePublicProfileUrl: input.public-profile-url
     },
-    user: credentials.username,
-    corpus: credentials.corpus_candidates,
+    user: ci_credentials.username,
+    corpus: ci_credentials.corpus_candidates,
     documentid: input.id
 };
 	  conceptInsights.createDocument(params, function(error, result) {
@@ -212,7 +256,7 @@ app.put('/candidate', function(req, res) {
 app.get('/semantic_search/:corpus', function (req, res) {
   var payload = extend({
     func:'semanticSearch',
-    user: credentials.username,
+    user: ci_credentials.username,
     corpus: req.params.corpus
   }, req.query);
   console.log(req.params);
@@ -229,6 +273,36 @@ app.get('/semantic_search/:corpus', function (req, res) {
       return res.json(result);
   });
 });
+
+
+var pi_credentials = extend({
+    version: 'v2',
+    url: "https://gateway-s.watsonplatform.net/personality-insights/api",
+    username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
+    password: "QHGtHD142ZhU"
+}, bluemix.getServiceCreds('personality_insights')); // VCAP_SERVICES
+
+// Create the service wrapper
+var personalityInsights = new watson.personality_insights(pi_credentials);
+
+// render index page
+app.get('/', function(req, res) {
+  res.render('index', { content: 'alan braz' });
+});
+
+app.post('/', function(req, res) {
+  personalityInsights.profile(req.body, function(err, profile) {
+    if (err) {
+      if (err.message){
+        err = { error: err.message };
+      }
+      return res.status(err.code || 500).json(err || 'Error processing the request');
+    }
+    else
+      return res.json(profile);
+  });
+});
+
 
 
 var port = process.env.VCAP_APP_PORT || 3000;

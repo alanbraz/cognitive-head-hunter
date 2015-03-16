@@ -13,8 +13,9 @@
     	"errorhandler": "*",
     	"express": "*",
     	"jade": "*",
-    	"watson-developer-cloud": "*",
-    	"linkedin-js": "*"
+    	"watson-developer-cloud": "0.9.*",
+    	"linkedin-js": "*",
+    	"node-linkedin": "*"
 	},
 	"engines": {
 		"node": "0.10.*"

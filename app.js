@@ -33,35 +33,93 @@ var appKey = '781og0rurwqsom',
     };
 
 
-var linkedin_client = require('linkedin-js')(appKey, appSecret, 'http://localhost:3000/');
+var linkedin_client = require('linkedin-js')(appKey, appSecret, 'http://localhost:3000/auth/callback');
 
-//var Linkedin = require('node-linkedin')(appKey, appSecret, '/oauth/linkedin/callback');
+app.get('/', function(req, res){
+    res.render('index');
+});
 
-//var linkedin = Linkedin.init(token, {
-  //  timeout: 10000 /* 10 seconds */
-//});
 
 app.get('/auth', function (req, res) {
-  // the first time will redirect to linkedin
+	
   linkedin_client.getAccessToken(req, res, function (error, token) {
-    // will enter here when coming back from linkedin
-    req.session.token = token;
-
-    if ( err )
-            return console.error(err);
-        
-        /**
-         * Results have something like:
-         * {"expires_in":5184000,"access_token":". . . ."}
-         */
- 
+    
+    if (error) {
+    	console.error('error authenticating accessToken');
+    	return console.error(error);
+    }
+    
+    else {
+  
+    	req.session.token = token;
+    	console.log('success on getting access token');
         console.log(token);
-        return res.redirect('/');
+    	return res.redirect('/');
+    }
+    	
   });
 });
 
-app.get('/oauth/linkedin', function(req, res) {
+app.get('/auth/callback', function (req, res) {
+	
+	console.log('chamou o callback');
+	  linkedin_client.getAccessToken(req, res, function (error, token) {
+	    
+	    if (error) {
+	    	console.error('error authenticating accessToken');
+	    	return console.error(error);
+	    }
+	    
+	    else {
+	    	//console.log(token);
+	    	req.session.token = token;
+	    	console.log('success on getting access token');
+	        console.log(token);
+	    	return res.redirect('/');
+	    }
+	    	
+	  });
+	});
+
+app.get('/auth/profile', function (req, res) {
+	  // the first time will redirect to linkedin
+	console.log(req.session);
+	linkedin_client.apiCall('GET', '/people/~:(id)', { token : req.session.token }, function(error, result) {
+		
+		console.log('api call callback');
+		if (error) {
+			res.json(error);
+		} else {
+			console.log(result);
+			res.json(result);
+		}
+	});
+});
+
+app.post('/message', function (req, res) {
+	  linkedin_client.apiCall('POST', '/people/~/shares',
+	    {
+	      token: {
+	        oauth_token_secret: req.session.token.oauth_token_secret
+	      , oauth_token: req.session.token.oauth_token
+	      }
+	    , share: {
+	        comment: req.param('message')
+	      , visibility: {code: 'private'}
+	      }
+	    }
+	  , function (error, result) {
+	      //res.render('message_sent');
+		  console.log(error);
+		  res.json(result);
+	    }
+	  );
+	}); 
+
+
+/*app.get('/oauth/linkedin', function(req, res) {
     // This will ask for permisssions etc and redirect to callback url. 
+	console.log(res);
     Linkedin.auth.authorize(res, ['r_basicprofile', 'r_fullprofile', 'r_emailaddress', 
       'r_network', 'r_contactinfo', 'rw_nus', 'rw_groups', 'w_messages']);
 });
@@ -71,15 +129,22 @@ app.get('/oauth/linkedin/callback', function(req, res) {
         if ( err )
             return console.error(err);
         
-        /**
-         * Results have something like:
-         * {"expires_in":5184000,"access_token":". . . ."}
-         */
- 
         console.log(results);
         return res.redirect('/');
     });
 });
+
+app.get('/linkedin/', function(req, res) {
+	linkedin.people.me(function(err, profile) {
+	   
+		if (err)
+            return console.error(err);
+		else
+			
+        console.log(profile);
+        return res.json(profile);
+	});
+});*/
 
 var ci_credentials = {
   version: 'v1',
@@ -94,10 +159,6 @@ var ci_credentials = {
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
-
-app.get('/', function(req, res){
-    res.render('index');
-});
 
 /*app.get('/label_search', function (req, res) {
   var payload = extend({

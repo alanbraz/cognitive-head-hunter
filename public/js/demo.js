@@ -22,6 +22,91 @@ $(document).ready(function() {
     widgetWidth = 700, widgetHeight = 700, // Default width and height
     personImageUrl = 'images/app.png'; // Can be blank
 
+  var transformProfile = function(data){
+  	
+  	var profile = {};
+  	var textData = "";
+  	var positionData = "";
+  	var publicationData = "";
+  	var patentData = "";
+  	var languageData = "";
+  	var skillData = "";
+  	var certificationData = "";
+  	var educationData = "";
+  	var courseData = "";
+  	var recommendationData = "";
+  	
+  	profile.id = data.id;
+  	profile.fullName = data.formattedName;
+  	textData += data.interests + ".";
+  	textData += data.summary + ".";
+  	textData += data.specialties + ".";
+  	textData += data.industry + ".";
+  	profile.pictureUrl = data.pictureUrl;
+  	profile.publicProfileUrl = data.publicProfileUrl;
+  	
+  	for(var i=0; i < data.positions.values.lenght; i++){
+  		var position = data.positions.values[i];
+  		positionData += (position.title || "") + ".";
+  		positionData += (position.summary || "") + ".";
+  	}
+  	
+  	/*$.each(data.positions.values, function(i,position){
+  		positionData += (position.title || "") + ".";
+  		positionData += (position.summary || "") + ".";
+  	});
+  	
+  	$.each(data.publications.values, function(i,publication){
+  		publicationData += (publication.title || "") + ".";
+  		publicationData += (publication.summary || "") + ".";
+  	});
+  	
+  	$.each(data.patents.values, function(i, patent){
+  		patentData += (patent.title || "") + ".";
+  		patentData += (patent.summary || "") + ".";
+  	});
+  	
+  	$.each(data.languages.values, function(i,language){
+  		languageData += language.language + ".";
+  		languageData += language.proficiency + ".";
+  		languageData += (language.name || "") + ".";
+  	});
+  	
+  	$.each(data.skills.values, function(i,skill){
+  		skillData += (skill.name || "") + ".";
+  	});
+  	
+  	$.each(data.certifications.values, function(i,certification){
+  		certificationData += (certification.name || "") + ".";
+  	});
+  	
+  	$.each(data.educations.values, function(i,education){
+  		educationData += (education.field-of-study || "") + ".";
+  		educationData += (education.degree || "") + ".";
+  		educationData += (education.activities || "") + ".";
+  	});
+  	
+  	$.each(data.courses.values, function(i,course){
+  		courseData += (course.name || "") + ".";
+  	});
+  	
+  	$.each(data.recommendationsReceived.values, function(i,recommendation){
+  		recommendationData += (recommendation.recommendation-text || "") + ".";
+  	});*/
+  	
+  	profile.data = textData + "." + positionData + "." + 
+  	publicationData + "." + 
+  	patentData + "." + 
+  	languageData + "." + 
+  	skillData + "." + 
+  	certificationData + "." + 
+  	educationData + "." + 
+  	courseData + "." + 
+  	recommendationData + ".";
+  	
+  	return profile;
+  };
+  
   // Jquery variables
   var $content = $('.content'),
     $loading = $('.loading'),

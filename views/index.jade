@@ -4,13 +4,14 @@ extends ./layout.jade
 block row-content
   div.row
     div.col-lg-6.col-md-6.col-xs-12
-      h2 Try the service
+      h2 #{user.formattedName}
       div.well
         div.form-group.row
           div.col-lg-12.col-xs-12
             textarea.content.form-control(rows='8', required='true',
               placeholder='Please enter the text to analyze (minimum of 100 words)...')
-              |#{content}
+              |#{user.summary}
+            p #{JSON.stringify(user)}
             div.text-right
               span.wordsCount.small
         div.form-group.row

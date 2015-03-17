@@ -33,12 +33,12 @@ var appKey = '781og0rurwqsom',
     };
 
 
-var linkedin_client = require('linkedin-js')(appKey, appSecret, 'http://localhost:3000/auth/callback');
+var linkedin_client = require('linkedin-js')
+  ("7520yhhithxeg8", "fvrctKbDcwYtJJKF", 'http://localhost:3000/auth');
 
 app.get('/', function(req, res){
-    res.render('index');
+    res.render('index', { user: req.session.user });
 });
-
 
 app.get('/auth', function (req, res) {
 	
@@ -47,71 +47,52 @@ app.get('/auth', function (req, res) {
     if (error) {
     	console.error('error authenticating accessToken');
     	return console.error(error);
-    }
-    
-    else {
-  
+    } else {
     	req.session.token = token;
     	console.log('success on getting access token');
-        console.log(token);
-    	return res.redirect('/');
+      console.log(token);
+    	return res.redirect('/profile');
     }
     	
   });
 });
 
-app.get('/auth/callback', function (req, res) {
-	
-	console.log('chamou o callback');
-	  linkedin_client.getAccessToken(req, res, function (error, token) {
-	    
-	    if (error) {
-	    	console.error('error authenticating accessToken');
-	    	return console.error(error);
-	    }
-	    
-	    else {
-	    	//console.log(token);
-	    	req.session.token = token;
-	    	console.log('success on getting access token');
-	        console.log(token);
-	    	return res.redirect('/');
-	    }
-	    	
-	  });
-	});
-
-app.get('/auth/profile', function (req, res) {
+app.get('/profile', function (req, res) {
 	  // the first time will redirect to linkedin
 	console.log(req.session);
-	linkedin_client.apiCall('GET', '/people/~:(id)', { token : req.session.token }, function(error, result) {
+	linkedin_client.apiCall('GET', '/people/~:' + 
+    '(id,formatted-name,first-name,last-name,headline,skills,' + 
+      'educations,languages,twitter-accounts,industry,' + 
+      'three-current-positions,three-past-positions,volunteer,' + 
+      'interests,summary,positions,specialties,picture-url,public-profile-url,' + 
+      'publications,patents,certifications,courses,' + 
+      'recommendations-received,honors-awards)', { token : req.session.token }, 
+    function(error, result) {
 		
 		console.log('api call callback');
 		if (error) {
 			res.json(error);
 		} else {
 			console.log(result);
-			res.json(result);
+      req.session.user = result;
+			res.redirect('/');
 		}
 	});
 });
 
 app.post('/message', function (req, res) {
+    console.log("message \n" + req.session.token);
 	  linkedin_client.apiCall('POST', '/people/~/shares',
 	    {
-	      token: {
-	        oauth_token_secret: req.session.token.oauth_token_secret
-	      , oauth_token: req.session.token.oauth_token
-	      }
-	    , share: {
-	        comment: req.param('message')
-	      , visibility: {code: 'private'}
+	      token: req.session.token,
+	      share: {
+	        comment: req.param('message'),
+	        visibility: {code: 'anyone'}
 	      }
 	    }
 	  , function (error, result) {
-	      //res.render('message_sent');
-		  console.log(error);
-		  res.json(result);
+  		  console.log(error);
+  		  res.json(result);
 	    }
 	  );
 	}); 

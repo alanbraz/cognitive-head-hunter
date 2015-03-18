@@ -21,95 +21,10 @@ $(document).ready(function() {
   var widgetId = 'vizcontainer', // Must match the ID in index.jade
     widgetWidth = 700, widgetHeight = 700, // Default width and height
     personImageUrl = 'images/app.png'; // Can be blank
-
-  var transformProfile = function(data){
-  	
-  	var profile = {};
-  	var textData = "";
-  	var positionData = "";
-  	var publicationData = "";
-  	var patentData = "";
-  	var languageData = "";
-  	var skillData = "";
-  	var certificationData = "";
-  	var educationData = "";
-  	var courseData = "";
-  	var recommendationData = "";
-  	
-  	profile.id = data.id;
-  	profile.fullName = data.formattedName;
-  	textData += data.interests + ".";
-  	textData += data.summary + ".";
-  	textData += data.specialties + ".";
-  	textData += data.industry + ".";
-  	profile.pictureUrl = data.pictureUrl;
-  	profile.publicProfileUrl = data.publicProfileUrl;
-  	
-  	for(var i=0; i < data.positions.values.lenght; i++){
-  		var position = data.positions.values[i];
-  		positionData += (position.title || "") + ".";
-  		positionData += (position.summary || "") + ".";
-  	}
-  	
-  	/*$.each(data.positions.values, function(i,position){
-  		positionData += (position.title || "") + ".";
-  		positionData += (position.summary || "") + ".";
-  	});
-  	
-  	$.each(data.publications.values, function(i,publication){
-  		publicationData += (publication.title || "") + ".";
-  		publicationData += (publication.summary || "") + ".";
-  	});
-  	
-  	$.each(data.patents.values, function(i, patent){
-  		patentData += (patent.title || "") + ".";
-  		patentData += (patent.summary || "") + ".";
-  	});
-  	
-  	$.each(data.languages.values, function(i,language){
-  		languageData += language.language + ".";
-  		languageData += language.proficiency + ".";
-  		languageData += (language.name || "") + ".";
-  	});
-  	
-  	$.each(data.skills.values, function(i,skill){
-  		skillData += (skill.name || "") + ".";
-  	});
-  	
-  	$.each(data.certifications.values, function(i,certification){
-  		certificationData += (certification.name || "") + ".";
-  	});
-  	
-  	$.each(data.educations.values, function(i,education){
-  		educationData += (education.field-of-study || "") + ".";
-  		educationData += (education.degree || "") + ".";
-  		educationData += (education.activities || "") + ".";
-  	});
-  	
-  	$.each(data.courses.values, function(i,course){
-  		courseData += (course.name || "") + ".";
-  	});
-  	
-  	$.each(data.recommendationsReceived.values, function(i,recommendation){
-  		recommendationData += (recommendation.recommendation-text || "") + ".";
-  	});*/
-  	
-  	profile.data = textData + "." + positionData + "." + 
-  	publicationData + "." + 
-  	patentData + "." + 
-  	languageData + "." + 
-  	skillData + "." + 
-  	certificationData + "." + 
-  	educationData + "." + 
-  	courseData + "." + 
-  	recommendationData + ".";
-  	
-  	return profile;
-  };
   
   // Jquery variables
   var $content = $('.content'),
-    $loading = $('.loading'),
+    $loading = $('.loading1'),
     $error = $('.error'),
     $errorMsg = $('.errorMsg'),
     $traits = $('.traits'),
@@ -148,23 +63,34 @@ $(document).ready(function() {
     $traits.hide();
     $results.hide();
 
+    var $user = JSON.parse($('#raw').html());
+
+    $('#concepts').show();
+    $('#concepts .loading').show();
+    $('#concepts .content').hide();
+
+    $('#positions').show();
+    $('#positions .loading').show();
+    $('#positions .content').hide();
+
     $.ajax({
       type: 'POST',
+      async: true,
       data: {
         text: $content.val()
       },
       url: '/',
       dataType: 'json',
-      success: function(response) {
+      success: function(data) {
         $loading.hide();
 
-        if (response.error) {
-          showError(response.error);
+        if (data.error) {
+          showError(data.error);
         } else {
           $results.show();
-          showTraits(response);
-          showTextSummary(response);
-          showVizualization(response);
+          showTraits(data);
+          showTextSummary(data);
+          showVizualization(data);
         }
 
       },
@@ -177,7 +103,80 @@ $(document).ready(function() {
         showError(error.error || error);
       }
     });
-  });
+  
+    var candidate;
+
+    // check candidate
+    $.ajax({
+        type: 'GET',
+        async: false,
+        url: '/candidate/' + $user.id,
+        dataType: 'json',
+        success: function(data) {
+          if (!data.error) {
+            candidate = data;
+          }
+          console.log(JSON.stringify(data));
+        },
+        error: function(xhr) {
+          // TODO
+        }
+    });
+
+    // add or update
+    $.ajax({
+        type: (candidate)?'POST':'PUT',
+        async: false,
+        data: $user,
+        url: '/candidate',
+        dataType: 'json',
+        success: function(data) {
+          console.log(JSON.stringify(data));
+        },
+        error: function(xhr) {
+          // TODO
+        }
+    });
+    // get update to show concepts
+    $.ajax({
+        type: 'GET',
+        async: false,
+        url: '/candidate/' + $user.id,
+        dataType: 'json',
+        success: function(data) {
+          $('#concepts .loading').hide();
+          if (!data.error) {
+            candidate = data;
+          }
+          // call until state.status == "done" and state.stage == "ready"
+          console.log(JSON.stringify(data));
+          $('#concepts .content').html(JSON.stringify(data.annotations)); // TODO mostras só conceitos e %
+          $('#concepts .content').show();
+        },
+        error: function(xhr) {
+          // TODO
+        }
+    });
+
+    // search
+    $.ajax({
+        type: 'GET',
+        async: false,
+        url: '/semantic_search/' + $user.id + "/10",
+        dataType: 'json',
+        success: function(data) {
+          $('#positions .loading').hide();
+          // call until state.status == "done" and state.stage == "ready"
+          console.log(JSON.stringify(data));
+          $('#positions .content').html(JSON.stringify(data.results)); // TODO mostras só conceitos e %
+          $('#positions .content').show();
+        },
+        error: function(xhr) {
+          // TODO
+        }
+    });
+
+  }); //click
 
   /**
    * Display an error or a default message

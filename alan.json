@@ -239,6 +239,12 @@
           }
         ]
     },
+  "projects" : { "_total" : 1,
+      "values" : [ { "description" : "April 2014 \"Investigating Business Needs Fluctuations on IT Delivery Operations\" at SRII 2014 Global Conference (San Jose, CA)\nApril 2014 \"Ei! Real-time Sentiment Analysis of Twitter during Brazil soccer games\" at IBM Research lab (Cambridge, MA)\nJune 2013 \"How IBM transformed its own IT department with Agile and RTC\" at IBM Innovate 2013 (Orlando, FL)\n",
+            "id" : 603363779,
+            "name" : "International talks"
+          } ]
+    },
   "proposalComments" : "Best way to contact me is via Twitter @alanbraz",
   "publicProfileUrl" : "https://www.linkedin.com/in/alanbraz",
   "publications" : { "_total" : 2,

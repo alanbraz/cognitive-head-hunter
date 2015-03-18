@@ -104,60 +104,42 @@ $(document).ready(function() {
       }
     });
   
-    var candidate;
-
     // check candidate
-    $.ajax({
-        type: 'GET',
-        async: false,
-        url: '/candidate/' + $user.id,
-        dataType: 'json',
-        success: function(data) {
-          if (!data.error) {
-            candidate = data;
-          }
-          console.log(JSON.stringify(data));
-        },
-        error: function(xhr) {
-          // TODO
-        }
-    });
+    var candidate = getCandidate($user.id);    
+    console.log(candidate);
 
-    // add or update
-    $.ajax({
-        type: (candidate)?'POST':'PUT',
-        async: false,
-        data: $user,
-        url: '/candidate',
-        dataType: 'json',
-        success: function(data) {
-          console.log(JSON.stringify(data));
-        },
-        error: function(xhr) {
-          // TODO
-        }
-    });
-    // get update to show concepts
-    $.ajax({
-        type: 'GET',
-        async: false,
-        url: '/candidate/' + $user.id,
-        dataType: 'json',
-        success: function(data) {
-          $('#concepts .loading').hide();
-          if (!data.error) {
-            candidate = data;
+    // alanbraz: only insert if not there, will not consider update this time.
+    if (!candidate) {
+      // add or update
+      $.ajax({
+          type: 'PUT', //(candidate)?'POST':'PUT'
+          async: false,
+          data: $user,
+          url: '/candidate',
+          dataType: 'json',
+          success: function(data) {
+            console.log(JSON.stringify(data));
+          },
+          error: function(xhr) {
+            console.error(xhr);
           }
-          // call until state.status == "done" and state.stage == "ready"
-          console.log(JSON.stringify(data));
-          $('#concepts .content').html(JSON.stringify(data.annotations)); // TODO mostras só conceitos e %
-          $('#concepts .content').show();
-        },
-        error: function(xhr) {
-          // TODO
-        }
-    });
+      });
+    
+      // get update to show concepts
+      // call until state.status == "done" and state.stage == "ready"
+      candidate = getCandidate($user.id);
+      console.log(candidate.state || "no candidate");
+      while (candidate.state.stage != "ready" && candidate.state.status != "done") {
+        setTimeout(function() { console.log("wait"); },3000);
+        candidate = getCandidate($user.id);
+        console.log(candidate.state || "no candidate");
+      }
+    }
 
+    $('#concepts .loading').hide();
+    $('#concepts .content').html(JSON.stringify(candidate.annotations)); // TODO mostras só conceitos e %
+    $('#concepts .content').show();
+    
     // search
     $.ajax({
         type: 'GET',
@@ -172,12 +154,39 @@ $(document).ready(function() {
           $('#positions .content').show();
         },
         error: function(xhr) {
-          // TODO
-        }
+          var error;
+          try {
+            error = JSON.parse(xhr.responseText);
+          } catch(e) {}
+          console.log(error.error || error);
+          showError(error.error || error);
+        } 
     });
 
   }); //click
 
+  function getCandidate(id) {
+    var r;
+    $.ajax({
+        type: 'GET',
+        async: false,
+        url: '/candidate/' + id,
+        dataType: 'json',
+        success: function(data) {
+          if (!data.error) {
+            r = data;
+          } else {
+            console.error(data);
+            r = null;
+          }
+        },
+        error: function(xhr) {
+          console.error(xhr);
+          r = null;
+        }
+    });
+    return r;
+  }
   /**
    * Display an error or a default message
    * @param  {String} error The error

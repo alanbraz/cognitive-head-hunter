@@ -22,6 +22,7 @@ var express = require('express'),
   bluemix = require('./config/bluemix'),
   watson = require('watson-developer-cloud'),
   extend = require('util')._extend;
+;
 
 // Bootstrap application settings
 require('./config/express')(app);
@@ -38,6 +39,7 @@ var linkedin_client = require('linkedin-js')
   ("7520yhhithxeg8", "fvrctKbDcwYtJJKF", 'http://localhost:3000/auth');
 
 app.get('/', function(req, res){
+	
     res.render('index', { user: req.session.user });
 });
 
@@ -82,22 +84,6 @@ app.get('/profile', function (req, res) {
 	});
 });
 
-app.post('/message', function (req, res) {
-    console.log("message \n" + req.session.token);
-	  linkedin_client.apiCall('POST', '/people/~/shares',
-	    {
-	      token: req.session.token,
-	      share: {
-	        comment: req.param('message'),
-	        visibility: {code: 'anyone'}
-	      }
-	    }
-	  , function (error, result) {
-  		  console.log(error);
-  		  res.json(result);
-	    }
-	  );
-	}); 
 
 var ci_credentials = {
   version: 'v1',
@@ -114,10 +100,7 @@ var ci_credentials = {
 var conceptInsights = watson.concept_insights(ci_credentials);
 
 app.put('/job', function(req, res) {
-	/* { code: 'RES-91203213', title: 'Software intern',
-    description: 'la la la' } */
-  // TODO transform body 
-  // TODO test
+	
   var input = req.body;
   var params = {
     document: {
@@ -207,11 +190,11 @@ app.get('/candidate/:id', function(req, res) {
 
 app.put('/candidate', function(req, res) {
 
-  var input = req.body;
+  var input = req.body.user || req.session.user;
   var params = {
     document: {
         id: input.id,
-        label: input.full-name,
+        label: input.fullName,
         parts: [
             {
                 data: input.data,
@@ -219,8 +202,9 @@ app.put('/candidate', function(req, res) {
                 type: "text"
             }
         ],
-        candidatePictureUrl: input.picture-url,
-        candidatePublicProfileUrl: input.public-profile-url
+        candidatePictureUrl: input.pictureUrl,
+        candidatePublicProfileUrl: input.publicProfileUrl,
+        candidateEmailAddress: input.emailAddress
     },
     user: ci_credentials.username,
     corpus: ci_credentials.corpus_candidates,
@@ -240,12 +224,11 @@ app.get('/semantic_search/:corpus', function (req, res) {
     user: ci_credentials.username,
     corpus: req.params.corpus
   }, req.query);
-  console.log(req.params);
-  console.log(req.query);
-  console.log(payload);
+  //console.log(payload);
 
   // ids needs to be stringify
-  payload.ids = JSON.stringify(payload.ids);
+  //payload.ids = JSON.stringify(payload.ids);
+  //console.log(payload.ids);
 
   conceptInsights.semanticSearch(payload, function(error, result) {
     if (error)
@@ -294,6 +277,7 @@ var transformProfile = function(data){
   	
   	var profile = {};
   	var textData = "";
+  	var awardsData = "";
   	var positionData = "";
   	var publicationData = "";
   	var patentData = "";
@@ -306,61 +290,28 @@ var transformProfile = function(data){
   	
   	profile.id = data.id;
   	profile.fullName = data.formattedName;
-  	textData += (data.interests || "") + ".";
-  	textData += (data.summary || "") + ".";
-  	textData += (data.specialties || "") + ".";
-  	textData += (data.industry || "") + ".";
+  	textData += (data.interests || "") + ". ";
+  	textData += (data.summary || "") + ". ";
+  	textData += (data.specialties || "") + ". ";
+  	textData += (data.industry || "") + ". ";
+  	textData += (data.associations || "") + ". ";
   	profile.pictureUrl = (data.pictureUrl || "");
   	profile.publicProfileUrl = (data.publicProfileUrl || "");
-  	
-  	if(data.hasOwnProperty('positions')){
-  		console.log('tem positions');
-  		for(var i=0; i < (data.positions._total); i++){
-  	  		var position = data.positions.values[i];
-  	  		positionData += (position.title || "") + ".";
-  	  		positionData += (position.summary || "") + ".";
-  	  	}
-  	}
-  	
-  	if(data.hasOwnProperty('publications')){
-  		console.log('tem publications');
-  		for(var i=0; i < (data.publications._total); i++){
-  	  		var publication = data.publications.values[i];
-  	  		publicationData += (publication.title || "") + ".";
-  	  		publicationData += (publication.summary || "") + ".";
-  	  	}
-  	}
-  	
-  	if(data.hasOwnProperty('patents')){
-  		console.log('tem patents');
-  		for(var i=0; i < (data.patents._total); i++){
-  	  		var patent = data.patents.values[i];
-  	  		patentData += (patent.title || "") + ".";
-  	  		patentData += (patent.summary || "") + ".";
-  	  	}
-  	}
-  	
-  	if(data.hasOwnProperty('languages')){
-  		console.log('tem languages');
-  		for(var i=0; i < (data.languages._total); i++){
-  	  		var language = data.languages.values[i].language;
-  	  		languageData += (language.name || "") + ".";
-  	  	}
-  	}
-  	
-  	if(data.hasOwnProperty('skills')){
-  		console.log('tem skills');
-  		for(var i=0; i < (data.skills._total); i++){
-  	  		var skill = data.skills.values[i].skill;
-  	  		skillData += (skill.name || "") + ".";
-  	  	}
-  	}
+  	profile.emailAddress = (data.emailAddress || "");
   	
   	if(data.hasOwnProperty('certifications')){
   		console.log('tem certifications');
   		for(var i=0; i < (data.certifications._total); i++){
   	  		var certification = data.certifications.values[i];
-  	  		certificationData += (certification.name || "") + ".";
+  	  		certificationData += (certification.name || "") + ". ";
+  	  	}
+  	}
+  	
+  	if(data.hasOwnProperty('courses')){
+  		console.log('tem courses');
+  		for(var i=0; i < (data.courses._total); i++){
+  	  		var course = data.courses.values[i];
+  	  		courseData += (course.name || "") + ". ";
   	  	}
   	}
   	
@@ -369,17 +320,52 @@ var transformProfile = function(data){
   		for(var i=0; i < (data.educations._total); i++){
   	  		var education = data.educations.values[i];
   	  		
-  	  		//educationData += (education.field-of-study || "") + ".";
-  	  		educationData += (education.degree || "") + ".";
-  	  		//educationData += (education.activities || "") + ".";
+  	  		educationData += (education.fieldOfStudy || "") + ". ";
+  	  		educationData += (education.degree || "") + ". ";
+  	  		educationData += (education.notes || "") + ". ";
   	  	}
   	}
   	
-  	if(data.hasOwnProperty('courses')){
-  		console.log('tem courses');
-  		for(var i=0; i < (data.courses._total); i++){
-  	  		var course = data.courses.values[i];
-  	  		courseData += (course.name || "") + ".";
+  	if(data.hasOwnProperty('honorsAwards')){
+  		console.log('tem honor awards');
+  		for(var i=0; i < (data.honorsAwards._total); i++){
+  	  		var award = data.skills.values[i];
+  	  		awardsData += (award.name || "") + ". ";
+  	  	}
+  	}
+  	
+  	if(data.hasOwnProperty('languages')){
+  		console.log('tem languages');
+  		for(var i=0; i < (data.languages._total); i++){
+  	  		var language = data.languages.values[i].language;
+  	  		languageData += (language.name || "") + ". ";
+  	  	}
+  	}
+  	
+  	if(data.hasOwnProperty('positions')){
+  		console.log('tem positions');
+  		for(var i=0; i < (data.positions._total); i++){
+  	  		var position = data.positions.values[i];
+  	  		positionData += (position.title || "") + ". ";
+  	  		positionData += (position.summary || "") + ". ";
+  	  	}
+  	}
+  	
+  	if(data.hasOwnProperty('publications')){
+  		console.log('tem publications');
+  		for(var i=0; i < (data.publications._total); i++){
+  	  		var publication = data.publications.values[i];
+  	  		publicationData += (publication.title || "") + ". ";
+  	  		publicationData += (publication.summary || "") + ". ";
+  	  	}
+  	}
+  	
+  	if(data.hasOwnProperty('patents')){
+  		console.log('tem patents');
+  		for(var i=0; i < (data.patents._total); i++){
+  	  		var patent = data.patents.values[i];
+  	  		patentData += (patent.title || "") + ". ";
+  	  		patentData += (patent.summary || "") + ". ";
   	  	}
   	}
   	
@@ -387,20 +373,28 @@ var transformProfile = function(data){
   	 	console.log('tem recommendationsReceived');
   		for(var i=0; i < (data.recommendationsReceived._total); i++){
   	  		var recommendation = data.recommendationsReceived.values[i];
-  	  		recommendationData += (recommendation.recommendation-text || "") + ".";
+  	  		recommendationData += (recommendation.recommendationText || "") + ". ";
   	  	}
   	}
   	
+  	if(data.hasOwnProperty('skills')){
+  		console.log('tem skills');
+  		for(var i=0; i < (data.skills._total); i++){
+  	  		var skill = data.skills.values[i].skill;
+  	  		skillData += (skill.name || "") + ". ";
+  	  	}
+  	}
   	
-  	profile.data = textData + "." + positionData + "." + 
-  	publicationData + "." + 
-  	patentData + "." + 
-  	languageData + "." + 
-  	skillData + "." + 
-  	certificationData + "." + 
-  	educationData + "." + 
-  	courseData + "." + 
-  	recommendationData + ".";
+  	profile.data = textData + ". " + positionData + ". " + 
+  	publicationData + " " + 
+  	patentData + ". " + 
+  	languageData + ". " + 
+  	skillData + ". " + 
+  	certificationData + ". " +
+  	awardsData + ". " +
+  	educationData + ". " + 
+  	courseData + ". " + 
+  	recommendationData + ". ";
   	
   	return profile;
   };

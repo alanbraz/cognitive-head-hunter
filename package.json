@@ -1,45 +1,45 @@
 {
-	"name": "CognitiveHeadHunter",
-	"version": "0.0.1",
-	"description": "A sample nodejs app for Bluemix",
-	"scripts": {
-		"start": "node app.js"
-	},
-	"dependencies": {
-		"body-parser": "*",
-		"cookie-parser" : "*",
-		"serve-favicon" : "*",
-		"express-session" : "*",
-    	"errorhandler": "*",
-    	"express": "*",
-    	"jade": "*",
-    	"watson-developer-cloud": "0.9.*",
-    	"linkedin-js": "*"
+  "name": "CognitiveHeadHunter",
+  "version": "0.0.1",
+  "description": "A sample nodejs app for Bluemix",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "body-parser": "*",
+    "cookie-parser": "*",
+    "errorhandler": "*",
+    "express": "*",
+    "express-session": "*",
+    "jade": "*",
+    "linkedin-js": "*",
+    "serve-favicon": "*",
+    "watson-developer-cloud": "0.9.*"
+  },
+  "engines": {
+    "node": "0.10.*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://hub.jazz.net/git/alanbraz/match-my-job"
+  },
+  "author": "IBM Corp.",
+  "contributors": [
+    {
+      "name": "Alan Braz",
+      "email": "alanbraz@br.ibm.com"
     },
-	"engines": {
-		"node": "0.10.*"
-	},
-	"repository": {
-    	"type": "git",
-    	"url": "https://hub.jazz.net/git/alanbraz/match-my-job"
-  	},
-  	"author": "IBM Corp.",
-  	"contributors": [
-	    {
-	      "name": "Alan Braz",
-	      "email": "alanbraz@br.ibm.com"
-	    },
-	    {
-	      "name": "Paulo Cavoto",
-	      "email": "pcavoto@br.ibm.com"
-	    },
-	    {
-	      "name": "Paulo Marques",
-	      "email": "pmcjr@br.ibm.com"
-	    },
-	    {
-	      "name": "Rafael Cintra",
-	      "email": "rccintra@br.ibm.com"
-	    }
-  	]
+    {
+      "name": "Paulo Cavoto",
+      "email": "pcavoto@br.ibm.com"
+    },
+    {
+      "name": "Paulo Marques",
+      "email": "pmcjr@br.ibm.com"
+    },
+    {
+      "name": "Rafael Cintra",
+      "email": "rccintra@br.ibm.com"
+    }
+  ]
 }

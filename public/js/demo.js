@@ -124,18 +124,20 @@ $(document).ready(function() {
             console.error(xhr);
           }
       });
-    
+
       // get update to show concepts
-      // call until state.status == "done" and state.stage == "ready"
+      candidate = getCandidate($user.id);
+
+    }
+
+    // call until state.status == "done" and state.stage == "ready"    
+    console.log(candidate.state || "no candidate");
+    while (candidate.state.stage != "ready" && candidate.state.status != "done") {
+      setTimeout(function() { console.log("wait"); },3000);
       candidate = getCandidate($user.id);
       console.log(candidate.state || "no candidate");
-      while (candidate.state.stage != "ready" && candidate.state.status != "done") {
-        setTimeout(function() { console.log("wait"); },3000);
-        candidate = getCandidate($user.id);
-        console.log(candidate.state || "no candidate");
-      }
     }
- 
+
     var concepts = [];
     var conceptsArray = [];
     $.each(candidate.annotations[0], function (i, data){
@@ -202,6 +204,7 @@ $(document).ready(function() {
 
   function populateConcepts(concepts){
 	  $('#concepts .loading').hide();
+	  console.log(concepts);
 	  conceptsToHtml(concepts);
 	  $('#concepts .content').show();
   }
@@ -230,12 +233,17 @@ $(document).ready(function() {
     var tags;
     var html;
     var position;
+    var score;
+    console.log(positions);
     $('#positions .loading').hide();
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
-        html = $('<div id=' + position.id + '>['+ position.id + '] ' + position.label +'</div>');
-        tags = position.tags;
-        /*for (var j = 0, length2 = tags.length; j < length2; j++) {
+        score = Math.ceil(position.score * 100) + "%";
+        html = $('<div id=' + position.id + '>'+ score + 
+          ' <a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >'+ 
+          position.id + '</a> ' + position.label +' </div>');
+        /*tags = position.tags;
+        for (var j = 0, length2 = tags.length; j < length2; j++) {
             $('<span>' + tags[j].concept + '</span>').appendTo(html);
         }*/
         $('#positions .content').append(html);

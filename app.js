@@ -151,6 +151,33 @@ app.put('/job', function(req, res) {
 	  });
 });
 
+app.post('/job', function(req, res) {
+	
+  var input = req.body;
+  var params = {
+	document: {
+		id: input.code,
+		label: input.title,
+		parts: [
+			{
+				data: input.description,
+				name: "Job description",
+				type: "text"
+			}
+		]
+	},
+	user: ci_credentials.username,
+	corpus: ci_credentials.corpus_jobs,
+	documentid: input.code
+}  ;
+	  conceptInsights.updateDocument(params, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+});
+
 app.get('/jobs', function(req, res) {
 	console.log('inside .get /jobs');
 	console.log(ci_credentials);

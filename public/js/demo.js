@@ -135,11 +135,35 @@ $(document).ready(function() {
         console.log(candidate.state || "no candidate");
       }
     }
-
-    $('#concepts .loading').hide();
-    $('#concepts .content').html(JSON.stringify(candidate.annotations)); // TODO mostras só conceitos e %
-    $('#concepts .content').show();
+ 
+    var concepts = [];
+    var conceptsArray = [];
+    $.each(candidate.annotations[0], function (i, data){
+    	conceptsArray.push(data.concept);
+    	var obj = {
+			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
+			"weight": data.weight * 100
+    	};
+    	concepts.push(obj);
+    });
     
+    console.log(concepts);
+	$.get('/graph_search', {
+	      ids: conceptsArray
+	  }, function(conceptsWiki){ 
+		console.log(conceptsWiki);
+		for(var i=0; i < concepts.length; i++){
+			for(var j=0; j < conceptsWiki.length; j++){
+				if(concepts[i].id == conceptsWiki[j].id){
+					concepts[i].summary = conceptsWiki[j].abstract;
+					concepts[i].label = conceptsWiki[j].label;
+					concepts[i].link = conceptsWiki[j].link;
+				}
+			}
+		}
+		populateConcepts(concepts);
+	});
+	  
     // search
     $.ajax({
         type: 'GET',
@@ -165,6 +189,13 @@ $(document).ready(function() {
 
   }); //click
 
+  function populateConcepts(concepts){
+	  //TODO populate concepts list inside here
+	  $('#concepts .loading').hide();
+	  $('#concepts .content').html(JSON.stringify(concepts));
+	  $('#concepts .content').show();
+  }
+  
   function getCandidate(id) {
     var r;
     $.ajax({

@@ -313,6 +313,24 @@ app.get('/semantic_search/:candidate/:limit', function (req, res) {
   });
 });
 
+app.get('/graph_search', function (req, res) {
+	  var payload = extend({
+		user: ci_credentials.username
+	  }, req.query);
+	  console.log(payload);
+
+	  // ids needs to be stringify
+	  payload.ids = JSON.stringify(payload.ids);
+	  console.log(payload.ids);
+
+	  conceptInsights.getConceptsMetadata(payload, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+	});
+
 
 var pi_credentials = extend({
 	version: 'v2',

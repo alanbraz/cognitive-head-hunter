@@ -147,7 +147,6 @@ $(document).ready(function() {
     	concepts.push(obj);
     });
     
-    console.log(concepts);
 	$.get('/graph_search', {
 	      ids: conceptsArray
 	  }, function(conceptsWiki){ 
@@ -164,18 +163,14 @@ $(document).ready(function() {
 		populateConcepts(concepts);
 	});
 	  
-    // search
     $.ajax({
         type: 'GET',
         async: false,
         url: '/semantic_search/' + $user.id + "/10",
         dataType: 'json',
         success: function(data) {
-          $('#positions .loading').hide();
-          // call until state.status == "done" and state.stage == "ready"
           console.log(JSON.stringify(data));
-          $('#positions .content').html(JSON.stringify(data.results)); // TODO mostras só conceitos e %
-          $('#positions .content').show();
+          positionsToHtml(data.results);
         },
         error: function(xhr) {
           var error;
@@ -190,10 +185,34 @@ $(document).ready(function() {
   }); //click
 
   function populateConcepts(concepts){
-	  //TODO populate concepts list inside here
 	  $('#concepts .loading').hide();
-	  $('#concepts .content').html(JSON.stringify(concepts));
+	  conceptsToHtml(concepts);
 	  $('#concepts .content').show();
+  }
+  
+  function conceptsToHtml(concepts) {
+    for (var i = 0, length = concepts.length; i < length; i++) {
+        var label = concepts[i].label;
+        var weight = concepts[i].weight;
+        $('#concepts .content').append($('<div>' + label + ': '+ weight +'</div>'));
+    }
+  }
+  
+  function positionsToHtml(positions) {
+    var tags;
+    var html;
+    var position;
+    $('#positions .loading').hide();
+    for (var i = 0, length = positions.length; i < length; i++) {
+        position = positions[i];
+        html = $('<div id=' + position.id + '>['+ position.id + '] ' + position.label +'</div>');
+        tags = position.tags;
+        /*for (var j = 0, length2 = tags.length; j < length2; j++) {
+            $('<span>' + tags[j].concept + '</span>').appendTo(html);
+        }*/
+        $('#positions .content').append(html);
+    }
+    $('#positions .content').show();
   }
   
   function getCandidate(id) {

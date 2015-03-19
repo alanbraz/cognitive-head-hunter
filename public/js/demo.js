@@ -139,13 +139,27 @@ $(document).ready(function() {
     var concepts = [];
     var conceptsArray = [];
     $.each(candidate.annotations[0], function (i, data){
-    	conceptsArray.push(data.concept);
+    	
     	var obj = {
 			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
-			"weight": data.weight * 100
+			"weight": Math.ceil(data.weight * 100)
     	};
-    	concepts.push(obj);
+      var exists = false;
+      for(var i=0; i < concepts.length; i++) {
+        if (concepts[i].id == obj.id) {
+          concepts[i].weight += obj.weight;
+          exists = true;
+          break;
+        }
+      }
+      if (!exists) {
+        conceptsArray.push(data.concept);
+        concepts.push(obj);
+      }
+    	
     });
+
+    concepts.sort(function(a,b) { return parseInt(b.weight) - parseInt(a.weight) } );
     
 	$.get('/graph_search', {
 	      ids: conceptsArray
@@ -157,6 +171,8 @@ $(document).ready(function() {
 					concepts[i].summary = conceptsWiki[j].abstract;
 					concepts[i].label = conceptsWiki[j].label;
 					concepts[i].link = conceptsWiki[j].link;
+          concepts[i].ontology = conceptsWiki[j].ontology;
+          break;
 				}
 			}
 		}
@@ -191,10 +207,22 @@ $(document).ready(function() {
   }
   
   function conceptsToHtml(concepts) {
-    for (var i = 0, length = concepts.length; i < length; i++) {
+    for (var i = 0,show = 10, length = concepts.length; (i < length && show > 0); i++) {
         var label = concepts[i].label;
         var weight = concepts[i].weight;
-        $('#concepts .content').append($('<div>' + label + ': '+ weight +'</div>'));
+        var ont = concepts[i].ontology;
+        
+        var ignore = false;
+        ignore = ignore || ($.inArray("Year",ont)>-1);
+        ignore = ignore || ($.inArray("Place",ont)>-1);
+        
+        console.log(concepts[i]);
+        if (!ignore) {
+          $('#concepts .content').append($('<div>' + label + 
+              //' (debug: '+ weight +' ' + ont +' ' +')' +
+              '</div>'));
+          show--;
+        }
     }
   }
   

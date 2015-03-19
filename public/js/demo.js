@@ -136,33 +136,44 @@ $(document).ready(function() {
       }
     }
  
-    var concepts = [];
-    var conceptsArray = [];
-    $.each(candidate.annotations[0], function (i, data){
-    	conceptsArray.push(data.concept);
-    	var obj = {
-			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
-			"weight": data.weight * 100
-    	};
-    	concepts.push(obj);
-    });
-    
-	$.get('/graph_search', {
-	      ids: conceptsArray
-	  }, function(conceptsWiki){ 
-		console.log(conceptsWiki);
-		for(var i=0; i < concepts.length; i++){
-			for(var j=0; j < conceptsWiki.length; j++){
-				if(concepts[i].id == conceptsWiki[j].id){
-					concepts[i].summary = conceptsWiki[j].abstract;
-					concepts[i].label = conceptsWiki[j].label;
-					concepts[i].link = conceptsWiki[j].link;
-				}
-			}
-		}
-		populateConcepts(concepts);
-	});
-	  
+    if(candidate){
+        var concepts = [];
+        var conceptsArray = [];
+        
+        if(candidate.state.stage != "ready" && candidate.state.status != "done"){
+        	while (candidate.state.stage != "ready" && candidate.state.status != "done") {
+                setTimeout(function() { console.log("wait"); },3000);
+                candidate = getCandidate($user.id);
+                console.log(candidate.state || "no candidate");
+              }
+        }
+        
+        $.each(candidate.annotations[0], function (i, data){
+        	conceptsArray.push(data.concept);
+        	var obj = {
+    			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
+    			"weight": Math.ceil(data.weight)
+        	};
+        	concepts.push(obj);
+        });
+        
+    	$.get('/graph_search', {
+    	      ids: conceptsArray
+    	  }, function(conceptsWiki) { 
+    		console.log(conceptsWiki);
+    		for(var i=0; i < concepts.length; i++){
+    			for(var j=0; j < conceptsWiki.length; j++){
+    				if(concepts[i].id == conceptsWiki[j].id){
+    					concepts[i].summary = conceptsWiki[j].abstract;
+    					concepts[i].label = conceptsWiki[j].label;
+    					concepts[i].link = conceptsWiki[j].link;
+    				}
+    			}
+    		}
+    		populateConcepts(concepts);
+    	});
+    }
+   
     $.ajax({
         type: 'GET',
         async: false,
@@ -186,6 +197,7 @@ $(document).ready(function() {
 
   function populateConcepts(concepts){
 	  $('#concepts .loading').hide();
+	  console.log(concepts);
 	  conceptsToHtml(concepts);
 	  $('#concepts .content').show();
   }
@@ -193,7 +205,7 @@ $(document).ready(function() {
   function conceptsToHtml(concepts) {
     for (var i = 0, length = concepts.length; i < length; i++) {
         var label = concepts[i].label;
-        var weight = concepts[i].weight;
+        var weight = concepts[i].weight + "%";
         $('#concepts .content').append($('<div>' + label + ': '+ weight +'</div>'));
     }
   }
@@ -202,10 +214,13 @@ $(document).ready(function() {
     var tags;
     var html;
     var position;
+    var score;
+    console.log(positions);
     $('#positions .loading').hide();
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
-        html = $('<div id=' + position.id + '>['+ position.id + '] ' + position.label +'</div>');
+        score = Math.ceil(position.score) + "%";
+        html = $('<div id=' + position.id + '><a href=https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'>['+ position.id + ']</a> ' + position.label +' : ' +score+ '</div>');
         tags = position.tags;
         /*for (var j = 0, length2 = tags.length; j < length2; j++) {
             $('<span>' + tags[j].concept + '</span>').appendTo(html);

@@ -137,7 +137,8 @@ $(document).ready(function() {
     }
 
     $('#concepts .loading').hide();
-    $('#concepts .content').html(JSON.stringify(candidate.annotations)); // TODO mostras só conceitos e %
+//    $('#concepts .content').html(JSON.stringify(candidate.annotations)); // TODO mostras só conceitos e %
+      conceptsToHtml(candidate.annotations[0]);
     $('#concepts .content').show();
     
     // search
@@ -149,8 +150,9 @@ $(document).ready(function() {
         success: function(data) {
           $('#positions .loading').hide();
           // call until state.status == "done" and state.stage == "ready"
-          console.log(JSON.stringify(data));
-          $('#positions .content').html(JSON.stringify(data.results)); // TODO mostras só conceitos e %
+//          console.log(JSON.stringify(data));
+//          $('#positions .content').html(JSON.stringify(data.results)); // TODO mostras só conceitos e %
+             positionsToHtml(data.results);
           $('#positions .content').show();
         },
         error: function(xhr) {
@@ -165,6 +167,28 @@ $(document).ready(function() {
 
   }); //click
 
+     function conceptsToHtml(concepts) {
+            var ret = "";
+            for (var i = 0, length = concepts.length; i < length; i++) {
+                ret = concepts[i].concept.split("/");
+                $('#concepts .content').append($('<div>' + ret[ret.length-1] + '</div>'))
+            }
+        }
+        function positionsToHtml(positions) {
+            var tags;
+            var html;
+            var position;
+            for (var i = 0, length = positions.length; i < length; i++) {
+                position = positions[i];
+                html = $('<div id=' + position.id + '>['+ position.id + '] ' + position.label +'</div>');
+//                tags = position.tags;
+//                for (var j = 0, length2 = tags.length; j < length2; j++) {
+//                    $('<span>' + tags[j].concept + '</span>').appendTo(html);
+//                }
+                $('#positions .content').append(html);
+            }
+            
+        }
   function getCandidate(id) {
     var r;
     $.ajax({

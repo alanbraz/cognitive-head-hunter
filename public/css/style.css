@@ -4,9 +4,10 @@
 }
 
 .top-nav {
-  background-color: #404041;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  background-color: #333333; //#404041;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
 }
 .top-nav a {
   font-size: 14px;
@@ -21,6 +22,7 @@
 .top-nav .right {
   float: right;
   margin-right: 20px;
+  margin-top: 50px;
 }
 .top-nav .left {
   float: left;
@@ -110,4 +112,45 @@
     .col540px {
         height: 100%;
     }
+}
+
+*{
+  font-family: 'Open Sans', Arial, Tahoma;
+}
+
+.line-separator{
+	padding-top: 10px;
+	height:1px;
+	border-bottom: double #ddd;
+	border-top: double #ddd;
+}
+.chh_logo{
+	padding-top: 10px;
+}
+
+.chh_logo img {
+	width: 200px
+}
+
+._8, ._9, ._10 {
+	color: green;
+	font-weight: bold;
+}
+
+._1, ._2, ._3, ._4, ._5, ._6, ._7 {
+	color: red;
+	font-weight: bold;
+}
+
+.content > div {
+	margin: 3px;
+}
+
+
+.positionLine {
+	line-height: 200%;
+}
+
+.positionLine:hover {
+	background: #F1F1F2;
 }

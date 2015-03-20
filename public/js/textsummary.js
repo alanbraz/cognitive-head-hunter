@@ -26,7 +26,7 @@ $.ajax({
   dataType: 'json',
   type: 'GET',
   contentType: 'application/json',
-  url: 'json/traits.json',
+  url: '/json/traits.json',
   success: function(response) {
     circumplexData = response;
   }
@@ -36,7 +36,7 @@ $.ajax({
   dataType: 'json',
   type: 'GET',
   contentType: 'application/json',
-  url: 'json/facets.json',
+  url: '/json/facets.json',
   success: function(response) {
     facetsData = response;
   }
@@ -46,7 +46,7 @@ $.ajax({
   dataType: 'json',
   type: 'GET',
   contentType: 'application/json',
-  url: 'json/values.json',
+  url: '/json/values.json',
   success: function(response) {
     valuesData = response;
   }
@@ -56,7 +56,7 @@ $.ajax({
   dataType: 'json',
   type: 'GET',
   contentType: 'application/json',
-  url: 'json/needs.json',
+  url: '/json/needs.json',
   success: function(response) {
     needsData = response;
   }

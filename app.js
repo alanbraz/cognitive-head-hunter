@@ -64,6 +64,48 @@ app.get('/', function(req, res){
 	res.redirect('/auth');
 });
 
+app.get('/user/:id', function(req, res) {
+	var params = { 
+		user: ci_credentials.username,
+		corpus: ci_credentials.corpus_candidates,
+		documentid: req.params.id
+	};
+
+	conceptInsights.getDocument(params, function(error, result) {
+	  if (error)
+		return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	  else {
+		  var temp = JSON.parse(JSON.stringify(result));
+		  console.log(temp.id);
+		  var newUser = {};
+
+		  newUser.id = temp.id;
+		  newUser.fullName = temp.label;
+		  newUser.pictureUrl = temp.candidatePictureUrl;
+		  newUser.headline = temp.candidateHeadline || '';
+		  newUser.publicProfileUrl = temp.candidatePublicProfileUrl;
+		  console.log(temp.lastmodified);
+		  newUser.data = temp.parts[0].data;
+
+		  return res.render('index', { user:  newUser});
+	  }
+	});
+});
+
+app.get('/2', function(req, res){
+  if (req.session.user)
+	res.render('index2', { user: req.session.user });
+  else
+	res.redirect('/auth');
+});
+
+app.get('/3', function(req, res){
+  if (req.session.user)
+	res.render('index3', { user: req.session.user });
+  else
+	res.redirect('/auth');
+});
+
 app.get('/job/add', function(req, res){
 	res.render('vaga', { user: req.session.user });
 });
@@ -190,7 +232,8 @@ app.get('/jobs', function(req, res) {
 
   var params = { 
 	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_jobs
+	  corpus: ci_credentials.corpus_jobs,
+	  limit: 0
   };
 	
 	  conceptInsights.getDocumentIds(params, function(error, result) {
@@ -290,7 +333,8 @@ app.post('/candidate', function(req, res) {
 			],
 			candidatePictureUrl: input.pictureUrl,
 			candidatePublicProfileUrl: input.publicProfileUrl,
-			candidateEmailAddress: input.emailAddress
+			candidateEmailAddress: input.emailAddress,
+			candidateHeadline: input.headline
 		},
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
@@ -322,7 +366,8 @@ app.put('/candidate', function(req, res) {
 			],
 			candidatePictureUrl: input.pictureUrl,
 			candidatePublicProfileUrl: input.publicProfileUrl,
-			candidateEmailAddress: input.emailAddress
+			candidateEmailAddress: input.emailAddress,
+			candidateHeadline: input.headline
 		},
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,

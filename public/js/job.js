@@ -62,6 +62,31 @@
       $('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
     });
     $('#num-jobs').html(j.length + ' jobs');
+	j.forEach(function(job) {
+		var r;
+		$.ajax({
+			type: 'GET',
+			async: true,
+			url: '/job/'+job,
+			dataType: 'json',
+			success: function(data) {
+			  if (!data.error) {
+				r = data;
+				  console.log(r.id + ' - ' + r.state.status);
+			  } else {
+				console.error(data);
+				r = null;
+			  }
+			},
+			error: function(xhr) {
+			  console.error(xhr);
+			  r = null;
+			}
+		});
+		r;
+      $('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
+    });
+	  
   }
 
   function getJobs() {

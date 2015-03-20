@@ -28,7 +28,8 @@ $(document).ready(function() {
     $error = $('.error'),
     $errorMsg = $('.errorMsg'),
     $traits = $('.traits'),
-    $results = $('.results');
+    $results = $('.results'),
+	  $personality = $('.personality');
 
   /**
    * Clear the "textArea"
@@ -57,21 +58,13 @@ $(document).ready(function() {
    * 3. Call the methods to display the results
    */
   $('.analysis-btn').click(function(){
-    $('.analysis-btn').blur();
-    $loading.show();
-    $error.hide();
-    $traits.hide();
-    $results.hide();
-
-    var $user = JSON.parse($('#raw').html());
-
-    $('#concepts').show();
-    $('#concepts .loading').show();
+   
+	  $('#summary').hide();
+	  $('#loading').show();
+    
+	  var $user = JSON.parse($('#raw').html());
+    
     $('#concepts .content').hide();
-
-    $('#positions').show();
-    $('#positions .loading').show();
-    $('#positions .content').hide();
 
     $.ajax({
       type: 'POST',
@@ -88,6 +81,7 @@ $(document).ready(function() {
           showError(data.error);
         } else {
           $results.show();
+		  $personality.show();
           showTraits(data);
           showTextSummary(data);
           showVizualization(data);
@@ -134,7 +128,8 @@ $(document).ready(function() {
     console.log(candidate.state || "no candidate");
     while (candidate.state.stage != "ready" && candidate.state.status != "done") {
       setTimeout(function() { console.log("wait"); },3000);
-      candidate = getCandidate($user.id);
+	  candidate = getCandidate($user.id);
+		//candidate = getCandidate('8GnkluzR4Y'); //      CAVOTO
       console.log(candidate.state || "no candidate");
     }
 
@@ -184,7 +179,8 @@ $(document).ready(function() {
     $.ajax({
         type: 'GET',
         async: false,
-        url: '/semantic_search/' + $user.id + "/10",
+	    url: '/semantic_search/' + $user.id + "/10",
+		//url: '/semantic_search/' + '8GnkluzR4Y' + "/10", //      CAVOTO
         dataType: 'json',
         success: function(data) {
           console.log(JSON.stringify(data));
@@ -206,6 +202,7 @@ $(document).ready(function() {
 	  $('#concepts .loading').hide();
 	  console.log(concepts);
 	  conceptsToHtml(concepts);
+	  $('#concepts').show();
 	  $('#concepts .content').show();
   }
   
@@ -234,14 +231,17 @@ $(document).ready(function() {
     var html;
     var position;
     var score;
-    console.log(positions);
-    $('#positions .loading').hide();
+    //console.log(positions);
+    //$('#positions .loading').hide();
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
         score = Math.ceil(position.score * 100) + "%";
-        html = $('<div id=' + position.id + '>'+ score + 
-          ' <a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >'+ 
-          position.id + '</a> ' + position.label +' </div>');
+        html = $('<div id=' + position.id + ' class=\'row positionLine\'>' +
+				 '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >' +
+				 '<span class=\'_'+ Math.round(position.score * 10) + ' col-lg-1\'>'+ score + '</span>' +
+				 	'<span class=\'col-lg-9\'> ' + position.label + '</span>' +
+				 '<span class=\'col-lg-2\'>'+ position.id + '</a> </span>' +
+				 '</div>');
         /*tags = position.tags;
         for (var j = 0, length2 = tags.length; j < length2; j++) {
             $('<span>' + tags[j].concept + '</span>').appendTo(html);
@@ -249,6 +249,8 @@ $(document).ready(function() {
         $('#positions .content').append(html);
     }
     $('#positions .content').show();
+	  $('#loading').hide();
+    $('#positions').show();
   }
   
   function getCandidate(id) {

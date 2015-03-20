@@ -3,7 +3,7 @@ doctype html
 html(lang='en')
   head
     block title
-      title Personality Insights
+      title Cognitive Head Hunter
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1')
@@ -12,9 +12,18 @@ html(lang='en')
     link(rel='icon', href='/images/favicon.ico', type='image/x-icon')
     link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
     link(rel='stylesheet', href='/css/style.css')
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800')
 
   body
     div.container
+      div.row.top-nav(style='background-color: #333333;')
+        div.col-lg-12
+          h3.heading.left 
+            img(src='/images/logo-black.jpg',height='60px;') 
+            //span Watson Developer Cloud
+            //| : Demo
+          a.right(href='https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter',target='_blank') Challenge blog post
+          a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
       block content
 
     script(type='text/javascript', src='/js/jquery-1.11.1.min.js')

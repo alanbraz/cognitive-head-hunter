@@ -15,29 +15,11 @@ html(lang='en')
 
   body
     div.container
-      div.row
-        div.col-lg-12
-          //
-            div.row.top-nav
-              div.col-lg-12
-                a.left(href='http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html') Learn more about this service
-                a.right.fork(href='https://github.com/watson-developer-cloud/personality-insights-nodejs') Fork
-                a.right(href='mailto:watsondevelopercloud@wwpdl.vnet.ibm.com') Contact Us
-                a.right(href='https://developer.ibm.com/answers') Watson Community
-          div.row.header(style='padding-bottom:0px;')
-            div.avatar.img-container.col-lg-1.col-xs-1
-              img(src='#{user.pictureUrl}')
-            div.col-lg-6.col-xs-6
-              h2 #{user.fullName}
-              p #{user.headline}
-            div.col-lg-4.col-xs-4
-              h3 About the project:
-              a.left(href='https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter?lang=en') Challange post
-              a.right(href='http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/personality-insights') API Details
-      block row-content
+      block content
 
     script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
     script(type='text/javascript', src='/js/d3.v2.min.js')
     script(type='text/javascript', src='/js/demo.js')
     script(type='text/javascript', src='/js/personality.js')
     script(type='text/javascript', src='/js/textsummary.js')
+    script(type='text/javascript', src='/js/job.js')

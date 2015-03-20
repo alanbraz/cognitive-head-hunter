@@ -1,0 +1,39 @@
+//- index.jade
+extends ./layout.jade
+
+block content
+	div.row
+		div.col-lg-8
+			div.form-group.row.error(style='display: none;')
+				h2 &nbsp;
+				div.well
+					p.errorMsg
+			div.row
+				div.col-lg-12.col-xs-12
+					h2 Add job position
+					div.well
+						div.form-group.row
+							h3#message
+						div.form-group.row
+							div.col-lg-12.col-xs-12
+								input#code.form-control(type="text", required='true', placeholder='Position code (like GBS-0730663)')
+						div.form-group.row
+							div.col-lg-12.col-xs-12
+								input#title.form-control(type="text", required='true', placeholder='Position tile (like Technical Support Representative)')
+						div.form-group.row
+							div.col-lg-12.col-xs-12
+								textarea#description.form-control(rows='15', required='true', placeholder='Description text')
+						div.row.form-group
+							div.col-lg-4.col-lg-push-4.col-xs-4
+								button.btn.btn-block.job-clear-btn(type='button') Clear
+							div.col-lg-4.col-lg-push-4.col-xs-4.col-xs-push-4
+								button.btn.btn-block.job-add-btn(type='button') Submit
+		div.col-lg-4
+			div.row
+				div.col-lg-12.col-xs-12
+					div.row.loading.text-center(style='display:none;')
+						h2 &nbsp;
+						img(src='../images/watson.gif')
+					h2#num-jobs
+					div.well
+						ul#jobs-list

@@ -64,6 +64,10 @@ app.get('/', function(req, res){
 	res.redirect('/auth');
 });
 
+app.get('/job/add', function(req, res){
+	res.render('vaga', { user: req.session.user });
+});
+
 app.get('/auth', function (req, res) {
 	
   linkedin_client.getAccessToken(req, res, function (error, token) {
@@ -142,8 +146,36 @@ app.put('/job', function(req, res) {
 	user: ci_credentials.username,
 	corpus: ci_credentials.corpus_jobs,
 	documentid: input.code
-}  ;
+  }  ;
 	  conceptInsights.createDocument(params, function(error, result) {
+	  	console.log('createDocument: ' + error + ' > ' + result);
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).send(error);
+		else
+		  return res.status(200).send("OK");
+	  });
+});
+
+app.post('/job', function(req, res) {
+	
+  var input = req.body;
+  var params = {
+	document: {
+		id: input.code,
+		label: input.title,
+		parts: [
+			{
+				data: input.description,
+				name: "Job description",
+				type: "text"
+			}
+		]
+	},
+	user: ci_credentials.username,
+	corpus: ci_credentials.corpus_jobs,
+	documentid: input.code
+}  ;
+	  conceptInsights.updateDocument(params, function(error, result) {
 		if (error)
 		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -177,6 +209,21 @@ app.get('/job/:id', function(req, res) {
   };
   
 	conceptInsights.getDocument(params, function(error, result) {
+	  if (error)
+		return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	  else
+		return res.json(result);
+	});
+});
+
+app.delete('/job/:id', function(req, res) {
+  var params = { 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_jobs,
+	  documentid: req.params.id
+  };
+  
+	conceptInsights.deleteDocument(params, function(error, result) {
 	  if (error)
 		return res.status(error.error ? error.error.code || 500 : 500).json(error);
 	  else

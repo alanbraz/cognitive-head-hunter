@@ -124,56 +124,63 @@ $(document).ready(function() {
             console.error(xhr);
           }
       });
-    
+
       // get update to show concepts
-      // call until state.status == "done" and state.stage == "ready"
+      candidate = getCandidate($user.id);
+
+    }
+
+    // call until state.status == "done" and state.stage == "ready"    
+    console.log(candidate.state || "no candidate");
+    while (candidate.state.stage != "ready" && candidate.state.status != "done") {
+      setTimeout(function() { console.log("wait"); },3000);
       candidate = getCandidate($user.id);
       console.log(candidate.state || "no candidate");
-      while (candidate.state.stage != "ready" && candidate.state.status != "done") {
-        setTimeout(function() { console.log("wait"); },3000);
-        candidate = getCandidate($user.id);
-        console.log(candidate.state || "no candidate");
-      }
     }
- 
-    if(candidate){
-        var concepts = [];
-        var conceptsArray = [];
-        
-        if(candidate.state.stage != "ready" && candidate.state.status != "done"){
-        	while (candidate.state.stage != "ready" && candidate.state.status != "done") {
-                setTimeout(function() { console.log("wait"); },3000);
-                candidate = getCandidate($user.id);
-                console.log(candidate.state || "no candidate");
-              }
+
+    var concepts = [];
+    var conceptsArray = [];
+    $.each(candidate.annotations[0], function (i, data){
+    	
+    	var obj = {
+			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
+			"weight": Math.ceil(data.weight * 100)
+    	};
+      var exists = false;
+      for(var i=0; i < concepts.length; i++) {
+        if (concepts[i].id == obj.id) {
+          concepts[i].weight += obj.weight;
+          exists = true;
+          break;
         }
-        
-        $.each(candidate.annotations[0], function (i, data){
-        	conceptsArray.push(data.concept);
-        	var obj = {
-    			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
-    			"weight": Math.ceil(data.weight)
-        	};
-        	concepts.push(obj);
-        });
-        
-    	$.get('/graph_search', {
-    	      ids: conceptsArray
-    	  }, function(conceptsWiki) { 
-    		console.log(conceptsWiki);
-    		for(var i=0; i < concepts.length; i++){
-    			for(var j=0; j < conceptsWiki.length; j++){
-    				if(concepts[i].id == conceptsWiki[j].id){
-    					concepts[i].summary = conceptsWiki[j].abstract;
-    					concepts[i].label = conceptsWiki[j].label;
-    					concepts[i].link = conceptsWiki[j].link;
-    				}
-    			}
-    		}
-    		populateConcepts(concepts);
-    	});
-    }
-   
+      }
+      if (!exists) {
+        conceptsArray.push(data.concept);
+        concepts.push(obj);
+      }
+    	
+    });
+
+    concepts.sort(function(a,b) { return parseInt(b.weight) - parseInt(a.weight) } );
+    
+	$.get('/graph_search', {
+	      ids: conceptsArray
+	  }, function(conceptsWiki){ 
+		console.log(conceptsWiki);
+		for(var i=0; i < concepts.length; i++){
+			for(var j=0; j < conceptsWiki.length; j++){
+				if(concepts[i].id == conceptsWiki[j].id){
+					concepts[i].summary = conceptsWiki[j].abstract;
+					concepts[i].label = conceptsWiki[j].label;
+					concepts[i].link = conceptsWiki[j].link;
+          concepts[i].ontology = conceptsWiki[j].ontology;
+          break;
+				}
+			}
+		}
+		populateConcepts(concepts);
+	});
+	  
     $.ajax({
         type: 'GET',
         async: false,
@@ -203,10 +210,22 @@ $(document).ready(function() {
   }
   
   function conceptsToHtml(concepts) {
-    for (var i = 0, length = concepts.length; i < length; i++) {
+    for (var i = 0,show = 10, length = concepts.length; (i < length && show > 0); i++) {
         var label = concepts[i].label;
-        var weight = concepts[i].weight + "%";
-        $('#concepts .content').append($('<div>' + label + ': '+ weight +'</div>'));
+        var weight = concepts[i].weight;
+        var ont = concepts[i].ontology;
+        
+        var ignore = false;
+        ignore = ignore || ($.inArray("Year",ont)>-1);
+        ignore = ignore || ($.inArray("Place",ont)>-1);
+        
+        console.log(concepts[i]);
+        if (!ignore) {
+          $('#concepts .content').append($('<div>' + label + 
+              //' (debug: '+ weight +' ' + ont +' ' +')' +
+              '</div>'));
+          show--;
+        }
     }
   }
   
@@ -219,10 +238,12 @@ $(document).ready(function() {
     $('#positions .loading').hide();
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
-        score = Math.ceil(position.score) + "%";
-        html = $('<div id=' + position.id + '><a href=https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'>['+ position.id + ']</a> ' + position.label +' : ' +score+ '</div>');
-        tags = position.tags;
-        /*for (var j = 0, length2 = tags.length; j < length2; j++) {
+        score = Math.ceil(position.score * 100) + "%";
+        html = $('<div id=' + position.id + '>'+ score + 
+          ' <a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >'+ 
+          position.id + '</a> ' + position.label +' </div>');
+        /*tags = position.tags;
+        for (var j = 0, length2 = tags.length; j < length2; j++) {
             $('<span>' + tags[j].concept + '</span>').appendTo(html);
         }*/
         $('#positions .content').append(html);

@@ -1,0 +1,11 @@
+{
+    "id": "SWG-0709989",
+    "label": "Aspera Software Engineer - Intern",
+    "parts": [
+        {
+            "data": "Aspera, an IBM company is the creator of next-generation transport technologies that move the world’s data at maximum speed regardless of file size, transfer distance and network conditions. Based on its patented, Emmy® award-winning FASP™ protocol, Aspera software fully utilizes existing infrastructures to deliver the fastest, most predictable file-transfer experience. Aspera’s core technology delivers unprecedented control over bandwidth, complete security and uncompromising reliability. Organizations across a variety of industries on six continents rely on Aspera software for the business-critical transport of their digital assets. Responsibilities could include: Assisting the software development team in developing and testing client and server components for Aspera's high performance file transfer suite, including internal libraries, tools and user interface components. Develop and maintain unit tests and automated system tests. Assist in the research and development of plug-ins for third party products utilizing the Aspera Software Developers Kit (SDK), such as video and audio editing tools. Create sample programs and documentation for utilizing Aspera SDK components in browser, web services, and Java/.NET/C++ applications. Required High School Diploma/GED Basic knowledge in Programming skills in C/C++ Basic knowledge in Programming skills in Java Basic knowledge in .NET Experience English: Fluent Preferred Bachelor's Degree in Engineering At least 6 months experience in Programming skills in C/C++ At least 6 months experience in Programming skills in Java At least 6 months experience in .NET Experience Basic knowledge in Ruby on Rails knowledge At least 1 year experience in professional software development experience",
+            "name": "Job description",
+            "type": "text"
+        }
+    ]
+}

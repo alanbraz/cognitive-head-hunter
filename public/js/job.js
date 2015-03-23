@@ -29,8 +29,9 @@
     var $input = {
         code: $('#code').val(),
         title: $('#title').val(),
-        description: $('#description').val().replace(/(\n)+/g, ' ')
+        description: $('#description').val().replace(/(\r\n|\n|\r)/gm," ")
       };
+    //console.log(JSON.stringify($input.description));
 
     //$('#message').html(JSON.stringify($input));
 
@@ -42,7 +43,6 @@
       dataType: 'json',
       success: function(data) {
         $('.loading').hide();
-
         $('#message').html( $input.code + ' added.');
         loadJobs(); 
 

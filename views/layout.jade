@@ -14,6 +14,11 @@ html(lang='en')
     link(rel='stylesheet', href='/css/style.css')
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800')
 
+    script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
+    script(type='text/javascript', src='/js/d3.v2.min.js')
+
+    block specificJS 
+
   body
     div.container
       div.row.top-nav(style='background-color: #333333;')
@@ -25,10 +30,3 @@ html(lang='en')
           a.right(href='https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter',target='_blank') Challenge blog post
           a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
       block content
-
-    script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
-    script(type='text/javascript', src='/js/d3.v2.min.js')
-    script(type='text/javascript', src='/js/demo.js')
-    script(type='text/javascript', src='/js/personality.js')
-    script(type='text/javascript', src='/js/textsummary.js')
-    script(type='text/javascript', src='/js/job.js')

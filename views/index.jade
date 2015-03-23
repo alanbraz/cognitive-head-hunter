@@ -1,6 +1,11 @@
 //- index.jade
 extends ./layout.jade
 
+block specificJS
+	script(type='text/javascript', src='/js/demo.js')
+	script(type='text/javascript', src='/js/personality.js')
+	script(type='text/javascript', src='/js/textsummary.js')
+
 block content
 	//
 		div.row

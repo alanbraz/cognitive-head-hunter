@@ -1,4 +1,4 @@
-//$(document).ready(function() {
+$('#jobs-page').ready(function() {
 
   /**
    * Clear the "textArea"
@@ -39,18 +39,18 @@
       type: 'PUT',
       data: $input,
       url: '/job',
-      dataType: 'json',
-      success: function(data) {
+      dataType: 'html',
+      success: function() {
         $('.loading').hide();
 
         $('#message').html( $input.code + ' added.');
         loadJobs(); 
 
       },
-      error: function(error) {
+      error: function(err) {
         $('.loading').hide();
-        console.log('Error: ' + JSON.stringify(error) + '\n' + JSON.stringify($input) );
-        showError(error.error || error);
+        console.log('Error: ' + JSON.stringify(err) + '\n' + JSON.stringify($input) );
+        showError(err.error || err);
       }
     });
 
@@ -58,9 +58,9 @@
 
   function loadJobs() {
     var j = getJobs();
-    j.forEach(function(job) {
+    /*j.forEach(function(job) {
       $('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
-    });
+    });*/
     $('#num-jobs').html(j.length + ' jobs');
 	j.forEach(function(job) {
 		var r;
@@ -70,21 +70,13 @@
 			url: '/job/'+job,
 			dataType: 'json',
 			success: function(data) {
-			  if (!data.error) {
-				r = data;
-				  console.log(r.id + ' - ' + r.state.status);
-			  } else {
-				console.error(data);
-				r = null;
-			  }
+          $('<li><a href=\'/job/'+data.id+'\' target=\'_blank\'>'+data.id+'</a>' + ' ' + data.state.stage + ' ' + data.state.status + '</li>').appendTo($('#jobs-list'));
 			},
 			error: function(xhr) {
 			  console.error(xhr);
-			  r = null;
-			}
+      }
 		});
-		r;
-      $('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
+      
     });
 	  
   }
@@ -97,15 +89,10 @@
         url: '/jobs',
         dataType: 'json',
         success: function(data) {
-          if (!data.error) {
-            r = data;
-          } else {
-            console.error(data);
-            r = null;
-          }
+          r = data;
         },
-        error: function(xhr) {
-          console.error(xhr);
+        error: function(err) {
+          console.error(err);
           r = null;
         }
     });
@@ -120,75 +107,6 @@
     var defaultErrorMsg = 'Error processing the request, please try again later.';
     $('.error').show();
     $('.errorMsg').text(JSON.stringify(error) || defaultErrorMsg);
-  }
-
-  /**
-   * Displays the traits received from the
-   * Personality Insights API in a table,
-   * just trait names and values.
-   */
-  function showTraits(data) {
-    console.log('showTraits()');
-    $traits.show();
-
-    var traitList = flatten(data.tree),
-      table = $traits;
-
-    table.empty();
-
-    // Header
-    $('#header-template').clone().appendTo(table);
-
-    // For each trait
-    for (var i = 0; i < traitList.length; i++) {
-      var elem = traitList[i];
-
-      var Klass = 'row';
-      Klass += (elem.title) ? ' model_title' : ' model_trait';
-      Klass += (elem.value === '') ? ' model_name' : '';
-
-      if (elem.value !== '') { // Trait child name
-        $('#trait-template').clone()
-          .attr('class', Klass)
-          .find('.tname')
-          .find('span').html(elem.id).end()
-          .end()
-          .find('.tvalue')
-            .find('span').html(elem.value === '' ?  '' : (elem.value + ' (± '+ elem.sampling_error+')'))
-            .end()
-          .end()
-          .appendTo(table);
-      } else {
-        // Model name
-        $('#model-template').clone()
-          .attr('class', Klass)
-          .find('.col-lg-12')
-          .find('span').html(elem.id).end()
-          .end()
-          .appendTo(table);
-      }
-    }
-  }
-
-  /**
-   * Construct a text representation for big5 traits crossing, facets and
-   * values.
-   */
-  function showTextSummary(data) {
-    console.log('showTextSummary()');
-    var paragraphs = [
-      assembleTraits(data.tree.children[0]),
-      assembleFacets(data.tree.children[0]),
-      assembleNeeds(data.tree.children[1]),
-      assembleValues(data.tree.children[2])
-    ];
-    var div = $('.summary-div');
-    div.empty();
-    paragraphs.forEach(function(sentences) {
-      $('<p></p>').text(sentences.join(' ')).appendTo(div);
-    });
-  }
-
- 
+  } 
   
-//});
+});

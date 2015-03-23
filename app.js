@@ -110,6 +110,10 @@ app.get('/job/add', function(req, res){
 	res.render('vaga', { user: req.session.user });
 });
 
+app.get('/candidates/list', function(req, res){
+	res.render('candidates');
+});
+
 app.get('/auth', function (req, res) {
 	
   linkedin_client.getAccessToken(req, res, function (error, token) {

@@ -20,7 +20,8 @@ $(document).ready(function() {
 
   var widgetId = 'vizcontainer', // Must match the ID in index.jade
     widgetWidth = 700, widgetHeight = 700, // Default width and height
-    personImageUrl = 'images/app.png'; // Can be blank
+    personImageUrl = 'images/app.png', // Can be blank
+    minWords = 200;
   
   // Jquery variables
   var $content = $('.content'),
@@ -420,8 +421,13 @@ function showVizualization(theProfile) {
   function updateWordsCount() {
     var text = $content.val();
     var wordsCount = text.match(/\S+/g) ? text.match(/\S+/g).length : 0;
-    $('.wordsCount').css('color',wordsCount < 100 ? 'red' : 'gray');
+    $('.wordsCount').css('color',wordsCount < minWords ? 'red' : 'gray');
     $('.wordsCount').text(wordsCount + ' words');
+    if (wordsCount < minWords) {
+      $('.analysis-btn').attr('disabled','disabled');
+    } else {
+      $('.analysis-btn').removeAttr('disabled');
+    }
   }
   $content.keyup(updateWordsCount);
   updateWordsCount();

@@ -27,7 +27,6 @@ $(document).ready(function() {
     $loading = $('.loading1'),
     $error = $('.error'),
     $errorMsg = $('.errorMsg'),
-    $traits = $('.traits'),
     $results = $('.results'),
 	  $personality = $('.personality');
 
@@ -82,7 +81,6 @@ $(document).ready(function() {
         } else {
           $results.show();
 		  $personality.show();
-          showTraits(data);
           showTextSummary(data);
           showVizualization(data);
         }
@@ -285,55 +283,7 @@ $(document).ready(function() {
     $errorMsg.text(error || defaultErrorMsg);
   }
 
-  /**
-   * Displays the traits received from the
-   * Personality Insights API in a table,
-   * just trait names and values.
-   */
-  function showTraits(data) {
-    console.log('showTraits()');
-    $traits.show();
-
-    var traitList = flatten(data.tree),
-      table = $traits;
-
-    table.empty();
-
-    // Header
-    $('#header-template').clone().appendTo(table);
-
-    // For each trait
-    for (var i = 0; i < traitList.length; i++) {
-      var elem = traitList[i];
-
-      var Klass = 'row';
-      Klass += (elem.title) ? ' model_title' : ' model_trait';
-      Klass += (elem.value === '') ? ' model_name' : '';
-
-      if (elem.value !== '') { // Trait child name
-        $('#trait-template').clone()
-          .attr('class', Klass)
-          .find('.tname')
-          .find('span').html(elem.id).end()
-          .end()
-          .find('.tvalue')
-            .find('span').html(elem.value === '' ?  '' : (elem.value + ' (± '+ elem.sampling_error+')'))
-            .end()
-          .end()
-          .appendTo(table);
-      } else {
-        // Model name
-        $('#model-template').clone()
-          .attr('class', Klass)
-          .find('.col-lg-12')
-          .find('span').html(elem.id).end()
-          .end()
-          .appendTo(table);
-      }
-    }
-  }
-
-  /**
+    /**
    * Construct a text representation for big5 traits crossing, facets and
    * values.
    */

@@ -28,7 +28,7 @@ $(document).ready(function() {
     $error = $('.error'),
     $errorMsg = $('.errorMsg'),
     $results = $('.results'),
-	  $personality = $('.personality');
+	$personality = $('.personality');
 
   /**
    * Clear the "textArea"

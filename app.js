@@ -58,12 +58,12 @@ var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
 app.get('/', function(req, res){
-  //if (req.session.user)
-//	res.render('index', { user: req.session.user });
-	  res.render('index3');
-  //else
-	//res.redirect('/auth');
+	 res.render('index3');
 });
+
+app.get('/analyze', function(req, res){
+	  res.render('analyze');
+	});
 
 app.get('/jobsearch', function(req, res){
 	  if (req.session.user)
@@ -139,6 +139,40 @@ app.get('/auth', function (req, res) {
   });
 });
 
+app.get('/parse', function (req, res) {
+	
+	req.session.text = cleanTextProfile(req.params.text);
+	console.log('success on cleaning text profile');
+	console.log(req.session.text);
+	return res.redirect('/profile');
+
+});
+
+app.get('/profile', function (req, res) {
+	  // the first time will redirect to linkedin
+	console.log(req.session);
+	if(req.session.token){
+		linkedin_client.apiCall('GET', '/people/~:' + 
+				'(' + basic_profile + ',' + full_profile + ')', 
+			{ token : req.session.token }, 			
+			function(error, result) {
+				console.log('api call callback');
+				if (error) {
+					res.json(error);
+				} else {
+					req.session.user = transformProfile(result);
+					console.log("transformProfile");
+					res.redirect('/jobsearch');
+				}
+			  });
+	}
+	else if(req.session.text){
+		req.session.user = req.session.text
+		console.log("req.session.text");
+		res.redirect('/jobsearch');
+	}
+});
+
 //https://developer.linkedin.com/docs/fields/full-profile
 var full_profile =  "proposal-comments,associations,interests,projects," + 
 					"publications,patents,languages,skills,certifications," +
@@ -146,27 +180,6 @@ var full_profile =  "proposal-comments,associations,interests,projects," +
 //https://developer.linkedin.com/docs/fields/basic-profile
 var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
 					"positions,picture-url,public-profile-url,email-address";
-
-app.get('/profile', function (req, res) {
-	  // the first time will redirect to linkedin
-	console.log(req.session);
-	linkedin_client.apiCall('GET', '/people/~:' + 
-	'(' + basic_profile + ',' + full_profile + ')', 
-	{ token : req.session.token }, 
-	
-	function(error, result) {
-		
-		console.log('api call callback');
-		if (error) {
-			res.json(error);
-		} else {
-			req.session.user = transformProfile(result);
-			console.log("transformProfile");
-			res.redirect('/');
-		}
-	  });
-});
-
 
 var ci_credentials = {
   version: 'v1',
@@ -468,7 +481,6 @@ function transformProfile(data){
 	var profile = {};
 		
 	profile.id = data.id;
-	//profile.raw = data;
 	profile.fullName = data.formattedName;
 	profile.headline = data.headline;
 	profile.pictureUrl = (data.pictureUrl || "");
@@ -599,9 +611,32 @@ function transformProfile(data){
 	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
 	profile.data = profile.data.replace(/\.\,/g, '.');
 	profile.data = profile.data.replace(/\,\./g, '.');
-	profile.data = profile.data.replace(/\,\s\.\s/g, '. ')
-	
+	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
 	profile.data = profile.data.replace(/\\/g, '');
 
+	return profile;
+}
+
+function cleanTextProfile(text){
+	
+	var profile = {};
+	
+	//profile.id = data.id;
+	//profile.fullName = data.formattedName;
+	//profile.headline = data.headline;
+//	profile.pictureUrl = (data.pictureUrl || "");
+//	profile.publicProfileUrl = (data.publicProfileUrl || "");
+//	profile.emailAddress = (data.emailAddress || "");
+	
+	profile.data = text;
+	profile.data = profile.data.replace(/(\n)/g, ' ');
+	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
+	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
+	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
+	profile.data = profile.data.replace(/\.\,/g, '.');
+	profile.data = profile.data.replace(/\,\./g, '.');
+	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
+	profile.data = profile.data.replace(/\\/g, '');
+	
 	return profile;
 }

@@ -14,7 +14,8 @@
     "jade": "*",
     "linkedin-js": "*",
     "serve-favicon": "*",
-    "watson-developer-cloud": "0.9.*"
+    "watson-developer-cloud": "0.9.*",
+    "node-restful": "*"
   },
   "engines": {
     "node": "0.10.*"

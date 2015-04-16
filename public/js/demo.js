@@ -20,7 +20,7 @@ $(document).ready(function() {
 
   var widgetId = 'vizcontainer', // Must match the ID in index.jade
     widgetWidth = 700, widgetHeight = 700, // Default width and height
-    personImageUrl = 'images/app.png', // Can be blank
+    personImageUrl = '/images/Cognitive-Head-Hunter.png', // Can be blank
     minWords = 200;
   
   // Jquery variables
@@ -62,6 +62,8 @@ $(document).ready(function() {
 	  $('#summary').hide();
 	  $('#loading').show();
     
+    // usando desse #raw escondido, acho q o melhor é usar o conteudo do textbox
+    // $content.val()
 	  var $user = JSON.parse($('#raw').html());
     
     $('#concepts .content').hide();
@@ -81,7 +83,7 @@ $(document).ready(function() {
           showError(data.error);
         } else {
           $results.show();
-		  $personality.show();
+		  		$personality.show();
           showTextSummary(data);
           showVizualization(data);
         }
@@ -127,13 +129,15 @@ $(document).ready(function() {
     console.log(candidate.state || "no candidate");
     while (candidate.state.stage != "ready" && candidate.state.status != "done") {
       setTimeout(function() { console.log("wait"); },3000);
-	  candidate = getCandidate($user.id);
-		//candidate = getCandidate('8GnkluzR4Y'); //      CAVOTO
+	  	candidate = getCandidate($user.id);
       console.log(candidate.state || "no candidate");
     }
 
+    // consolidate repetead candidate concepts
     var concepts = [];
     var conceptsArray = [];
+    // 0 is the candidate cv full text
+    // will have to change if we store grad-level, language, location separated
     $.each(candidate.annotations[0], function (i, data){
     	
     	var obj = {
@@ -154,32 +158,57 @@ $(document).ready(function() {
       }
     	
     });
-
+    // sort by weight desc to show first the more relevant concepts
     concepts.sort(function(a,b) { return parseInt(b.weight) - parseInt(a.weight) } );
     
-	$.get('/graph_search', {
-	      ids: conceptsArray
-	  }, function(conceptsWiki){ 
-		console.log(conceptsWiki);
-		for(var i=0; i < concepts.length; i++){
-			for(var j=0; j < conceptsWiki.length; j++){
-				if(concepts[i].id == conceptsWiki[j].id){
-					concepts[i].summary = conceptsWiki[j].abstract;
-					concepts[i].label = conceptsWiki[j].label;
-					concepts[i].link = conceptsWiki[j].link;
-          concepts[i].ontology = conceptsWiki[j].ontology;
-          break;
+    // get all concept for the candidate
+		$.get('/graph_search', { ids: conceptsArray }, function(conceptsWiki){ 
+			console.log(conceptsWiki);
+			for(var i=0; i < concepts.length; i++){
+				for(var j=0; j < conceptsWiki.length; j++){
+					if(concepts[i].id == conceptsWiki[j].id){
+						concepts[i].summary = conceptsWiki[j].abstract;
+						concepts[i].label = conceptsWiki[j].label;
+						concepts[i].link = conceptsWiki[j].link;
+	          concepts[i].ontology = conceptsWiki[j].ontology; //used to clean up cities and dates
+	          break;
+					}
 				}
 			}
-		}
-		populateConcepts(concepts);
-	});
+			populateConcepts(concepts);
+
+			console.log("db concepts");
+			for(var j=0; j < conceptsWiki.length; j++){
+				var c = conceptsWiki[j];
+				c.key = conceptsArray[j];
+
+				$.ajax({
+				  type: "GET",
+				  url: '/concepts?key='+c.key,
+				  success: function(data) { 
+						console.log(data);
+						if (data.length == 0) {
+							$.ajax({
+							  type: "POST",
+							  url: '/concepts',
+							  data: c,
+							  success: function(data) { 
+									console.log("concept inserted: " + data);
+								},
+							  dataType: 'json'
+							});
+						}
+					},
+				  dataType: 'json'
+				});
+
+			}
+		});
 	  
     $.ajax({
         type: 'GET',
         async: false,
-	    url: '/semantic_search/' + $user.id + "/10",
-		//url: '/semantic_search/' + '8GnkluzR4Y' + "/10", //      CAVOTO
+	    	url: '/semantic_search/' + $user.id + "/20", // 10 positions?
         dataType: 'json',
         success: function(data) {
           console.log(JSON.stringify(data));
@@ -195,7 +224,7 @@ $(document).ready(function() {
         } 
     });
 
-  }); //click
+  }); //click analyze button
 
   function populateConcepts(concepts){
 	  $('#concepts .loading').hide();
@@ -206,7 +235,7 @@ $(document).ready(function() {
   }
   
   function conceptsToHtml(concepts) {
-    for (var i = 0,show = 10, length = concepts.length; (i < length && show > 0); i++) {
+    for (var i = 0,show = concepts.length, length = concepts.length; (i < length && show > 0); i++) {
         var label = concepts[i].label;
         var weight = concepts[i].weight;
         var ont = concepts[i].ontology;
@@ -218,7 +247,8 @@ $(document).ready(function() {
         console.log(concepts[i]);
         if (!ignore) {
           $('#concepts .content').append($('<div>' + label + 
-              //' (debug: '+ weight +' ' + ont +' ' +')' +
+              //' (debug: '+ weight +' ' + 
+              (ont || ' ') +//' ' +')' + // TODO
               '</div>'));
           show--;
         }
@@ -235,16 +265,19 @@ $(document).ready(function() {
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
         score = Math.ceil(position.score * 100) + "%";
-        html = $('<div id=' + position.id + ' class=\'row positionLine\'>' +
+        html = '<div id=' + position.id + ' class=\'row positionLine\'>' +
 				 '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >' +
 				 '<span class=\'_'+ Math.round(position.score * 10) + ' col-lg-1\'>'+ score + '</span>' +
-				 	'<span class=\'col-lg-9\'> ' + position.label + '</span>' +
-				 '<span class=\'col-lg-2\'>'+ position.id + '</a> </span>' +
-				 '</div>');
-        /*tags = position.tags;
-        for (var j = 0, length2 = tags.length; j < length2; j++) {
-            $('<span>' + tags[j].concept + '</span>').appendTo(html);
-        }*/
+				 '<span class=\'col-lg-9\'> ' + position.label + '</span>' +
+				 '<span class=\'col-lg-2\'>'+ position.id + '</a> </span>';
+				 
+        // TODO
+        tags = position.tags;
+        for (var j = 0; j < tags.length; j++) {
+            html += '<span>' + tags[j].concept + ',' + tags[j].score + ',' + tags[j].weight + '</span>';
+        }
+
+        html += '</div>';
         $('#positions .content').append(html);
     }
     $('#positions .content').show();

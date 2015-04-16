@@ -44,10 +44,10 @@ var express = require('express'),
   bluemix = require('./config/bluemix'),
   watson = require('watson-developer-cloud'),
   extend = require('util')._extend;
-;
 
 // Bootstrap application settings
 require('./config/express')(app);
+require('./config/db')(app);
 
 var appKey = '781og0rurwqsom', 
 	appSecret = '9FnyK7slh4CuPxFo';
@@ -451,10 +451,6 @@ app.post('/', function(req, res) {
   });
 });
 
-
-app.listen(port);
-console.log('listening at:', port);
-
 function transformProfile(data){
 	
 	var profile = {};
@@ -597,3 +593,6 @@ function transformProfile(data){
 
 	return profile;
 }
+
+app.listen(port);
+console.log('listening at:', port);

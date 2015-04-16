@@ -28,6 +28,7 @@ module.exports = function (app) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(session({ secret: 'abzgss123kevinyork' } ));
+  app.use(express.query());
 
   // Setup static public directory
   app.use(express.static(__dirname + '/../public'));

@@ -58,11 +58,19 @@ var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
 app.get('/', function(req, res){
-  if (req.session.user)
-	res.render('index', { user: req.session.user });
-  else
-	res.redirect('/auth');
+  //if (req.session.user)
+//	res.render('index', { user: req.session.user });
+	  res.render('index3');
+  //else
+	//res.redirect('/auth');
 });
+
+app.get('/jobsearch', function(req, res){
+	  if (req.session.user)
+		res.render('index', { user: req.session.user });
+	  else
+		res.redirect('/auth');
+	});
 
 app.get('/user/:id', function(req, res) {
 	var params = { 

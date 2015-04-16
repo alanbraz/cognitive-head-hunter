@@ -48,6 +48,7 @@ var express = require('express'),
 // Bootstrap application settings
 require('./config/express')(app);
 require('./config/db')(app);
+// TODO externalize linked, ci and pi stuff
 
 var appKey = '781og0rurwqsom', 
 	appSecret = '9FnyK7slh4CuPxFo';
@@ -58,12 +59,12 @@ var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
 app.get('/', function(req, res){
-  //if (req.session.user)
-//	res.render('index', { user: req.session.user });
-	  res.render('index3');
-  //else
-	//res.redirect('/auth');
+	 res.render('home');
 });
+
+app.get('/analyze', function(req, res){
+	  res.render('analyze');
+	});
 
 app.get('/jobsearch', function(req, res){
 	  if (req.session.user)
@@ -100,22 +101,8 @@ app.get('/user/:id', function(req, res) {
 	});
 });
 
-app.get('/2', function(req, res){
-  if (req.session.user)
-	res.render('index2', { user: req.session.user });
-  else
-	res.redirect('/auth');
-});
-
-app.get('/3', function(req, res){
-  if (req.session.user)
-	res.render('index3', { user: req.session.user });
-  else
-	res.redirect('/auth');
-});
-
-app.get('/job/add', function(req, res){
-	res.render('vaga', { user: req.session.user });
+app.get('/manage', function(req, res){
+	res.render('manage');
 });
 
 app.get('/candidates/list', function(req, res){
@@ -139,6 +126,40 @@ app.get('/auth', function (req, res) {
   });
 });
 
+app.get('/parse', function (req, res) {
+	
+	req.session.text = cleanTextProfile(req.params.text);
+	console.log('success on cleaning text profile');
+	console.log(req.session.text);
+	return res.redirect('/profile');
+
+});
+
+app.get('/profile', function (req, res) {
+	  // the first time will redirect to linkedin
+	console.log(req.session);
+	if(req.session.token){
+		linkedin_client.apiCall('GET', '/people/~:' + 
+				'(' + basic_profile + ',' + full_profile + ')', 
+			{ token : req.session.token }, 			
+			function(error, result) {
+				console.log('api call callback');
+				if (error) {
+					res.json(error);
+				} else {
+					req.session.user = transformProfile(result);
+					console.log("transformProfile");
+					res.redirect('/jobsearch');
+				}
+			  });
+	}
+	else if(req.session.text){
+		req.session.user = req.session.text
+		console.log("req.session.text");
+		res.redirect('/jobsearch');
+	}
+});
+
 //https://developer.linkedin.com/docs/fields/full-profile
 var full_profile =  "proposal-comments,associations,interests,projects," + 
 					"publications,patents,languages,skills,certifications," +
@@ -147,35 +168,14 @@ var full_profile =  "proposal-comments,associations,interests,projects," +
 var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
 					"positions,picture-url,public-profile-url,email-address";
 
-app.get('/profile', function (req, res) {
-	  // the first time will redirect to linkedin
-	console.log(req.session);
-	linkedin_client.apiCall('GET', '/people/~:' + 
-	'(' + basic_profile + ',' + full_profile + ')', 
-	{ token : req.session.token }, 
-	
-	function(error, result) {
-		
-		console.log('api call callback');
-		if (error) {
-			res.json(error);
-		} else {
-			req.session.user = transformProfile(result);
-			console.log("transformProfile");
-			res.redirect('/');
-		}
-	  });
-});
-
-
 var ci_credentials = {
   version: 'v1',
   url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
   username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
   password: 'J4DjaOigWNuU',
   use_vcap_services: false,
-  corpus_jobs: 'testmatchmyjob',
-  corpus_candidates: 'candidates'
+  corpus_jobs: 'testmatchmyjob2',
+  corpus_candidates: 'candidates2'
 }; // Bluemix externo, bind manual
 
 
@@ -464,7 +464,6 @@ function transformProfile(data){
 	var profile = {};
 		
 	profile.id = data.id;
-	//profile.raw = data;
 	profile.fullName = data.formattedName;
 	profile.headline = data.headline;
 	profile.pictureUrl = (data.pictureUrl || "");
@@ -595,12 +594,36 @@ function transformProfile(data){
 	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
 	profile.data = profile.data.replace(/\.\,/g, '.');
 	profile.data = profile.data.replace(/\,\./g, '.');
-	profile.data = profile.data.replace(/\,\s\.\s/g, '. ')
-	
+	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
 	profile.data = profile.data.replace(/\\/g, '');
 
 	return profile;
 }
+
+function cleanTextProfile(text){
+	
+	var profile = {};
+	
+	//profile.id = data.id;
+	//profile.fullName = data.formattedName;
+	//profile.headline = data.headline;
+//	profile.pictureUrl = (data.pictureUrl || "");
+//	profile.publicProfileUrl = (data.publicProfileUrl || "");
+//	profile.emailAddress = (data.emailAddress || "");
+	
+	profile.data = text;
+	profile.data = profile.data.replace(/(\n)/g, ' ');
+	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
+	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
+	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
+	profile.data = profile.data.replace(/\.\,/g, '.');
+	profile.data = profile.data.replace(/\,\./g, '.');
+	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
+	profile.data = profile.data.replace(/\\/g, '');
+	
+	return profile;
+}
+
 
 app.listen(port);
 console.log('listening at:', port);

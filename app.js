@@ -57,6 +57,38 @@ var cavoto = { key: "7520yhhithxeg8", secret: "fvrctKbDcwYtJJKF"}
 var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
+//https://developer.linkedin.com/docs/fields/full-profile
+var full_profile =  "proposal-comments,associations,interests,projects," + 
+					"publications,patents,languages,skills,certifications," +
+					"educations,courses,volunteer,recommendations-received,honors-awards";
+//https://developer.linkedin.com/docs/fields/basic-profile
+var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
+					"positions,picture-url,public-profile-url,email-address";
+
+var ci_credentials = {
+  version: 'v1',
+  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+  password: 'J4DjaOigWNuU',
+  use_vcap_services: false,
+  corpus_jobs: 'testmatchmyjob',
+  corpus_candidates: 'candidates'
+}; // Bluemix externo, bind manual
+
+
+// Create the service wrapper
+var conceptInsights = watson.concept_insights(ci_credentials);
+
+var pi_credentials = extend({
+	version: 'v2',
+	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
+	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
+	password: "QHGtHD142ZhU"
+}, bluemix.getServiceCreds('personality_insights')); // VCAP_SERVICES
+
+// Create the service wrapper
+var personalityInsights = new watson.personality_insights(pi_credentials);
+
 app.get('/', function(req, res){
 	 res.render('index3');
 });
@@ -66,11 +98,15 @@ app.get('/analyze', function(req, res){
 	});
 
 app.get('/jobsearch', function(req, res){
-	  if (req.session.user)
-		res.render('index', { user: req.session.user });
-	  else
-		res.redirect('/auth');
-	});
+	  if (req.session.user){
+		  clearSession(req.session);
+		  res.render('index', { user: req.session.user });
+	  }
+	  else{
+		  clearSession(req.session);
+		  res.redirect('/auth');
+	  }
+});
 
 app.get('/user/:id', function(req, res) {
 	var params = { 
@@ -139,19 +175,18 @@ app.get('/auth', function (req, res) {
   });
 });
 
-app.get('/parse', function (req, res) {
+app.post('/parse', function (req, res) {
 	
-	req.session.text = cleanTextProfile(req.params.text);
+	req.session.text = cleanTextProfile(req.body);
 	console.log('success on cleaning text profile');
-	console.log(req.session.text);
-	return res.redirect('/profile');
+	return res.json(req.session.text);
 
 });
 
 app.get('/profile', function (req, res) {
 	  // the first time will redirect to linkedin
 	console.log(req.session);
-	if(req.session.token){
+	if(req.session.token && !req.session.text){
 		linkedin_client.apiCall('GET', '/people/~:' + 
 				'(' + basic_profile + ',' + full_profile + ')', 
 			{ token : req.session.token }, 			
@@ -167,33 +202,10 @@ app.get('/profile', function (req, res) {
 			  });
 	}
 	else if(req.session.text){
-		req.session.user = req.session.text
-		console.log("req.session.text");
+		req.session.user = req.session.text;
 		res.redirect('/jobsearch');
 	}
 });
-
-//https://developer.linkedin.com/docs/fields/full-profile
-var full_profile =  "proposal-comments,associations,interests,projects," + 
-					"publications,patents,languages,skills,certifications," +
-					"educations,courses,volunteer,recommendations-received,honors-awards";
-//https://developer.linkedin.com/docs/fields/basic-profile
-var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
-					"positions,picture-url,public-profile-url,email-address";
-
-var ci_credentials = {
-  version: 'v1',
-  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
-  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
-  password: 'J4DjaOigWNuU',
-  use_vcap_services: false,
-  corpus_jobs: 'testmatchmyjob',
-  corpus_candidates: 'candidates'
-}; // Bluemix externo, bind manual
-
-
-// Create the service wrapper
-var conceptInsights = watson.concept_insights(ci_credentials);
 
 app.put('/job', function(req, res) {
 	
@@ -448,17 +460,6 @@ app.get('/graph_search', function (req, res) {
 	  });
 	});
 
-
-var pi_credentials = extend({
-	version: 'v2',
-	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
-	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
-	password: "QHGtHD142ZhU"
-}, bluemix.getServiceCreds('personality_insights')); // VCAP_SERVICES
-
-// Create the service wrapper
-var personalityInsights = new watson.personality_insights(pi_credentials);
-
 app.post('/', function(req, res) {
   personalityInsights.profile(req.body, function(err, profile) {
 	if (err) {
@@ -617,18 +618,17 @@ function transformProfile(data){
 	return profile;
 }
 
-function cleanTextProfile(text){
+function cleanTextProfile(data){
 	
 	var profile = {};
 	
-	//profile.id = data.id;
-	//profile.fullName = data.formattedName;
-	//profile.headline = data.headline;
-//	profile.pictureUrl = (data.pictureUrl || "");
-//	profile.publicProfileUrl = (data.publicProfileUrl || "");
-//	profile.emailAddress = (data.emailAddress || "");
+	profile.id = data.id;
+	profile.fullName = data.name;
+	profile.pictureUrl = (data.pictureUrl || "");
+	profile.publicProfileUrl = (data.publicProfileUrl || "");
+	profile.emailAddress = (data.emailAddress || "");
 	
-	profile.data = text;
+	profile.data = data.text;
 	profile.data = profile.data.replace(/(\n)/g, ' ');
 	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
 	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
@@ -638,5 +638,17 @@ function cleanTextProfile(text){
 	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
 	profile.data = profile.data.replace(/\\/g, '');
 	
+	
 	return profile;
 }
+
+function clearSession(session){
+	
+	if(session.token){
+		session.token = null;
+	}
+	
+	if(session.text){
+		session.text = null;
+	}
+} 

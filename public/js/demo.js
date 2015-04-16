@@ -37,6 +37,7 @@ $(document).ready(function() {
   $('.clear-btn').click(function(){
     $('.clear-btn').blur();
     $content.val('');
+    $('#txt-name').val('');
     updateWordsCount();
   });
 
@@ -51,13 +52,45 @@ $(document).ready(function() {
   $content.bind('paste', function(e) {
     setTimeout(updateWordsCount, 100);
   });
+  
+  $('#btn-analyzeText').click(function(){
+	  
+	  $('#summary').hide();
+	  $('#loading').show();
+    
+	  var $text = $content.val();
+	  var $name = $('#txt-name').val();
+	  var profile = {};
+
+	  profile.id = $name; //change to id from db
+	  profile.text = $text;
+	  profile.name = $name;
+	  
+	  console.log(JSON.stringify(profile));
+	  $.ajax({
+	      type: 'POST',
+	      async: true,
+	      data: profile,
+	      url: '/parse',
+	      dataType: 'json',
+	      success: function(data) {
+	    	  var url = window.location.protocol + "//" + window.location.host + "/profile";
+	    	  //window.location.replace(url);
+	    	  window.location.href = url;
+	      },
+	      error: function(error){
+	    	  $('#loading').hide();
+	    	  console.log(error);
+	      }
+	    });
+  });
 
   /**
    * 1. Create the request
    * 2. Call the API
    * 3. Call the methods to display the results
    */
-  $('.analysis-btn').click(function(){
+  $('#analysis-btn').click(function(){
    
 	  $('#summary').hide();
 	  $('#loading').show();

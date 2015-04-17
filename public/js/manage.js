@@ -30,10 +30,9 @@ $(document).ready(function() {
   
   $('#candidate-add-btn').click(function(){
     $('#candidate-add-btn').blur();
-    showSuccess('Candidate created');
+    showSuccess('Not implemented yet');
   });
 
-$('#jobs.loading').show();
   /**
    * 1. Create the request
    * 2. Call the API
@@ -41,140 +40,149 @@ $('#jobs.loading').show();
    */
   $('.job-add-btn').click(function(){
     $('.job-add-btn').blur();
-    $('#jobs.loading').show();
+    $('#jobs-loading').show();
     cleanMessages(); 
     
     var $input = {
-        code: $('#code').val(),
-        title: $('#title').val(),
-        description: $('#description').val().replace(/(\r\n|\n|\r)/gm," ")
-      };
-    //console.log(JSON.stringify($input.description));
+      code: $('#code').val(),
+      title: $('#title').val(),
+      description: $('#description').val().replace(/(\r\n|\n|\r)/gm," ")
+    };
 
-    //$('#message').html(JSON.stringify($input));
-
-    // TODO alanbra: not working b/c always returning error
     $.ajax({
-      type: 'PUT',
+      type: "POST",
+      url: '/db/jobs',
       data: $input,
-      url: '/job',
-      dataType: 'html',
-      success: function() {
-        $('#jobs.loading').hide();
-        showSuccess($input.code + ' added.');
-        loadJobs(); 
+      dataType: 'json',
+      success: function(data) { 
+        $input.id = data._id;
+        //console.log(data);
+        $.ajax({
+          type: "POST",
+          url: '/ci/jobs',
+          data: $input,
+          dataType: 'html',
+          success: function(data) { 
+            showSuccess("Job " + $input.code + ' added.');
+            loadJobs(); 
+          },
+          error: function(err) {
+            showError(err);
+          }
+        });
       },
       error: function(err) {
-        $('#jobs.loading').hide();
-        console.log('Error: ' + JSON.stringify(err) + '\n' + JSON.stringify($input) );
-        showError(err.error || err);
+        showError(err);
       }
     });
 
   }); //click
 
   function loadJobs() {
-
+    $('#jobs-loading').show();
     $("#jobs-list").empty();
 
-    var j = getJobs();
-    /*j.forEach(function(job) {
-      $('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
-    });*/
-    $('#num-jobs').html(j.length + ' jobs');
-	j.forEach(function(job) {
-		var r;
-		$.ajax({
-			type: 'GET',
-			async: true,
-			url: '/job/'+job,
-			dataType: 'json',
-			success: function(data) {
-          $('<li><a href=\'/job/'+data.id+'\' target=\'_blank\'>'+data.id+'</a>' +
-           ' ' + data.state.stage + ' ' + data.state.status + '</li>')
-          .appendTo($('#jobs-list'));
-			},
-			error: function(xhr) {
-			  console.error(xhr);
-      }
-		});
-      
-    });
-	  
-  }
-
-  function getJobs() {
-    var r;
     $.ajax({
         type: 'GET',
-        async: false,
-        url: '/jobs',
+        url: '/ci/jobs',
         dataType: 'json',
         success: function(data) {
-          r = data;
+          $('#num-jobs').html(data.length + ' jobs');
+          data.forEach(function(job) {
+            $('<li><a href=\'/ci/jobs/'+job+'\' target=\'_blank\'>'+job+'</a>' + 
+              '<span id=\'job-'+job+'\'></span>' + '</li>')
+            .appendTo($('#jobs-list'));
+          });
+          handleJobs(data);
         },
         error: function(err) {
           console.error(err);
-          r = null;
+          showError(err.error || err);
+        },
+        complete: function(data) {
+          $('#jobs-loading').hide();
         }
     });
-    return r;
+	  
   }
   
 });
 
+function handleJobs(jobs) {
+  $('#jobs-loading').show();
+  jobs.forEach(function(job) {
+    $.ajax({
+      type: 'GET',
+      url: '/ci/jobs/'+job,
+      dataType: 'json',
+      success: function(data) {
+          $('#job-'+data.id).text(' ' + data.state.stage + ' ' + data.state.status + ' ');
+      },
+      error: function(err) {
+        console.error(err);
+        showError(err.error || err);
+      },
+      complete: function(data) {
+        $('#jobs-loading').hide();
+      }
+    });
+  });
+}
+
+function handleCandidates(cands) {
+    $('#candidates-loading').show();
+    cands.forEach(function(c) {
+      $.ajax({
+        type: 'GET',
+        url: '/ci/candidates/'+c,
+        dataType: 'json',
+        success: function(data) {
+          console.log(data.id + ' - ' + data.state.status);
+          $('#cand-'+data.id).html('<a href=\'/user/'+data.id+'\' target=\'_blank\'>'+
+            data.label + '</a> (' + data.candidateHeadline + ') ' + 
+            data.state.stage + ' ' + data.state.status +
+            ' > ' + words(data.parts[0].data) + ' words ' + 
+            '[<a href=\'javascript:delCandidate(\"'+data.id+'\")\'>delete</a>]');
+        },
+        error: function(err) {
+          console.error(err);
+          showError(err.error || err);
+        },
+        complete: function(data) {
+          $('#candidates-loading').hide();
+        }
+      }); 
+      //$('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
+    });
+      //candidatesArray.sort(function(a,b) { return a.label.localeCompare(b.label); } );
+  } 
 
 var loadCandidates = function() {
-  $('#candidates.loading').show();
+  $('#candidates-loading').show();
   cleanMessages(); 
+  $("#candidates-list").empty();
 
-  var cands;
   $.ajax({
     type: 'GET',
-    async: false,
-    url: '/candidates',
+    url: '/ci/candidates',
     dataType: 'json',
     success: function(data) {
-      cands = data;
+      $('#num-candidates').html(data.length + ' candidates');
+      data.forEach(function(c) {
+        $('<li><span id=\'cand-'+c+'\'> </span>' + '</li>').appendTo($('#candidates-list'));
+      });
+      handleCandidates(data);
     },
     error: function(err) {
       console.error(err);
       cands = null;
+      showError(err.error || err);
+    },
+    complete: function(data) {
+      $('#candidates-loading').hide();
     }
   });
-
-  /*cands.forEach(function(c) {
-    $('<li><a href=\'/user/'+c+'\' target=\'_blank\'>'+c+'</a></li>').appendTo($('#candidates-list'));
-  });*/
-  $('#num-candidates').html(cands.length + ' candidates');
-  $("#candidates-list").empty();
-
-  cands.forEach(function(c) {
-    $.ajax({
-      type: 'GET',
-      async: false,
-      global: true,
-      url: '/candidate/'+c,
-      dataType: 'json',
-      success: function(data) {
-        console.log(data.id + ' - ' + data.state.status);
-        //candidatesArray.push(data);
-        $('<li><a href=\'/user/'+data.id+'\' target=\'_blank\'>'+
-          data.label + '</a> (' + data.candidateHeadline + ') ' + 
-          data.state.stage + ' ' + data.state.status +
-          ' > ' + words(data.parts[0].data) + ' words ' + 
-          '[<a href=\'javascript:delCandidate(\"'+data.id+'\")\'>delete</a>]' +
-          '</li>').appendTo($('#candidates-list'));
-      },
-      error: function(xhr) {
-        console.error(xhr);
-      }
-    }); 
-    //$('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
-  });
-    //candidatesArray.sort(function(a,b) { return a.label.localeCompare(b.label); } );
-
-    $('#candidates.loading').hide();
+  
 
 }
 
@@ -187,9 +195,10 @@ var delCandidate = function(id) {
   $.ajax({
     type: 'DELETE',
     async: false,
-    url: '/candidate/' + id,
+    url: '/ci/candidates/' + id,
     dataType: 'html',
     success: function(data) {
+      showSuccess("Candidate " + id + " removed.");
       loadCandidates();
     },
     error: function(err) {

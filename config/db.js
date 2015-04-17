@@ -19,6 +19,8 @@
 // Module dependencies
 var express    = require('express'),
     restful = require('node-restful'),
+    extend = require('util')._extend,
+    bluemix = require('./bluemix'),
     mongoose = restful.mongoose;
 
 var conceptSchema = mongoose.Schema({
@@ -34,18 +36,47 @@ var conceptSchema = mongoose.Schema({
 
 var conceptModel = restful.model('concept', conceptSchema);
 
+var jobSchema = mongoose.Schema({
+      code: "string",
+      title: "string",
+      description: "string",
+      requiredConcepts: [ "string" ]
+    });
+
+var jobModel = restful.model('job', jobSchema);
+
+var candidateSchema = mongoose.Schema({
+      name: "string",
+      profile: "string",
+      jobs: [ mongoose.Schema.Types.ObjectId ]
+    });
+
+var candidateModel = restful.model('candidate', candidateSchema);
+
 module.exports = function (app) {
 
-  //mongoose.connect("mongodb://f97de2c4-f673-40a0-866d-9b9bc43bf77b:e436a3a3-acf5-487c-83d9-8c771d2d6b6e@192.155.236.148:10201/db");
-  mongoose.connect("mongodb://localhost/chh");
+  var dbURL = extend({
+    uri: "mongodb://IbmCloud_lkdhl1bh_vv39s5g4_jb7t8j47:3RFllDMGweSCnJuO0li0Br1_z-c5eDnP@ds055110.mongolab.com:55110/IbmCloud_lkdhl1bh_vv39s5g4"
+    //"mongodb://localhost/chh"
+  }, bluemix.getServiceCreds('mongolab')); // VCAP_SERVICES
+
+  mongoose.connect(dbURL.uri);
 
   var Concept = app.resource = conceptModel;
   Concept.methods(['get', 'post', 'put', 'delete']);
-  Concept.register(app, '/concepts');
+  Concept.register(app, '/db/concepts');
+
+  var Job = app.resource = jobModel;
+  Job.methods(['get', 'post', 'put', 'delete']);
+  Job.register(app, '/db/jobs');
+
+  var Candidate = app.resource = candidateModel;
+  Candidate.methods(['get', 'post', 'put', 'delete']);
+  Candidate.register(app, '/db/candidates');
 
 };
 
-module.exports.Concept = conceptModel;
+//module.exports.Concept = conceptModel;
 
 /*
   http://mongoosejs.com/docs/guide.html

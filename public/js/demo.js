@@ -16,6 +16,8 @@
 
 'use strict';
 
+var conceptsCache = {};
+
 $(document).ready(function() {
 
   var widgetId = 'vizcontainer', // Must match the ID in index.jade
@@ -37,6 +39,7 @@ $(document).ready(function() {
   $('.clear-btn').click(function(){
     $('.clear-btn').blur();
     $content.val('');
+    $('#txt-name').val('');
     updateWordsCount();
   });
 
@@ -51,13 +54,45 @@ $(document).ready(function() {
   $content.bind('paste', function(e) {
     setTimeout(updateWordsCount, 100);
   });
+  
+  $('#btn-analyzeText').click(function(){
+	  
+	  $('#summary').hide();
+	  $('#loading').show();
+    
+	  var $text = $content.val();
+	  var $name = $('#txt-name').val();
+	  var profile = {};
+
+	  profile.id = $name; //change to id from db
+	  profile.text = $text;
+	  profile.name = $name;
+	  
+	  console.log(JSON.stringify(profile));
+	  $.ajax({
+	      type: 'POST',
+	      async: true,
+	      data: profile,
+	      url: '/parse',
+	      dataType: 'json',
+	      success: function(data) {
+	    	  var url = window.location.protocol + "//" + window.location.host + "/profile";
+	    	  //window.location.replace(url);
+	    	  window.location.href = url;
+	      },
+	      error: function(error){
+	    	  $('#loading').hide();
+	    	  console.log(error);
+	      }
+	    });
+  });
 
   /**
    * 1. Create the request
    * 2. Call the API
    * 3. Call the methods to display the results
    */
-  $('.analysis-btn').click(function(){
+  $('#analysis-btn').click(function(){
    
 	  $('#summary').hide();
 	  $('#loading').show();
@@ -74,7 +109,7 @@ $(document).ready(function() {
       data: {
         text: $content.val()
       },
-      url: '/',
+      url: '/pi/',
       dataType: 'json',
       success: function(data) {
         $loading.hide();
@@ -106,12 +141,13 @@ $(document).ready(function() {
     // alanbraz: only insert if not there, will not consider update this time.
     if (!candidate) {
       // add or update
+      // TODO insert db before
       $.ajax({
-          type: 'PUT', //(candidate)?'POST':'PUT'
+          type: 'POST', //(candidate)?'POST':'PUT'
           async: false,
           data: $user,
-          url: '/candidate',
-          dataType: 'json',
+          url: '/ci/candidates',
+          dataType: 'html',
           success: function(data) {
             console.log(JSON.stringify(data));
           },
@@ -162,8 +198,8 @@ $(document).ready(function() {
     concepts.sort(function(a,b) { return parseInt(b.weight) - parseInt(a.weight) } );
     
     // get all concept for the candidate
-		$.get('/graph_search', { ids: conceptsArray }, function(conceptsWiki){ 
-			console.log(conceptsWiki);
+		$.get('/ci/graph_search', { ids: conceptsArray }, function(conceptsWiki){ 
+			//console.log(conceptsWiki);
 			for(var i=0; i < concepts.length; i++){
 				for(var j=0; j < conceptsWiki.length; j++){
 					if(concepts[i].id == conceptsWiki[j].id){
@@ -177,38 +213,33 @@ $(document).ready(function() {
 			}
 			populateConcepts(concepts);
 
-			console.log("db concepts");
+			/*console.log("db concepts");
 			for(var j=0; j < conceptsWiki.length; j++){
 				var c = conceptsWiki[j];
 				c.key = conceptsArray[j];
-
+				conceptsCache[c.key] = c;
+				console.log("cache: " + JSON.stringify(c));
 				$.ajax({
 				  type: "GET",
-				  url: '/concepts?key='+c.key,
+				  url: '/db/concepts?key='+encodeURIComponent(c.key),
 				  success: function(data) { 
-						//console.log(data);
-						if (data.length == 0) {
-							$.ajax({
-							  type: "POST",
-							  url: '/concepts',
-							  data: c,
-							  success: function(data) { 
-									console.log("concept inserted: " + data);
-								},
-							  dataType: 'json'
-							});
+				  	if (data.length == 0) { // not found, so insert
+							addConcept(c);
 						}
+				  },
+				  error: function(err) { 
+						
 					},
 				  dataType: 'json'
 				});
 
-			}
+			}*/
 		});
 	  
     $.ajax({
         type: 'GET',
         async: false,
-	    	url: '/semantic_search/' + $user.id + "/20", // 10 positions?
+	    	url: '/ci/semantic_search/' + $user.id + "/20", // ab: 20 to degub, old value was 10
         dataType: 'json',
         success: function(data) {
           //console.log(JSON.stringify(data));
@@ -228,28 +259,48 @@ $(document).ready(function() {
 
   function populateConcepts(concepts){
 	  $('#concepts .loading').hide();
-	  console.log(concepts);
+	  //console.log(concepts);
 	  conceptsToHtml(concepts);
 	  $('#concepts').show();
 	  $('#concepts .content').show();
   }
   
-  
+  /*function addConcept(concept) {
+  	$.ajax({
+		  type: "POST",
+		  url: '/db/concepts',
+		  data: concept,
+		  dataType: 'json',
+		  success: function(data) { 
+		  	console.log(data.key + " inserted " + data._id);
+			}
+		});
+  }*/
 
-  function loadConceptsCache(handleData) {
-  	var conceptsCache = {};
+  /*function buildCache(data) {
+  	data.forEach(function(concept) {
+  		//console.log(JSON.stringify(concept));
+  		if (concept.key) {
+  			conceptsCache[concept.key] = concept;
+  		}
+    });
+  }*/
+    
+  /*function loadConceptsCache(handleData) {
   	$.ajax({
 		  type: "GET",
 		  async: false,
 		  global: true,
-		  url: '/concepts',
+		  url: '/db/concepts',
 		  success: function(data) { 
 		  	handleData(data);
 			},
 		  dataType: 'json'
 		});
-  }
+  }*/
  
+	//loadConceptsCache(buildCache);
+
   function conceptsToHtml(concepts) {
     for (var i = 0,show = concepts.length, length = concepts.length; (i < length && show > 0); i++) {
         var label = concepts[i].label;
@@ -270,26 +321,6 @@ $(document).ready(function() {
         }
     }
   }
-
-  function addConcept(key, handleData) {
-  	var conceptsArray = [];
-  	conceptsArray.push(key);
-  	$.get('/graph_search', { ids: conceptsArray }, function(conceptsWiki){ 
-			conceptsWiki.forEach(function(concept) {
-				var c = concept;
-				c.key = conceptsArray[0];
-				$.ajax({
-				  type: "POST",
-				  url: '/concepts',
-				  data: c,
-				  success: function(data) { 
-						handleData(data);
-					},
-				  dataType: 'json'
-				});
-			});
-		});
-  }
   
   function positionsToHtml(positions) {
     var tags;
@@ -298,18 +329,6 @@ $(document).ready(function() {
     var score;
     //console.log(positions);
     //$('#positions .loading').hide();
-
-    var cache = {};
-    function buildCache(data) {
-    	data.forEach(function(concept) {
-    		//console.log(JSON.stringify(concept));
-	  		if (concept.key) {
-	  			cache[concept.key] = concept;
-	  		}
-	    });
-    }
-    
-		loadConceptsCache(buildCache);
 
     //console.log("cache: " + JSON.stringify(cache));
 
@@ -321,38 +340,59 @@ $(document).ready(function() {
 				 '<span class=\'_'+ Math.round(position.score * 10) + ' col-lg-1\'>'+ score + '</span>' +
 				 '<span class=\'col-lg-9\'> ' + position.label + '</span>' +
 				 '<span class=\'col-lg-2\'>'+ position.id + '</a> </span>';
-				 
-        // TODO
-        tags = position.tags;
-        html += '<span>';
-        for (var j = 0; j < tags.length; j++) {
-        		var c = cache[tags[j].concept];
-        		var label = tags[j].concept;
-        		if (c) {
-        			label = c.label;
-        		} else {
-        			addConcept(tags[j].concept, function(d) { label = d.label; });
-        		}
-            html += label;
-            if (j < tags.length-1) 
-            		html +=', '; // + tags[j].score + ',' + tags[j].weight + '</span>';
-        }
-        html += '</span>';
-
+				html += '<span id=\'tags-'+ position.id + '\'>';
+				html += '</span>';
         html += '</div>';
         $('#positions .content').append(html);
+
+        // TODO
+        tags = [];
+        var t;
+        for (var j = 0; j < position.tags.length; j++) {
+        	tags.push(position.tags[j].concept);
+        }
+        console.log("tags: " + tags);
+        //printLabels('#tags-'+ position.id, tags);
+
+        $.ajax({
+		        type: 'GET',
+		        async: false,
+			    	url: '/ci/graph_search', 
+			    	data: { ids: tags },
+		        dataType: 'json',
+		        success: function(data) {
+		          var labels = [];
+		        	data.forEach(function(c) {
+		        		labels.push(c.label);
+		        	});
+		        	printLabels('#tags-'+ position.id, labels);
+		        },
+		        error: function(xhr) {
+		          var error;
+		          try {
+		            error = JSON.parse(xhr.responseText);
+		          } catch(e) {}
+		          console.log(error.error || error);
+		          showError(error.error || error);
+		        } 
+		    });
     }
     $('#positions .content').show();
 	  $('#loading').hide();
     $('#positions').show();
   }
   
+  function printLabels(id, labels) {
+		console.log("labels: " + labels);
+    $(id).text(labels);
+  }
+
   function getCandidate(id) {
     var r;
     $.ajax({
         type: 'GET',
         async: false,
-        url: '/candidate/' + id,
+        url: '/ci/candidates/' + id,
         dataType: 'json',
         success: function(data) {
           if (!data.error) {

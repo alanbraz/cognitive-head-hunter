@@ -58,21 +58,251 @@ var cavoto = { key: "7520yhhithxeg8", secret: "fvrctKbDcwYtJJKF"}
 var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
+//https://developer.linkedin.com/docs/fields/full-profile
+var full_profile =  "proposal-comments,associations,interests,projects," + 
+					"publications,patents,languages,skills,certifications," +
+					"educations,courses,volunteer,recommendations-received,honors-awards";
+//https://developer.linkedin.com/docs/fields/basic-profile
+var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
+					"positions,picture-url,public-profile-url,email-address";
+
+var ci_credentials = {
+  version: 'v1',
+  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+  password: 'J4DjaOigWNuU',
+  use_vcap_services: false,
+  corpus_jobs: 'testmatchmyjob',
+  corpus_candidates: 'candidates'
+}; // Bluemix externo, bind manual
+
+
+// Create the service wrapper
+var conceptInsights = watson.concept_insights(ci_credentials);
+
+var pi_credentials = extend({
+	version: 'v2',
+	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
+	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
+	password: "QHGtHD142ZhU"
+}, bluemix.getServiceCreds('personality_insights_pstg')); // VCAP_SERVICES
+
+// Create the service wrapper
+var personalityInsights = new watson.personality_insights(pi_credentials);
+
 app.get('/', function(req, res){
 	 res.render('home');
 });
 
 app.get('/analyze', function(req, res){
-	  res.render('analyze');
-	});
+  res.render('analyze');
+});
 
 app.get('/jobsearch', function(req, res){
-	  if (req.session.user)
-		res.render('index', { user: req.session.user });
-	  else
-		res.redirect('/auth');
-	});
+	  if (req.session.user){
+		  clearSession(req.session);
+		  res.render('index', { user: req.session.user });
+	  }
+	  else{
+		  clearSession(req.session);
+		  res.redirect('/auth');
+	  }
+});
 
+app.get('/manage', function(req, res){
+	res.render('manage');
+});
+
+app.get('/auth', function (req, res) {
+	
+  linkedin_client.getAccessToken(req, res, function (error, token) {
+	
+	if (error) {
+		console.error('error authenticating accessToken');
+		return console.error(error);
+	} else {
+		req.session.token = token;
+		console.log('success on getting access token');
+	  console.log(token);
+		return res.redirect('/profile');
+	}
+		
+  });
+});
+
+app.post('/parse', function (req, res) {
+	// do not use session
+	req.session.text = cleanTextProfile(req.body);
+	console.log('success on cleaning text profile');
+	return res.json(req.session.text);
+
+});
+
+app.get('/profile', function (req, res) {
+	  // the first time will redirect to linkedin
+	console.log(req.session);
+	if(req.session.token && !req.session.text){
+		linkedin_client.apiCall('GET', '/people/~:' + 
+				'(' + basic_profile + ',' + full_profile + ')', 
+			{ token : req.session.token }, 			
+			function(error, result) {
+				console.log('api call callback');
+				if (error) {
+					res.json(error);
+				} else {
+					req.session.user = transformProfile(result);
+					console.log("transformProfile");
+					res.redirect('/jobsearch');
+				}
+			  });
+	}
+	else if(req.session.text){
+		req.session.user = req.session.text;
+		res.redirect('/jobsearch');
+	}
+});
+
+//https://developer.linkedin.com/docs/fields/full-profile
+var full_profile =  "proposal-comments,associations,interests,projects," + 
+					"publications,patents,languages,skills,certifications," +
+					"educations,courses,volunteer,recommendations-received,honors-awards";
+//https://developer.linkedin.com/docs/fields/basic-profile
+var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
+					"positions,picture-url,public-profile-url,email-address";
+
+var ci_credentials = {
+  version: 'v1',
+  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+  password: 'J4DjaOigWNuU',
+  use_vcap_services: false,
+  corpus_jobs: 'testmatchmyjob',
+  corpus_candidates: 'candidates'
+}; // Bluemix externo, bind manual
+
+
+// Create the service wrapper
+var conceptInsights = watson.concept_insights(ci_credentials);
+
+app.post('/ci/jobs', function(req, res) {
+	
+  var input = req.body;
+  var params = {
+	document: {
+		id: input.id,
+		parts: [
+			{
+				data: input.description,
+				name: "Job description",
+				type: "text"
+			}
+		]
+	},
+	user: ci_credentials.username,
+	corpus: ci_credentials.corpus_jobs,
+	documentid: input.id
+  }  ;
+	  conceptInsights.createDocument(params, function(error, result) {
+	  	console.log('createDocument: ' + error + ' > ' + result);
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).send(error);
+		else
+		  return res.status(200).send("OK");
+	  });
+});
+
+app.put('/ci/jobs', function(req, res) {
+	
+  var input = req.body;
+  var params = {
+	document: {
+		id: input.code,
+		label: input.title,
+		parts: [
+			{
+				data: input.description,
+				name: "Job description",
+				type: "text"
+			}
+		]
+	},
+	user: ci_credentials.username,
+	corpus: ci_credentials.corpus_jobs,
+	documentid: input.code
+}  ;
+	  conceptInsights.updateDocument(params, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+});
+
+app.get('/ci/jobs', function(req, res) {
+	console.log('inside .get /jobs');
+	console.log(ci_credentials);
+  console.log(req.query);
+
+  var params = { 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_jobs//+"?limit=0",
+  };
+	
+	  conceptInsights.getDocumentIds(params, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+});
+
+
+
+app.get('/ci/jobs/:id', function(req, res) {
+  var params = { 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_jobs,
+	  documentid: req.params.id
+  };
+  
+	conceptInsights.getDocument(params, function(error, result) {
+	  if (error)
+		return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	  else
+		return res.json(result);
+	});
+});
+
+app.delete('/ci/jobs/:id', function(req, res) {
+  var params = { 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_jobs,
+	  documentid: req.params.id
+  };
+  
+	conceptInsights.deleteDocument(params, function(error, result) {
+	  if (error)
+		return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	  else
+		return res.json(result);
+	});
+});
+
+app.get('/ci/candidates', function(req, res) {
+  var params = { 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_candidates//+"?limit=0"
+  };
+	
+	  conceptInsights.getDocumentIds(params, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+});
+
+// review this, looks like it is duplicated
 app.get('/user/:id', function(req, res) {
 	var params = { 
 		user: ci_credentials.username,
@@ -101,206 +331,7 @@ app.get('/user/:id', function(req, res) {
 	});
 });
 
-app.get('/manage', function(req, res){
-	res.render('manage');
-});
-
-app.get('/candidates/list', function(req, res){
-	res.render('candidates');
-});
-
-app.get('/auth', function (req, res) {
-	
-  linkedin_client.getAccessToken(req, res, function (error, token) {
-	
-	if (error) {
-		console.error('error authenticating accessToken');
-		return console.error(error);
-	} else {
-		req.session.token = token;
-		console.log('success on getting access token');
-	  console.log(token);
-		return res.redirect('/profile');
-	}
-		
-  });
-});
-
-app.get('/parse', function (req, res) {
-	
-	req.session.text = cleanTextProfile(req.params.text);
-	console.log('success on cleaning text profile');
-	console.log(req.session.text);
-	return res.redirect('/profile');
-
-});
-
-app.get('/profile', function (req, res) {
-	  // the first time will redirect to linkedin
-	console.log(req.session);
-	if(req.session.token){
-		linkedin_client.apiCall('GET', '/people/~:' + 
-				'(' + basic_profile + ',' + full_profile + ')', 
-			{ token : req.session.token }, 			
-			function(error, result) {
-				console.log('api call callback');
-				if (error) {
-					res.json(error);
-				} else {
-					req.session.user = transformProfile(result);
-					console.log("transformProfile");
-					res.redirect('/jobsearch');
-				}
-			  });
-	}
-	else if(req.session.text){
-		req.session.user = req.session.text
-		console.log("req.session.text");
-		res.redirect('/jobsearch');
-	}
-});
-
-//https://developer.linkedin.com/docs/fields/full-profile
-var full_profile =  "proposal-comments,associations,interests,projects," + 
-					"publications,patents,languages,skills,certifications," +
-					"educations,courses,volunteer,recommendations-received,honors-awards";
-//https://developer.linkedin.com/docs/fields/basic-profile
-var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
-					"positions,picture-url,public-profile-url,email-address";
-
-var ci_credentials = {
-  version: 'v1',
-  url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
-  username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
-  password: 'J4DjaOigWNuU',
-  use_vcap_services: false,
-  corpus_jobs: 'testmatchmyjob2',
-  corpus_candidates: 'candidates2'
-}; // Bluemix externo, bind manual
-
-
-// Create the service wrapper
-var conceptInsights = watson.concept_insights(ci_credentials);
-
-app.put('/job', function(req, res) {
-	
-  var input = req.body;
-  var params = {
-	document: {
-		id: input.code,
-		label: input.title,
-		parts: [
-			{
-				data: input.description,
-				name: "Job description",
-				type: "text"
-			}
-		]
-	},
-	user: ci_credentials.username,
-	corpus: ci_credentials.corpus_jobs,
-	documentid: input.code
-  }  ;
-	  conceptInsights.createDocument(params, function(error, result) {
-	  	console.log('createDocument: ' + error + ' > ' + result);
-		if (error)
-		  return res.status(error.error ? error.error.code || 500 : 500).send(error);
-		else
-		  return res.status(200).send("OK");
-	  });
-});
-
-app.post('/job', function(req, res) {
-	
-  var input = req.body;
-  var params = {
-	document: {
-		id: input.code,
-		label: input.title,
-		parts: [
-			{
-				data: input.description,
-				name: "Job description",
-				type: "text"
-			}
-		]
-	},
-	user: ci_credentials.username,
-	corpus: ci_credentials.corpus_jobs,
-	documentid: input.code
-}  ;
-	  conceptInsights.updateDocument(params, function(error, result) {
-		if (error)
-		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
-		  return res.json(result);
-	  });
-});
-
-app.get('/jobs', function(req, res) {
-	console.log('inside .get /jobs');
-	console.log(ci_credentials);
-  console.log(req.query);
-
-  var params = { 
-	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_jobs,
-	  limit: 0
-  };
-	
-	  conceptInsights.getDocumentIds(params, function(error, result) {
-		if (error)
-		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
-		  return res.json(result);
-	  });
-});
-
-app.get('/job/:id', function(req, res) {
-  var params = { 
-	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_jobs,
-	  documentid: req.params.id
-  };
-  
-	conceptInsights.getDocument(params, function(error, result) {
-	  if (error)
-		return res.status(error.error ? error.error.code || 500 : 500).json(error);
-	  else
-		return res.json(result);
-	});
-});
-
-app.delete('/job/:id', function(req, res) {
-  var params = { 
-	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_jobs,
-	  documentid: req.params.id
-  };
-  
-	conceptInsights.deleteDocument(params, function(error, result) {
-	  if (error)
-		return res.status(error.error ? error.error.code || 500 : 500).json(error);
-	  else
-		return res.json(result);
-	});
-});
-
-app.get('/candidates', function(req, res) {
-  var params = { 
-	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_candidates
-  };
-	
-	  conceptInsights.getDocumentIds(params, function(error, result) {
-		if (error)
-		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
-		  return res.json(result);
-	  });
-});
-
-app.get('/candidate/:id', function(req, res) {
+app.get('/ci/candidates/:id', function(req, res) {
 	var params = { 
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
@@ -315,7 +346,7 @@ app.get('/candidate/:id', function(req, res) {
 	});
 });
 
-app.delete('/candidate/:id', function(req, res) {
+app.delete('/ci/candidates/:id', function(req, res) {
 	var params = { 
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
@@ -329,7 +360,7 @@ app.delete('/candidate/:id', function(req, res) {
 	});
 });
 
-app.post('/candidate', function(req, res) {
+app.put('/ci/candidates', function(req, res) {
 
   	var input = req.body;
   	var params = {
@@ -362,7 +393,7 @@ app.post('/candidate', function(req, res) {
 	
 });
 
-app.put('/candidate', function(req, res) {
+app.post('/ci/candidates', function(req, res) {
 
   	var input = req.body;
   	var params = {
@@ -395,7 +426,7 @@ app.put('/candidate', function(req, res) {
 	
 });
 	
-app.get('/semantic_search/:candidate/:limit', function (req, res) {
+app.get('/ci/semantic_search/:candidate/:limit', function (req, res) {
   var payload = extend({
 	func:'semanticSearch',
 	user: ci_credentials.username,
@@ -417,7 +448,7 @@ app.get('/semantic_search/:candidate/:limit', function (req, res) {
   });
 });
 
-app.get('/graph_search', function (req, res) {
+app.get('/ci/graph_search', function (req, res) {
 	  var payload = extend({
 		user: ci_credentials.username
 	  }, req.query);
@@ -435,18 +466,7 @@ app.get('/graph_search', function (req, res) {
 	  });
 	});
 
-
-var pi_credentials = extend({
-	version: 'v2',
-	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
-	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
-	password: "QHGtHD142ZhU"
-}, bluemix.getServiceCreds('personality_insights')); // VCAP_SERVICES
-
-// Create the service wrapper
-var personalityInsights = new watson.personality_insights(pi_credentials);
-
-app.post('/', function(req, res) {
+app.post('/pi/', function(req, res) {
   personalityInsights.profile(req.body, function(err, profile) {
 	if (err) {
 	  if (err.message){
@@ -600,18 +620,17 @@ function transformProfile(data){
 	return profile;
 }
 
-function cleanTextProfile(text){
+function cleanTextProfile(data){
 	
 	var profile = {};
 	
-	//profile.id = data.id;
-	//profile.fullName = data.formattedName;
-	//profile.headline = data.headline;
-//	profile.pictureUrl = (data.pictureUrl || "");
-//	profile.publicProfileUrl = (data.publicProfileUrl || "");
-//	profile.emailAddress = (data.emailAddress || "");
+	profile.id = data.id;
+	profile.fullName = data.name;
+	profile.pictureUrl = (data.pictureUrl || "");
+	profile.publicProfileUrl = (data.publicProfileUrl || "");
+	profile.emailAddress = (data.emailAddress || "");
 	
-	profile.data = text;
+	profile.data = data.text;
 	profile.data = profile.data.replace(/(\n)/g, ' ');
 	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
 	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
@@ -621,9 +640,22 @@ function cleanTextProfile(text){
 	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
 	profile.data = profile.data.replace(/\\/g, '');
 	
+	
 	return profile;
 }
 
+function clearSession(session){
+	
+	if(session.token){
+		session.token = null;
+	}
+	
+	if(session.text){
+		session.text = null;
+	}
+} 
 
+
+// leave always at the end of the file
 app.listen(port);
 console.log('listening at:', port);

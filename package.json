@@ -9,7 +9,7 @@
     "body-parser": "*",
     "cookie-parser": "*",
     "errorhandler": "*",
-    "express": "*",
+    "express": "4.11.*",
     "express-session": "*",
     "jade": "*",
     "linkedin-js": "*",

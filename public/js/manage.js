@@ -2,7 +2,7 @@ $(document).ready(function() {
 
   $('#job-new-btn').click(function(){
     $('#job-new-btn').blur();
-    $('#job-add-form').show();
+    $('#job-add-div').show();
     $('#code').val('');
     $('#title').val('');
     $('#description').val('');
@@ -10,7 +10,7 @@ $(document).ready(function() {
   });
   $('#job-cancel-btn').click(function(){
     $('#job-cancel-btn').blur();
-    $('#job-add-form').hide();
+    $('#job-add-div').hide();
   });
   $('#candidate-new-btn').click(function(){
     $('#candidate-new-btn').blur();
@@ -38,45 +38,7 @@ $(document).ready(function() {
    * 2. Call the API
    * 3. Call the methods to display the results
    */
-  $('.job-add-btn').click(function(){
-    $('.job-add-btn').blur();
-    $('#jobs-loading').show();
-    cleanMessages(); 
-    
-    var $input = {
-      code: $('#code').val(),
-      title: $('#title').val(),
-      description: $('#description').val().replace(/(\r\n|\n|\r)/gm," ")
-    };
-
-    $.ajax({
-      type: "POST",
-      url: '/db/jobs',
-      data: $input,
-      dataType: 'json',
-      success: function(data) { 
-        $input.id = data._id;
-        //console.log(data);
-        $.ajax({
-          type: "POST",
-          url: '/ci/jobs',
-          data: $input,
-          dataType: 'html',
-          success: function(data) { 
-            showSuccess("Job " + $input.code + ' added.');
-            loadJobs(); 
-          },
-          error: function(err) {
-            showError(err);
-          }
-        });
-      },
-      error: function(err) {
-        showError(err);
-      }
-    });
-
-  }); //click
+  //$('.job-add-form').submit(function( event ){
 
   function loadJobs() {
     $('#jobs-loading').show();
@@ -169,9 +131,9 @@ var loadCandidates = function() {
     success: function(data) {
       $('#num-candidates').html(data.length + ' candidates');
       data.forEach(function(c) {
-        $('<li><span id=\'cand-'+c+'\'> </span>' + '</li>').appendTo($('#candidates-list'));
+        $('<li>' + c + ' <span id=\'cand-'+c+'\'> </span>' +'</li>').appendTo($('#candidates-list'));
       });
-      handleCandidates(data);
+      //handleCandidates(data);
     },
     error: function(err) {
       console.error(err);
@@ -228,3 +190,93 @@ function cleanMessages() {
   $('#error').hide();
   $('#errorMsg').text('');
 } 
+
+function submitJob() {
+  $('.job-add-btn').blur();
+  $('#jobs-loading').show();
+  cleanMessages(); 
+  
+  var $input = {
+    code: $('#code').val(),
+    title: $('#title').val(),
+    description: $('#description').val().replace(/(\r\n|\n|\r)/gm," ")
+  };
+
+  $.ajax({
+    type: "POST",
+    url: '/db/jobs',
+    data: $input,
+    dataType: 'json',
+    success: function(data) { 
+      $input.id = data._id;
+      console.log(data);
+      addJobConcept($input);
+    },
+    error: function(err) {
+      showError(err);
+    },
+    complete: function(data) {
+      $('#job-add-div').hide();
+      //showSuccess("Job " + $input.code + ' added.' + ' ' + JSON.stringify($input));
+      //$('#jobs-loading').hide();
+      //event.preventDefault();
+    }
+  });
+
+}//); //click
+
+function addJobConcept(job) {
+  
+  $.ajax({
+    type: "PUT",
+    url: '/ci/jobs',
+    data: job,
+    dataType: 'html',
+    success: function(data) { 
+      console.log(data);
+      $('#job-required-form').show();
+      $('#jobs-required-loading').show();
+      $('#job-id').text(job.id);
+      $('#job-code').text(job.code);
+      var newJob = getJob(job.id);
+      console.log(newJob.state || "no newJob yet");
+      while (newJob.state.stage != "ready" && newJob.state.status != "done") {
+        setTimeout(function() { console.log("wait"); },3000);
+        newJob = getJob(job.id);
+        console.log(newJob.state || "no newJob yet");
+      }
+      $('#jobs-required-loading').hide();
+    },
+    error: function(err) {
+      showError(err);
+    },
+    complete: function(data) {
+      showSuccess("Job " + job.code + ' added.' + ' ' + JSON.stringify(job));
+      $('#jobs-loading').hide();
+    }
+  });
+
+}
+
+function getJob(id) {
+  var r;
+  $.ajax({
+      type: 'GET',
+      async: false,
+      url: '/ci/jobs/' + id,
+      dataType: 'json',
+      success: function(data) {
+        if (!data.error) {
+          r = data;
+        } else {
+          console.error(data);
+          r = null;
+        }
+      },
+      error: function(xhr) {
+        console.error(xhr);
+        r = null;
+      }
+  });
+  return r;
+}

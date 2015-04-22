@@ -43,6 +43,11 @@ $(document).ready(function() {
     updateWordsCount();
   });
 
+  /*$('#back-btn').click(function(){
+    $('#back-btn').blur();
+    $.get("/analyze", function(data) {});
+  });*/
+
   /**
    * Update words count on change
    */
@@ -53,38 +58,6 @@ $(document).ready(function() {
    */
   $content.bind('paste', function(e) {
     setTimeout(updateWordsCount, 100);
-  });
-  
-  $('#btn-analyzeText').click(function(){
-	  
-	  $('#summary').hide();
-	  $('#loading').show();
-    
-	  var $text = $content.val();
-	  var $name = $('#txt-name').val();
-	  var profile = {};
-
-	  profile.id = $name; //change to id from db
-	  profile.text = $text;
-	  profile.name = $name;
-	  
-	  console.log(JSON.stringify(profile));
-	  $.ajax({
-	      type: 'POST',
-	      async: true,
-	      data: profile,
-	      url: '/parse',
-	      dataType: 'json',
-	      success: function(data) {
-	    	  var url = window.location.protocol + "//" + window.location.host + "/profile";
-	    	  //window.location.replace(url);
-	    	  window.location.href = url;
-	      },
-	      error: function(error){
-	    	  $('#loading').hide();
-	    	  console.log(error);
-	      }
-	    });
   });
 
   /**
@@ -100,7 +73,8 @@ $(document).ready(function() {
     // usando desse #raw escondido, acho q o melhor é usar o conteudo do textbox
     // $content.val()
 	  var $user = JSON.parse($('#raw').html());
-    
+		$user.data = $content.val().trim();
+
     $('#concepts .content').hide();
 
     $.ajax({
@@ -143,7 +117,7 @@ $(document).ready(function() {
       // add or update
       // TODO insert db before
       $.ajax({
-          type: 'POST', //(candidate)?'POST':'PUT'
+          type: 'PUT', //(candidate)?'POST':'PUT'
           async: false,
           data: $user,
           url: '/ci/candidates',

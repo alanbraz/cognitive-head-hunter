@@ -99,14 +99,8 @@ app.get('/analyze', function(req, res){
 });
 
 app.get('/jobsearch', function(req, res){
-	  if (req.session.user){
-		  clearSession(req.session);
-		  res.render('index', { user: req.session.user });
-	  }
-	  else{
-		  clearSession(req.session);
-		  res.redirect('/auth');
-	  }
+	clearSession(req.session);
+	res.render('index', { user: req.session.user });
 });
 
 app.get('/manage', function(req, res){
@@ -123,7 +117,7 @@ app.get('/auth', function (req, res) {
 	} else {
 		req.session.token = token;
 		console.log('success on getting access token');
-	  console.log(token);
+	  	console.log(token);
 		return res.redirect('/profile');
 	}
 		
@@ -131,17 +125,18 @@ app.get('/auth', function (req, res) {
 });
 
 app.post('/parse', function (req, res) {
+	console.log('/parse ' + JSON.stringify(req.body));
 	// do not use session
-	req.session.text = cleanTextProfile(req.body);
+	req.session.user = cleanTextProfile(req.body);
 	console.log('success on cleaning text profile');
-	return res.json(req.session.text);
-
+	//return res.redirect('/jobsearch');
+	return res.json(req.session.user);
 });
 
 app.get('/profile', function (req, res) {
 	  // the first time will redirect to linkedin
 	console.log(req.session);
-	if(req.session.token && !req.session.text){
+	if(req.session.token){
 		linkedin_client.apiCall('GET', '/people/~:' + 
 				'(' + basic_profile + ',' + full_profile + ')', 
 			{ token : req.session.token }, 			
@@ -155,10 +150,8 @@ app.get('/profile', function (req, res) {
 					res.redirect('/jobsearch');
 				}
 			  });
-	}
-	else if(req.session.text){
-		req.session.user = req.session.text;
-		res.redirect('/jobsearch');
+	} else {
+		res.redirect('/');
 	}
 });
 
@@ -184,7 +177,7 @@ var ci_credentials = {
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
 
-app.post('/ci/jobs', function(req, res) {
+app.put('/ci/jobs', function(req, res) {
 	
   var input = req.body;
   var params = {
@@ -211,7 +204,7 @@ app.post('/ci/jobs', function(req, res) {
 	  });
 });
 
-app.put('/ci/jobs', function(req, res) {
+app.post('/ci/jobs', function(req, res) {
 	
   var input = req.body;
   var params = {
@@ -360,7 +353,7 @@ app.delete('/ci/candidates/:id', function(req, res) {
 	});
 });
 
-app.put('/ci/candidates', function(req, res) {
+app.post('/ci/candidates', function(req, res) {
 
   	var input = req.body;
   	var params = {
@@ -393,7 +386,7 @@ app.put('/ci/candidates', function(req, res) {
 	
 });
 
-app.post('/ci/candidates', function(req, res) {
+app.put('/ci/candidates', function(req, res) {
 
   	var input = req.body;
   	var params = {
@@ -624,9 +617,9 @@ function cleanTextProfile(data){
 	
 	var profile = {};
 	
-	profile.id = data.id;
+	profile.id = data.id || "";
 	profile.fullName = data.name;
-	profile.pictureUrl = (data.pictureUrl || "");
+	profile.pictureUrl = (data.pictureUrl || "images/user.png");
 	profile.publicProfileUrl = (data.publicProfileUrl || "");
 	profile.emailAddress = (data.emailAddress || "");
 	
@@ -639,8 +632,7 @@ function cleanTextProfile(data){
 	profile.data = profile.data.replace(/\,\./g, '.');
 	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
 	profile.data = profile.data.replace(/\\/g, '');
-	
-	
+
 	return profile;
 }
 

@@ -3,8 +3,7 @@ extends ./layout.jade
 
 block specificJS
 	script(type='text/javascript', src='/js/demo.js')
-	script(type='text/javascript', src='/js/personality.js')
-	script(type='text/javascript', src='/js/textsummary.js')
+	script(type='text/javascript', src='/js/analyze.js')
 
 block content
 	//
@@ -23,8 +22,6 @@ block content
 			
 				h2.text-center Import your LinkedIn profile 
 				div.row(style='padding:10px;margin-top:10px;margin-bottom:10px;')
-					div#loading.row.col-lg-12.col-xs-12.text-center(style='display:none;')
-						img(src='/images/watson.gif')
 					div.row.col-lg-12.col-xs-12.text-center
 						a.text-center(href='/auth')
 							img(src='/images/Sign-In-Large---Default.png')
@@ -34,29 +31,22 @@ block content
 					div#loading.row.col-lg-12.col-xs-12(style='display:none;')
 						img(src='/images/watson.gif')
 					div.row.col-lg-12.col-xs-12
-						div.row.col-lg-12.col-xs-12
-							div
-								div.form-group.col-xs-6
-									label(for="txt-name") Name
-									input#txt-name.form-control(type="text" required='true' 
-										placeholder='Please enter your full name')
-								div.col-lg-12.col-xs-12
-									label(for="txt-profile") Profile
-									textarea#txt-profile.content.form-control(rows='10', required='true',
-										placeholder='Please enter the text to analyze (minimum of 200 words)...')
-									div.text-right
-										span.wordsCount.small
-						div.row
-							div.col-lg-4.col-lg-push-4.col-xs-4
-								button.btn.btn-block.clear-btn(type='button') Clear
-							div.col-lg-4.col-lg-push-4.col-xs-4.col-xs-push-4
-								button#btn-analyzeText.btn.btn-block.analysis-btn(type='button') Analyze
-					div.col-lg-6.col-md-6.col-xs-12
-					div.row
-						div.form-group.row.loading1.text-center(style='display:none;')
-							h2 &nbsp;
-							img(src='/images/watson.gif')
-						div.form-group.row.error(style='display: none;')
-							h2 &nbsp;
-							div.well
-								p.errorMsg
+						form
+							div.row.col-lg-12.col-xs-12
+								div
+									div.form-group.col-xs-6
+										label(for="txt-name") Name
+										input#txt-name.form-control(type="text" required='true' 
+											placeholder='Please enter your full name')
+									div.col-lg-12.col-xs-12
+										label(for="txt-profile") Profile
+										textarea#txt-profile.content.form-control(rows='10', required='true',
+											placeholder='Please enter the text to analyze (minimum of 200 words)...')
+										div.text-right
+											span.wordsCount.small
+							div.row
+								div.col-lg-4.col-lg-push-4.col-xs-4
+									button.btn.btn-block.clear-btn(type='reset') Clear
+								div.col-lg-4.col-lg-push-4.col-xs-4.col-xs-push-4
+									button#continue-btn.btn.btn-block.analysis-btn(type='button') Continue
+			

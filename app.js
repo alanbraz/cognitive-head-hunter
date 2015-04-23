@@ -47,7 +47,9 @@ var express = require('express'),
 
 // Bootstrap application settings
 require('./config/express')(app);
-require('./config/db')(app);
+var db = require('./config/db');
+db(app);
+
 // TODO externalize linked, ci and pi stuff
 
 var appKey = '781og0rurwqsom', 
@@ -176,6 +178,57 @@ var ci_credentials = {
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
+
+conceptInsights.getDocumentIds({ 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_jobs
+  }, function(error, result) {
+  		result.forEach(function(job){
+  			//console.log(job);
+  			conceptInsights.getDocument({ 
+				  user: ci_credentials.username,
+				  corpus: ci_credentials.corpus_jobs,
+				  documentid: job
+			  }, function(error, result) {
+			  		result.annotations[0].forEach(function(concept){
+			  			//console.log(concept.concept);
+			  			getConceptDetails(concept.concept, function(d) {
+							//console.log(d);
+							db.addConcept(d);
+						});
+			  		});
+					  //console.log(result);
+					  
+				});	
+  		});
+});
+
+function getConceptDetails(id, callback) {
+	var payload = { user: ci_credentials.username };
+	// ids needs to be stringify
+	payload.ids = [ id ] ;//JSON.stringify(payload.ids);
+	//console.log(payload);
+	var concept;
+
+	conceptInsights.getConceptsMetadata(payload, function(error, result) {
+		if (error)
+		  console.log(error.error ? error.error.code || 500 : 500);
+		else {
+			//console.log(result.length);
+			//console.log(result);
+			result[0].key = id;
+		  	callback(result[0]);
+		}
+	});
+	return concept;
+}
+ 
+/*getConceptDetails('/graph/wikipedia/en-20120601/Application_software', function(d) {
+	console.log(d);
+	db.addConcept(d);
+});*/
+
+
 
 app.put('/ci/jobs', function(req, res) {
 	

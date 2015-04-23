@@ -53,14 +53,14 @@ var candidateSchema = mongoose.Schema({
 
 var candidateModel = restful.model('candidate', candidateSchema);
 
+var dbURL = extend({
+  uri: "mongodb://IbmCloud_lkdhl1bh_vv39s5g4_jb7t8j47:3RFllDMGweSCnJuO0li0Br1_z-c5eDnP@ds055110.mongolab.com:55110/IbmCloud_lkdhl1bh_vv39s5g4"
+  //"mongodb://localhost/chh"
+}, bluemix.getServiceCreds('mongolab')); // VCAP_SERVICES
+
 module.exports = function (app) {
 
-  var dbURL = extend({
-    uri: "mongodb://IbmCloud_lkdhl1bh_vv39s5g4_jb7t8j47:3RFllDMGweSCnJuO0li0Br1_z-c5eDnP@ds055110.mongolab.com:55110/IbmCloud_lkdhl1bh_vv39s5g4"
-    //"mongodb://localhost/chh"
-  }, bluemix.getServiceCreds('mongolab')); // VCAP_SERVICES
-
-  mongoose.connect(dbURL.uri);
+  mongoose.connect(dbURL.uri); 
 
   var Concept = app.resource = conceptModel;
   Concept.methods(['get', 'post', 'put', 'delete']);
@@ -75,6 +75,55 @@ module.exports = function (app) {
   Candidate.register(app, '/db/candidates');
 
 };
+
+module.exports.addConcept = function addConcept(concept) {
+  //console.log(concept);
+  conceptModel.find({ key: concept.key }, function (err, docs) {
+    if (err) {
+      console.log(err);
+    } else {
+      var instance;
+      if (docs.length == 0) {
+        console.log("add: " + concept.key);
+        instance = new conceptModel;
+      } else {
+        console.log("update: " + concept.key);
+        instance = docs[0];
+      }
+      copyAttributes(concept, instance);
+      console.log('instance: ' +  instance);
+      instance.save(function (err) {
+        if (err) { 
+               console.log('Error saving concept: ' + err); 
+            } else {
+              console.log('Success saving concept'); 
+            }
+        
+      });
+    }
+  });
+    
+  /*var instance = new conceptModel;
+  instance.key = concept;
+  */
+
+};
+
+function copyAttributes(src, obj) {
+    for (var key in src) {
+        //copy all the fields
+        obj[key] = src[key];
+    }
+}
+//clean them all
+/*conceptModel.find({}, function (err, docs) {
+  docs.forEach(function(d){ 
+    console.log(d)
+    d.remove();
+  }); 
+});*/
+
+
 
 //module.exports.Concept = conceptModel;
 

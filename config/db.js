@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2014 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,21 +78,19 @@ module.exports = function (app) {
 
 module.exports.addConcept = function addConcept(concept) {
   //console.log(concept);
-  conceptModel.find({ key: concept.key }, function (err, docs) {
+  conceptModel.findOne({ key: concept.key }, function (err, doc) {
     if (err) {
       console.log(err);
     } else {
-      var instance;
-      if (docs.length == 0) {
+      if (!doc) {
         console.log("add: " + concept.key);
-        instance = new conceptModel;
+        doc = new conceptModel;
       } else {
         console.log("update: " + concept.key);
-        instance = docs[0];
       }
-      copyAttributes(concept, instance);
-      console.log('instance: ' +  instance);
-      instance.save(function (err) {
+      copyAttributes(concept, doc);
+      console.log('instance: ' +  doc);
+      doc.save(function (err) {
         if (err) { 
                console.log('Error saving concept: ' + err); 
             } else {
@@ -108,6 +106,21 @@ module.exports.addConcept = function addConcept(concept) {
   */
 
 };
+
+module.exports.getAllConcepts = function getAllConcepts(cache) {
+  conceptModel.find({ }, 'key label ontology', function (err, docs) {
+    if (err) {
+      console.log(err);
+    } else {
+      //callback(docs);
+      docs.forEach(function(d){
+        //console.log("db >>> " + d.key + " : " + d.label);
+        cache.push(d);
+        //console.log(ret);
+      });
+    }
+  });
+}
 
 function copyAttributes(src, obj) {
     for (var key in src) {

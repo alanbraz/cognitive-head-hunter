@@ -47,9 +47,11 @@ var express = require('express'),
 
 // Bootstrap application settings
 require('./config/express')(app);
+require('./config/personality-insights')(app);
 var db = require('./config/db');
 db(app);
 
+var conceptsCache = [];
 // TODO externalize linked, ci and pi stuff
 
 var appKey = '781og0rurwqsom', 
@@ -81,16 +83,6 @@ var ci_credentials = {
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
-
-var pi_credentials = extend({
-	version: 'v2',
-	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
-	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
-	password: "QHGtHD142ZhU"
-}, bluemix.getServiceCreds('personality_insights_pstg')); // VCAP_SERVICES
-
-// Create the service wrapper
-var personalityInsights = new watson.personality_insights(pi_credentials);
 
 app.get('/', function(req, res){
 	 res.render('home');
@@ -204,7 +196,7 @@ var ci_credentials = {
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
 
-conceptInsights.getDocumentIds({ 
+/*conceptInsights.getDocumentIds({ 
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs
   }, function(error, result) {
@@ -226,7 +218,35 @@ conceptInsights.getDocumentIds({
 					  
 				});	
   		});
+});*/
+
+function reloadCache() {
+	console.log("reloading concepts cache...");
+	conceptsCache = [];
+	db.getAllConcepts(conceptsCache);
+		/*function(concepts){
+		//conceptsCache = concepts;
+		concepts.forEach(function(c){
+			callback(c);
+			//console.log(JSON.stringify(c));
+		});*/
+	//});
+}
+
+reloadCache();
+
+console.log("conceptsCache:");
+/*for (var key in conceptsCache) {
+    console.log(key + ' ' + conceptsCache[key]);
+}*/
+conceptsCache.forEach(function(c){
+	console.log(JSON.stringify(c));
 });
+function getConcept(key){
+	var res = conceptsCache.filter(function (ob) { 
+    	return ob.key === key;
+	});
+}
 
 function getConceptDetails(id, callback) {
 	var payload = { user: ci_credentials.username };
@@ -514,8 +534,16 @@ app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
   conceptInsights.semanticSearch(payload, function(error, result) {
 	if (error)
 	  return res.status(error.error ? error.error.code || 500 : 500).json(error);
-	else
+	else {
+		/*result.results.forEach(function(res) {
+			res.tags.forEach(function(tag){
+				var cache = getConcept(tag.concept);
+				tag.label = cache.label || "N/A";
+				tag.ontology = cache.ontology || [];
+			});
+		});*/
 	  return res.json(result);
+	}
   });
 });
 
@@ -559,18 +587,6 @@ app.get('/ci/graph_search', function (req, res) {
 	  });
 	});
 
-app.post('/pi/', function(req, res) {
-  personalityInsights.profile(req.body, function(err, profile) {
-	if (err) {
-	  if (err.message){
-		err = { error: err.message };
-	  }
-	  return res.status(err.code || 500).json(err || 'Error processing the request');
-	}
-	else
-	  return res.json(profile);
-  });
-});
 
 function transformProfile(data){
 	

@@ -16,8 +16,6 @@
 
 'use strict';
 
-var conceptsCache = {};
-
 $(document).ready(function() {
 
   var widgetId = 'vizcontainer', // Must match the ID in index.jade
@@ -151,8 +149,8 @@ $(document).ready(function() {
     $.each(candidate.annotations[0], function (i, data){
     	
     	var obj = {
-			"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
-			"weight": Math.ceil(data.weight * 100)
+				"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
+				"weight": Math.ceil(data.weight * 100)
     	};
       var exists = false;
       for(var i=0; i < concepts.length; i++) {
@@ -238,45 +236,10 @@ $(document).ready(function() {
 	  $('#concepts').show();
 	  $('#concepts .content').show();
   }
-  
-  /*function addConcept(concept) {
-  	$.ajax({
-		  type: "POST",
-		  url: '/db/concepts',
-		  data: concept,
-		  dataType: 'json',
-		  success: function(data) { 
-		  	console.log(data.key + " inserted " + data._id);
-			}
-		});
-  }*/
-
-  /*function buildCache(data) {
-  	data.forEach(function(concept) {
-  		//console.log(JSON.stringify(concept));
-  		if (concept.key) {
-  			conceptsCache[concept.key] = concept;
-  		}
-    });
-  }*/
-    
-  /*function loadConceptsCache(handleData) {
-  	$.ajax({
-		  type: "GET",
-		  async: false,
-		  global: true,
-		  url: '/db/concepts',
-		  success: function(data) { 
-		  	handleData(data);
-			},
-		  dataType: 'json'
-		});
-  }*/
- 
-	//loadConceptsCache(buildCache);
 
   function conceptsToHtml(concepts) {
-    for (var i = 0,show = concepts.length, length = concepts.length; (i < length && show > 0); i++) {
+  	var top = 10; //concepts.length
+    for (var i = 0,show = top, length = concepts.length; (i < length && show > 0); i++) {
         var label = concepts[i].label;
         var weight = concepts[i].weight;
         var ont = concepts[i].ontology;
@@ -289,7 +252,7 @@ $(document).ready(function() {
         if (!ignore) {
           $('#concepts .content').append($('<div>' + label + 
               //' (debug: '+ weight +' ' + 
-              (ont || ' ') +//' ' +')' + // TODO
+              //(ont || ' ') +//' ' +')' + // TODO
               '</div>'));
           show--;
         }
@@ -309,26 +272,31 @@ $(document).ready(function() {
     for (var i = 0, length = positions.length; i < length; i++) {
         position = positions[i];
         score = Math.ceil(position.score * 100) + "%";
-        html = '<div id=' + position.id + ' class=\'row positionLine\'>' +
-				 '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >' +
-				 '<span class=\'_'+ Math.round(position.score * 10) + ' col-lg-1\'>'+ score + '</span>' +
-				 '<span class=\'col-lg-9\'> ' + position.label + '</span>' +
-				 '<span class=\'col-lg-2\'>'+ position.id + '</a> </span>';
-				html += '<span id=\'tags-'+ position.id + '\'>';
-				html += '</span>';
-        html += '</div>';
+        html = '<div id=' + position.id + ' class="row">' +
+				 '<div class=\'_'+ Math.round(position.score * 10) + ' col-lg-1\'>'+ score + '</div>' +
+				 '<div class=\'col-lg-9\'><strong> ' + position.label + '</strong><br/>' +
+				 		//'&nbsp;<small><a id="show-'+ position.id + '">show concepts</a></small>' +
+				 		'<small class=\'row\' id=\'tags-'+ position.id + '\' style=\'display:block;\'></small>' + 
+				 '</div>' +
+				 '<div class=\'col-lg-2\'>' + 
+				 	'<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+position.id+'\' target=\'_blank\' >' + position.id + '</a>' +
+				 '</div>';
+				html += '</div>';
+        
         $('#positions .content').append(html);
 
         // TODO
         tags = [];
         var t;
         for (var j = 0; j < position.tags.length; j++) {
-        	tags.push(position.tags[j].concept);
+        	var c = position.tags[j].concept;
+        	c = c.substring(c.lastIndexOf('/') + 1);
+        	tags.push(c.replace(/_/g, ' '));
         }
         console.log("tags: " + tags);
-        //printLabels('#tags-'+ position.id, tags);
+        printLabels('#tags-'+ position.id, tags);
 
-        $.ajax({
+        /*$.ajax({
 		        type: 'GET',
 		        async: false,
 			    	url: '/ci/graph_search', 
@@ -349,7 +317,7 @@ $(document).ready(function() {
 		          console.log(error.error || error);
 		          showError(error.error || error);
 		        } 
-		    });
+		    });*/
     }
     $('#positions .content').show();
 	  $('#loading').hide();
@@ -357,8 +325,8 @@ $(document).ready(function() {
   }
   
   function printLabels(id, labels) {
-		console.log("labels: " + labels);
-    $(id).text(labels);
+		//console.log("labels: " + labels);
+    $(id).text(labels.toString().replace(/,/g, ', '));
   }
 
   function getCandidate(id) {
@@ -540,4 +508,9 @@ function showVizualization(theProfile) {
   }
   $content.keyup(updateWordsCount);
   updateWordsCount();
+
 });
+
+
+
+

@@ -213,7 +213,7 @@ $(document).ready(function() {
     $.ajax({
         type: 'GET',
         async: false,
-	    	url: '/ci/semantic_search/' + $user.id + "/20", // ab: 20 to degub, old value was 10
+	    	url: '/ci/semantic_search/candidate/' + $user.id + "/20", // ab: 20 to degub, old value was 10
         dataType: 'json',
         success: function(data) {
           //console.log(JSON.stringify(data));

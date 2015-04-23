@@ -51,7 +51,7 @@ $(document).ready(function() {
         success: function(data) {
           $('#num-jobs').html(data.length + ' jobs');
           data.forEach(function(job) {
-            $('<li><a href=\'/ci/jobs/'+job+'\' target=\'_blank\'>'+job+'</a>' + 
+            $('<li><a href=\'/analyze-jobs/'+job+'\' target=\'_blank\'>'+job+'</a>' + 
               '<span id=\'job-'+job+'\'></span>' + '</li>')
             .appendTo($('#jobs-list'));
           });

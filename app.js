@@ -100,9 +100,34 @@ app.get('/analyze', function(req, res){
   res.render('analyze');
 });
 
+app.get('/analyze-jobs/:id', function(req, res){
+	
+	var params = { 
+			  user: ci_credentials.username,
+			  corpus: ci_credentials.corpus_jobs,
+			  documentid: req.params.id
+		  };
+		  
+	conceptInsights.getDocument(params, function(error, result) {
+	  if (error){
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+	  }
+	  else {
+		  console.log("result: ");
+		  console.log(JSON.stringify(result));
+		  req.session.job = result;
+		  res.render('analyze-jobs', { job: result });
+	  }
+	});
+});
+
 app.get('/jobsearch', function(req, res){
 	clearSession(req.session);
-	res.render('index', { user: req.session.user });
+	res.render('user-dashboard', { user: req.session.user });
+});
+
+app.get('/candidatesearch/', function(req, res){
+	res.render('job-dashboard', { job: req.session.job });
 });
 
 app.get('/manage', function(req, res){
@@ -472,7 +497,7 @@ app.put('/ci/candidates', function(req, res) {
 	
 });
 	
-app.get('/ci/semantic_search/:candidate/:limit', function (req, res) {
+app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
   var payload = extend({
 	func:'semanticSearch',
 	user: ci_credentials.username,
@@ -493,6 +518,28 @@ app.get('/ci/semantic_search/:candidate/:limit', function (req, res) {
 	  return res.json(result);
   });
 });
+
+app.get('/ci/semantic_search/job/:job/:limit', function (req, res) {
+	  var payload = extend({
+		func:'semanticSearch',
+		user: ci_credentials.username,
+		corpus: ci_credentials.corpus_candidates,
+		ids: ['/corpus/'+ ci_credentials.username + '/' + ci_credentials.corpus_jobs + '/' + req.params.job ],
+		limit: req.params.limit || 5,
+	  }, req.query);
+	  //console.log(payload);
+
+	  // ids needs to be stringify
+	  payload.ids = JSON.stringify(payload.ids);
+	  //console.log(payload.ids);
+
+	  conceptInsights.semanticSearch(payload, function(error, result) {
+		if (error)
+		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+		  return res.json(result);
+	  });
+	});
 
 app.get('/ci/graph_search', function (req, res) {
 	  var payload = extend({

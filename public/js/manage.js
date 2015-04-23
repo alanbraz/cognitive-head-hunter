@@ -46,16 +46,20 @@ $(document).ready(function() {
 
     $.ajax({
         type: 'GET',
-        url: '/ci/jobs',
+        url: '/db/jobs',
         dataType: 'json',
         success: function(data) {
           $('#num-jobs').html(data.length + ' jobs');
           data.forEach(function(job) {
-            $('<li><a href=\'/analyze-jobs/'+job+'\' target=\'_blank\'>'+job+'</a>' + 
-              '<span id=\'job-'+job+'\'></span>' + '</li>')
+            job.id = (job.concept_id || job._id);
+            $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' + 
+              (job.requiredConcepts.length==0?'[<a href="/concepts/required/'+job._id+'">set required concepts</a>]':'OK') +
+              '&nbsp;[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]' + 
+              //'<span id=\'job-'+job.id+'\'></span>' + 
+              '</li>')
             .appendTo($('#jobs-list'));
           });
-          handleJobs(data);
+          //handleJobs(data);
         },
         error: function(err) {
           console.error(err);
@@ -75,7 +79,7 @@ function handleJobs(jobs) {
   jobs.forEach(function(job) {
     $.ajax({
       type: 'GET',
-      url: '/ci/jobs/'+job,
+      url: '/ci/jobs/'+job.id,
       dataType: 'json',
       success: function(data) {
           $('#job-'+data.id).text(' ' + data.state.stage + ' ' + data.state.status + ' ');

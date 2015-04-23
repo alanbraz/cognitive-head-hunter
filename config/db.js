@@ -40,6 +40,7 @@ var jobSchema = mongoose.Schema({
       code: "string",
       title: "string",
       description: "string",
+      concept_id: "string",
       requiredConcepts: [ "string" ]
     });
 
@@ -48,6 +49,7 @@ var jobModel = restful.model('job', jobSchema);
 var candidateSchema = mongoose.Schema({
       name: "string",
       profile: "string",
+      concept_id: "string",
       jobs: [ mongoose.Schema.Types.ObjectId ]
     });
 
@@ -128,6 +130,41 @@ function copyAttributes(src, obj) {
         obj[key] = src[key];
     }
 }
+
+module.exports.addJob = function addJob(job) {
+  conceptModel.findOne({ concept_id: job.id }, function (err, doc) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (!doc) {
+        console.log("add: " + job.id);
+        doc = new jobModel;
+        doc.code = job.code || job.id;
+        doc.concept_id = job.id;
+        doc.title = job.label;
+        doc.description = job.parts[0].data;
+        console.log('instance: ' +  doc);
+        doc.save(function (err) {
+          if (err) { 
+                 console.log('Error saving job: ' + err); 
+              } else {
+                console.log('Success saving job'); 
+              }
+          
+        });
+      } else {
+        console.log("nothing to do ");
+      }
+    }
+  });
+    
+  /*var instance = new conceptModel;
+  instance.key = concept;
+  */
+
+};
+
+
 //clean them all
 /*conceptModel.find({}, function (err, docs) {
   docs.forEach(function(d){ 

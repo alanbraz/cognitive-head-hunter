@@ -92,6 +92,10 @@ app.get('/analyze', function(req, res){
   res.render('analyze');
 });
 
+app.get('/concepts/required/:id', function(req, res){
+  res.render('req-concepts', { job_id : req.params.id } );
+});
+
 app.get('/analyze-jobs/:id', function(req, res){
 	
 	var params = { 
@@ -207,6 +211,7 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 				  corpus: ci_credentials.corpus_jobs,
 				  documentid: job
 			  }, function(error, result) {
+			  		db.addJob(result);
 			  		result.annotations[0].forEach(function(concept){
 			  			//console.log(concept.concept);
 			  			getConceptDetails(concept.concept, function(d) {
@@ -214,7 +219,7 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 							db.addConcept(d);
 						});
 			  		});
-					  //console.log(result);
+					//console.log(result);
 					  
 				});	
   		});

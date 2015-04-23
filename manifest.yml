@@ -2,10 +2,11 @@ applications:
 - services:
   - Tradeoff Analytics.chh
   - Personality Insights.chh
+  - MongoLab-lc
   disk_quota: 128M
   host: chh
   name: chh
   path: .
   domain: stage1.mybluemix.net
   instances: 1
-  memory: 512M
+  memory: 896M

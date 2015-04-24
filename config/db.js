@@ -164,6 +164,34 @@ module.exports.addJob = function addJob(job) {
 
 };
 
+module.exports.addCandidate = function addCandidate(cand) {
+  conceptModel.findOne({ concept_id: cand.id }, function (err, doc) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (!doc) {
+        console.log("add: " + cand.id);
+        doc = new candidateModel;
+        doc.name = cand.label;
+        doc.concept_id = cand.id;
+        doc.description = cand.parts[0].data;
+        console.log('instance: ' +  doc);
+        doc.save(function (err) {
+          if (err) { 
+                 console.log('Error saving candidate: ' + err); 
+              } else {
+                console.log('Success saving candidate'); 
+              }
+          
+        });
+      } else {
+        console.log("nothing to do ");
+      }
+    }
+  });
+
+};
+
 
 //clean them all
 /*conceptModel.find({}, function (err, docs) {

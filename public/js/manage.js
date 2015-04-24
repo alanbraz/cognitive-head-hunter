@@ -39,40 +39,42 @@ $(document).ready(function() {
    * 3. Call the methods to display the results
    */
   //$('.job-add-form').submit(function( event ){
-
-  function loadJobs() {
-    $('#jobs-loading').show();
-    $("#jobs-list").empty();
-
-    $.ajax({
-        type: 'GET',
-        url: '/db/jobs',
-        dataType: 'json',
-        success: function(data) {
-          $('#num-jobs').html(data.length + ' jobs');
-          data.forEach(function(job) {
-            job.id = (job.concept_id || job._id);
-            $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' + 
-              (job.requiredConcepts.length==0?'[<a href="/concepts/required/'+job._id+'">set required concepts</a>]':'OK') +
-              '&nbsp;[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]' + 
-              //'<span id=\'job-'+job.id+'\'></span>' + 
-              '</li>')
-            .appendTo($('#jobs-list'));
-          });
-          //handleJobs(data);
-        },
-        error: function(err) {
-          console.error(err);
-          showError(err.error || err);
-        },
-        complete: function(data) {
-          $('#jobs-loading').hide();
-        }
-    });
-	  
-  }
   
 });
+
+function loadJobs() {
+  $('#jobs-loading').show();
+  $("#jobs-list").empty();
+
+  $.ajax({
+      type: 'GET',
+      url: '/db/jobs',
+      dataType: 'json',
+      success: function(data) {
+        $('#num-jobs').html(data.length + ' jobs');
+        data.forEach(function(job) {
+          job.id = (job.concept_id || job._id);
+          $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' + 
+            (job.requiredConcepts.length==0?
+              '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':
+            '[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]') + 
+            '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
+            //'<span id=\'job-'+job.id+'\'></span>' + 
+            '</li>')
+          .appendTo($('#jobs-list'));
+        });
+        //handleJobs(data);
+      },
+      error: function(err) {
+        console.error(err);
+        showError(err.error || err);
+      },
+      complete: function(data) {
+        $('#jobs-loading').hide();
+      }
+  });
+  
+}
 
 function handleJobs(jobs) {
   $('#jobs-loading').show();
@@ -130,12 +132,12 @@ var loadCandidates = function() {
 
   $.ajax({
     type: 'GET',
-    url: '/ci/candidates',
+    url: '/db/candidates',
     dataType: 'json',
     success: function(data) {
       $('#num-candidates').html(data.length + ' candidates');
       data.forEach(function(c) {
-        $('<li>' + c + ' <span id=\'cand-'+c+'\'> </span>' +'</li>').appendTo($('#candidates-list'));
+        $('<li>' + c.name + ' <span id=\'cand-'+c._id+'\'> </span>' +'</li>').appendTo($('#candidates-list'));
       });
       //handleCandidates(data);
     },
@@ -170,6 +172,39 @@ var delCandidate = function(id) {
     error: function(err) {
       console.error(err);
     }
+  });
+}
+
+var delJob = function(dbId, ciId) {
+  $.ajax({
+    type: 'DELETE',
+    async: false,
+    url: '/ci/jobs/' + ciId,
+    dataType: 'json',
+    success: function(data) {
+      //showSuccess("Job " + dbId + " removed.");
+    },
+    error: function(err) {
+      console.error(err);
+    }, 
+    complete: function(data) {
+      //loadJobs();
+    }
+  });
+  $.ajax({
+      type: 'DELETE',
+      async: false,
+      url: '/db/jobs/' + dbId,
+      dataType: 'json',
+      success: function(data) {
+        showSuccess("Job " + dbId + " removed.");
+      },
+      error: function(err) {
+        console.error(err);
+      }, 
+      complete: function(data) {
+        loadJobs();
+      }
   });
 }
 
@@ -213,17 +248,22 @@ function submitJob() {
     dataType: 'json',
     success: function(data) { 
       $input.id = data._id;
+      $('#job-add-div').hide();
       console.log(data);
+      showSuccess("Job " + $input.code + ' added to the database.');
       addJobConcept($input);
     },
     error: function(err) {
       showError(err);
     },
     complete: function(data) {
-      $('#job-add-div').hide();
+      $('#jobs-loading').hide();
       //showSuccess("Job " + $input.code + ' added.' + ' ' + JSON.stringify($input));
       //$('#jobs-loading').hide();
       //event.preventDefault();
+      showSuccess("Job concepts processed. Redirecting...");
+      var url = window.location.protocol + "//" + window.location.host + "/concepts/required/"+$input.id;
+      window.location.href = url;
     }
   });
 
@@ -235,13 +275,15 @@ function addJobConcept(job) {
     type: "PUT",
     url: '/ci/jobs',
     data: job,
+    async: false,
     dataType: 'html',
     success: function(data) { 
       console.log(data);
-      $('#job-required-form').show();
-      $('#jobs-required-loading').show();
-      $('#job-id').text(job.id);
-      $('#job-code').text(job.code);
+      showSuccess("Job added to concepts insights. Extracting concepts...");
+      //$('#job-required-form').show();
+      //$('#jobs-required-loading').show();
+      //$('#job-id').text(job.id);
+      //$('#job-code').text(job.code);
       var newJob = getJob(job.id);
       console.log(newJob.state || "no newJob yet");
       while (newJob.state.stage != "ready" && newJob.state.status != "done") {
@@ -249,15 +291,14 @@ function addJobConcept(job) {
         newJob = getJob(job.id);
         console.log(newJob.state || "no newJob yet");
       }
-      $('#jobs-required-loading').hide();
     },
     error: function(err) {
       showError(err);
-    },
+    }/*,
     complete: function(data) {
       showSuccess("Job " + job.code + ' added.' + ' ' + JSON.stringify(job));
       $('#jobs-loading').hide();
-    }
+    }*/
   });
 
 }

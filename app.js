@@ -200,6 +200,7 @@ var ci_credentials = {
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
 
+// migrate jobs
 /*conceptInsights.getDocumentIds({ 
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs
@@ -224,6 +225,24 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 				});	
   		});
 });*/
+
+// migrate candidates
+/*conceptInsights.getDocumentIds({ 
+	  user: ci_credentials.username,
+	  corpus: ci_credentials.corpus_candidates
+  }, function(error, result) {
+  		result.forEach(function(cand){
+  			//console.log(job);
+  			conceptInsights.getDocument({ 
+				  user: ci_credentials.username,
+				  corpus: ci_credentials.corpus_candidates,
+				  documentid: cand
+			  }, function(error, result) {
+			  		db.addCandidate(result);			  
+				});	
+  		});
+});*/
+
 
 function reloadCache() {
 	console.log("reloading concepts cache...");

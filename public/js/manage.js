@@ -6,7 +6,7 @@ $(document).ready(function() {
     $('#code').val('');
     $('#title').val('');
     $('#description').val('');
-    cleanMessages(); 
+    cleanMessages();
   });
   $('#job-cancel-btn').click(function(){
     $('#job-cancel-btn').blur();
@@ -17,7 +17,7 @@ $(document).ready(function() {
     $('#candidate-add-form').show();
     $('#name').val('');
     $('#profile').val('');
-    cleanMessages(); 
+    cleanMessages();
   });
   $('#candidate-cancel-btn').click(function(){
     $('#candidate-cancel-btn').blur();
@@ -27,10 +27,11 @@ $(document).ready(function() {
 
   loadJobs();
   loadCandidates();
-  
+
   $('#candidate-add-btn').click(function(){
-    $('#candidate-add-btn').blur();
-    showSuccess('Not implemented yet');
+    // $('#candidate-add-btn').blur();
+    // showSuccess('Not implemented yet');
+    handleCreation();
   });
 
   /**
@@ -76,6 +77,7 @@ function loadJobs() {
   
 }
 
+
 function handleJobs(jobs) {
   $('#jobs-loading').show();
   jobs.forEach(function(job) {
@@ -100,17 +102,25 @@ function handleJobs(jobs) {
 function handleCandidates(cands) {
     $('#candidates-loading').show();
     cands.forEach(function(c) {
-      $.ajax({
+
+      $('<li><a href=\'/user/'+(c.concept_id || c._id)+'\' target=\'_blank\'>'+
+        c.name + '</a> ' + ' ' +
+        ' ' + words(c.profile || "") + ' words ' +
+        '[<a href=\'javascript:delCandidate(\"'+c._id+'\",\"'+(c.concept_id || c._id)+'\")\'>delete</a>]</li>')
+      .appendTo($('#candidates-list'));
+
+      /*$.ajax({
         type: 'GET',
-        url: '/ci/candidates/'+c,
+        url: '/ci/candidates/'+(c.concept_id || c._id),
+        // url: '/ci/candidates/'+c,
         dataType: 'json',
         success: function(data) {
           console.log(data.id + ' - ' + data.state.status);
-          $('#cand-'+data.id).html('<a href=\'/user/'+data.id+'\' target=\'_blank\'>'+
-            data.label + '</a> (' + data.candidateHeadline + ') ' + 
+          $('<div/>').html('<a href=\'/user/'+data.id+'\' target=\'_blank\'>'+
+            data.label + '</a> (' + data.candidateHeadline + ') ' +
             data.state.stage + ' ' + data.state.status +
-            ' > ' + words(data.parts[0].data) + ' words ' + 
-            '[<a href=\'javascript:delCandidate(\"'+data.id+'\")\'>delete</a>]');
+            ' > ' + words(data.parts[0].data) + ' words ' +
+            '[<a href=\'javascript:delCandidate(\"'+data.id+'\")\'>delete</a>]').appendTo($('#candidates-list'));
         },
         error: function(err) {
           console.error(err);
@@ -119,15 +129,14 @@ function handleCandidates(cands) {
         complete: function(data) {
           $('#candidates-loading').hide();
         }
-      }); 
-      //$('<li><a href=\'/job/'+job+'\' target=\'_blank\'>'+job+'</a></li>').appendTo($('#jobs-list'));
+      });*/
+      $('#candidates-loading').hide();
     });
-      //candidatesArray.sort(function(a,b) { return a.label.localeCompare(b.label); } );
-  } 
+  }
 
 var loadCandidates = function() {
   $('#candidates-loading').show();
-  cleanMessages(); 
+  cleanMessages();
   $("#candidates-list").empty();
 
   $.ajax({
@@ -136,10 +145,7 @@ var loadCandidates = function() {
     dataType: 'json',
     success: function(data) {
       $('#num-candidates').html(data.length + ' candidates');
-      data.forEach(function(c) {
-        $('<li>' + c.name + ' <span id=\'cand-'+c._id+'\'> </span>' +'</li>').appendTo($('#candidates-list'));
-      });
-      //handleCandidates(data);
+      handleCandidates(data);
     },
     error: function(err) {
       console.error(err);
@@ -150,7 +156,7 @@ var loadCandidates = function() {
       $('#candidates-loading').hide();
     }
   });
-  
+
 
 }
 
@@ -159,14 +165,27 @@ var words = function(text) {
 }
 
 
-var delCandidate = function(id) {
+var delCandidate = function(dbId, ciId) {
   $.ajax({
     type: 'DELETE',
     async: false,
-    url: '/ci/candidates/' + id,
-    dataType: 'html',
+    url: '/ci/candidates/' + ciId,
+    dataType: 'json',
     success: function(data) {
-      showSuccess("Candidate " + id + " removed.");
+      showSuccess("Candidate " + dbId + " removed.");
+    },
+    error: function(err) {
+      console.error(err);
+    }
+  });
+
+  $.ajax({
+    type: 'DELETE',
+    async: false,
+    url: '/db/candidates/' + dbId,
+    dataType: 'json',
+    success: function(data) {
+      showSuccess("Candidate " + dbId + " removed.");
       loadCandidates();
     },
     error: function(err) {
@@ -216,25 +235,25 @@ function showError(error) {
   var defaultErrorMsg = 'Error processing the request, please try again later.';
   $('#error').show();
   $('#errorMsg').text(JSON.stringify(error) || defaultErrorMsg);
-} 
+}
 
 function showSuccess(message) {
   $('#success').show();
   $('#successMsg').text(message);
-} 
+}
 
 function cleanMessages() {
   $('#success').hide();
   $('#successMsg').text('');
   $('#error').hide();
   $('#errorMsg').text('');
-} 
+}
 
 function submitJob() {
   $('.job-add-btn').blur();
   $('#jobs-loading').show();
-  cleanMessages(); 
-  
+  cleanMessages();
+
   var $input = {
     code: $('#code').val(),
     title: $('#title').val(),
@@ -246,7 +265,7 @@ function submitJob() {
     url: '/db/jobs',
     data: $input,
     dataType: 'json',
-    success: function(data) { 
+    success: function(data) {
       $input.id = data._id;
       $('#job-add-div').hide();
       console.log(data);
@@ -270,14 +289,14 @@ function submitJob() {
 }//); //click
 
 function addJobConcept(job) {
-  
+
   $.ajax({
     type: "PUT",
     url: '/ci/jobs',
     data: job,
     async: false,
     dataType: 'html',
-    success: function(data) { 
+    success: function(data) {
       console.log(data);
       showSuccess("Job added to concepts insights. Extracting concepts...");
       //$('#job-required-form').show();

@@ -54,7 +54,7 @@ db(app);
 var conceptsCache = [];
 // TODO externalize linked, ci and pi stuff
 
-var appKey = '781og0rurwqsom', 
+var appKey = '781og0rurwqsom',
 	appSecret = '9FnyK7slh4CuPxFo';
 
 var cavoto = { key: "7520yhhithxeg8", secret: "fvrctKbDcwYtJJKF"}
@@ -63,11 +63,11 @@ var linkedin_client = require('linkedin-js')
   (appKey, appSecret, uri + '/auth');
 
 //https://developer.linkedin.com/docs/fields/full-profile
-var full_profile =  "proposal-comments,associations,interests,projects," + 
+var full_profile =  "proposal-comments,associations,interests,projects," +
 					"publications,patents,languages,skills,certifications," +
 					"educations,courses,volunteer,recommendations-received,honors-awards";
 //https://developer.linkedin.com/docs/fields/basic-profile
-var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
+var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," +
 					"positions,picture-url,public-profile-url,email-address";
 
 var ci_credentials = {
@@ -97,13 +97,13 @@ app.get('/concepts/required/:id', function(req, res){
 });
 
 app.get('/analyze-jobs/:id', function(req, res){
-	
-	var params = { 
+
+	var params = {
 			  user: ci_credentials.username,
 			  corpus: ci_credentials.corpus_jobs,
 			  documentid: req.params.id
 		  };
-		  
+
 	conceptInsights.getDocument(params, function(error, result) {
 	  if (error){
 		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -131,9 +131,9 @@ app.get('/manage', function(req, res){
 });
 
 app.get('/auth', function (req, res) {
-	
+
   linkedin_client.getAccessToken(req, res, function (error, token) {
-	
+
 	if (error) {
 		console.error('error authenticating accessToken');
 		return console.error(error);
@@ -143,10 +143,9 @@ app.get('/auth', function (req, res) {
 	  	console.log(token);
 		return res.redirect('/profile');
 	}
-		
+
   });
 });
-
 app.post('/parse', function (req, res) {
 	console.log('/parse ' + JSON.stringify(req.body));
 	// do not use session
@@ -160,9 +159,9 @@ app.get('/profile', function (req, res) {
 	  // the first time will redirect to linkedin
 	console.log(req.session);
 	if(req.session.token){
-		linkedin_client.apiCall('GET', '/people/~:' + 
-				'(' + basic_profile + ',' + full_profile + ')', 
-			{ token : req.session.token }, 			
+		linkedin_client.apiCall('GET', '/people/~:' +
+				'(' + basic_profile + ',' + full_profile + ')',
+			{ token : req.session.token },
 			function(error, result) {
 				console.log('api call callback');
 				if (error) {
@@ -179,11 +178,11 @@ app.get('/profile', function (req, res) {
 });
 
 //https://developer.linkedin.com/docs/fields/full-profile
-var full_profile =  "proposal-comments,associations,interests,projects," + 
+var full_profile =  "proposal-comments,associations,interests,projects," +
 					"publications,patents,languages,skills,certifications," +
 					"educations,courses,volunteer,recommendations-received,honors-awards";
 //https://developer.linkedin.com/docs/fields/basic-profile
-var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," + 
+var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," +
 					"positions,picture-url,public-profile-url,email-address";
 
 var ci_credentials = {
@@ -207,7 +206,7 @@ var conceptInsights = watson.concept_insights(ci_credentials);
   }, function(error, result) {
   		result.forEach(function(job){
   			//console.log(job);
-  			conceptInsights.getDocument({ 
+  			conceptInsights.getDocument({
 				  user: ci_credentials.username,
 				  corpus: ci_credentials.corpus_jobs,
 				  documentid: job
@@ -221,8 +220,8 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 						});
 			  		});
 					//console.log(result);
-					  
-				});	
+
+				});
   		});
 });*/
 
@@ -267,7 +266,7 @@ conceptsCache.forEach(function(c){
 	console.log(JSON.stringify(c));
 });
 function getConcept(key){
-	var res = conceptsCache.filter(function (ob) { 
+	var res = conceptsCache.filter(function (ob) {
     	return ob.key === key;
 	});
 }
@@ -291,7 +290,7 @@ function getConceptDetails(id, callback) {
 	});
 	return concept;
 }
- 
+
 /*getConceptDetails('/graph/wikipedia/en-20120601/Application_software', function(d) {
 	console.log(d);
 	db.addConcept(d);
@@ -300,7 +299,7 @@ function getConceptDetails(id, callback) {
 
 
 app.put('/ci/jobs', function(req, res) {
-	
+
   var input = req.body;
   var params = {
 	document: {
@@ -327,7 +326,7 @@ app.put('/ci/jobs', function(req, res) {
 });
 
 app.post('/ci/jobs', function(req, res) {
-	
+
   var input = req.body;
   var params = {
 	document: {
@@ -358,11 +357,11 @@ app.get('/ci/jobs', function(req, res) {
 	console.log(ci_credentials);
   console.log(req.query);
 
-  var params = { 
+  var params = {
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs//+"?limit=0",
   };
-	
+
 	  conceptInsights.getDocumentIds(params, function(error, result) {
 		if (error)
 		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -374,12 +373,12 @@ app.get('/ci/jobs', function(req, res) {
 
 
 app.get('/ci/jobs/:id', function(req, res) {
-  var params = { 
+  var params = {
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs,
 	  documentid: req.params.id
   };
-  
+
 	conceptInsights.getDocument(params, function(error, result) {
 	  if (error)
 		return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -389,12 +388,12 @@ app.get('/ci/jobs/:id', function(req, res) {
 });
 
 app.delete('/ci/jobs/:id', function(req, res) {
-  var params = { 
+  var params = {
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs,
 	  documentid: req.params.id
   };
-  
+
 	conceptInsights.deleteDocument(params, function(error, result) {
 	  if (error)
 		return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -404,11 +403,11 @@ app.delete('/ci/jobs/:id', function(req, res) {
 });
 
 app.get('/ci/candidates', function(req, res) {
-  var params = { 
+  var params = {
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_candidates//+"?limit=0"
   };
-	
+
 	  conceptInsights.getDocumentIds(params, function(error, result) {
 		if (error)
 		  return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -419,7 +418,7 @@ app.get('/ci/candidates', function(req, res) {
 
 // review this, looks like it is duplicated
 app.get('/user/:id', function(req, res) {
-	var params = { 
+	var params = {
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
 		documentid: req.params.id
@@ -440,19 +439,20 @@ app.get('/user/:id', function(req, res) {
 		  newUser.publicProfileUrl = temp.candidatePublicProfileUrl;
 		  console.log(temp.lastmodified);
 		  newUser.data = temp.parts[0].data;
+			// clearSession(req.session);
 
-		  return res.render('index', { user:  newUser});
+		  return res.render('user-dashboard', { user: newUser });
 	  }
 	});
 });
 
 app.get('/ci/candidates/:id', function(req, res) {
-	var params = { 
+	var params = {
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
 		documentid: req.params.id
 	};
-  
+
 	conceptInsights.getDocument(params, function(error, result) {
 	  if (error)
 		return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -462,7 +462,7 @@ app.get('/ci/candidates/:id', function(req, res) {
 });
 
 app.delete('/ci/candidates/:id', function(req, res) {
-	var params = { 
+	var params = {
 		user: ci_credentials.username,
 		corpus: ci_credentials.corpus_candidates,
 		documentid: req.params.id
@@ -498,14 +498,14 @@ app.post('/ci/candidates', function(req, res) {
 		corpus: ci_credentials.corpus_candidates,
 		documentid: input.id
 	};
-	
+
 	conceptInsights.updateDocument(params, function(error, result) {
 		if (error)
 	  		return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
 	  		return res.json(result); // TODO tratar melhor
 	});
-	
+
 });
 
 app.put('/ci/candidates', function(req, res) {
@@ -531,16 +531,16 @@ app.put('/ci/candidates', function(req, res) {
 		corpus: ci_credentials.corpus_candidates,
 		documentid: input.id
 	};
-	
+
 	conceptInsights.createDocument(params, function(error, result) {
 		if (error)
 	  		return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
 	  		return res.json(result);
 	});
-	
+
 });
-	
+
 app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
   var payload = extend({
 	func:'semanticSearch',
@@ -613,20 +613,20 @@ app.get('/ci/graph_search', function (req, res) {
 
 
 function transformProfile(data){
-	
+
 	var profile = {};
-		
+
 	profile.id = data.id;
 	profile.fullName = data.formattedName;
 	profile.headline = data.headline;
 	profile.pictureUrl = (data.pictureUrl || "");
 	profile.publicProfileUrl = (data.publicProfileUrl || "");
 	profile.emailAddress = (data.emailAddress || "");
-	
+
 	profile.data = (data.summary|| "") + ". ";
 
 	profile.data += (data.associations || "") + ". ";
-	
+
 	if(data.hasOwnProperty('certifications')){
 		console.log('tem certifications');
 		for(var i=0; i < (data.certifications._total); i++){
@@ -635,7 +635,7 @@ function transformProfile(data){
 	  }
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('courses')){
 		console.log('tem courses');
 		for(var i=0; i < (data.courses._total); i++){
@@ -644,7 +644,7 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('educations')){
 		console.log('tem educations');
 		for(var i=0; i < (data.educations._total); i++){
@@ -655,7 +655,7 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('honorsAwards')){
 		console.log('tem honor awards');
 		for(var i=0; i < (data.honorsAwards._total); i++){
@@ -664,10 +664,10 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	profile.data += (data.industry || "") + ". ";
-	profile.data += (data.interests || "") + ". ";    
-	
+	profile.data += (data.interests || "") + ". ";
+
 	if(data.hasOwnProperty('languages')){
 		console.log('tem languages');
 		for(var i=0; i < (data.languages._total); i++){
@@ -676,10 +676,10 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	profile.data += (data.location.name || "") + ". ";
 
-	
+
 	if(data.hasOwnProperty('positions')){
 		console.log('tem positions');
 		for(var i=0; i < (data.positions._total); i++){
@@ -699,7 +699,7 @@ function transformProfile(data){
 	  }
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('publications')){
 		console.log('tem publications');
 		for(var i=0; i < (data.publications._total); i++){
@@ -709,7 +709,7 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('patents')){
 		console.log('tem patents');
 		for(var i=0; i < (data.patents._total); i++){
@@ -719,7 +719,7 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	if(data.hasOwnProperty('recommendationsReceived')){
 		console.log('tem recommendationsReceived');
 		for(var i=0; i < (data.recommendationsReceived._total); i++){
@@ -737,10 +737,10 @@ function transformProfile(data){
 		}
 	  profile.data += ". ";
 	}
-	
+
 	profile.data += (data.specialties || "") + ". ";
-	
-	
+
+
 	profile.data = profile.data.replace(/(\n)/g, ' ');
 	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
 	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
@@ -754,15 +754,15 @@ function transformProfile(data){
 }
 
 function cleanTextProfile(data){
-	
+
 	var profile = {};
-	
+
 	profile.id = data.id || "";
 	profile.fullName = data.name;
 	profile.pictureUrl = (data.pictureUrl || "images/user.png");
 	profile.publicProfileUrl = (data.publicProfileUrl || "");
 	profile.emailAddress = (data.emailAddress || "");
-	
+
 	profile.data = data.text;
 	profile.data = profile.data.replace(/(\n)/g, ' ');
 	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
@@ -777,15 +777,15 @@ function cleanTextProfile(data){
 }
 
 function clearSession(session){
-	
+
 	if(session.token){
 		session.token = null;
 	}
-	
+
 	if(session.text){
 		session.text = null;
 	}
-} 
+}
 
 
 // leave always at the end of the file

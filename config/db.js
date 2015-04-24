@@ -41,6 +41,7 @@ var jobSchema = mongoose.Schema({
       title: "string",
       description: "string",
       concept_id: "string",
+      concepts: "number",
       requiredConcepts: [ "string" ]
     });
 
@@ -137,16 +138,17 @@ module.exports.addJob = function addJob(job) {
       console.log(err);
     } else {
       if (!doc) {
-        console.log("add: " + job.id);
+        //console.log("add: " + job.id);
         doc = new jobModel;
         doc.code = job.code || job.id;
         doc.concept_id = job.id;
         doc.title = job.label;
         doc.description = job.parts[0].data;
-        console.log('instance: ' +  doc);
+        doc.concepts = job.annotations[0].length;
+        //console.log('instance: ' +  doc);
         doc.save(function (err) {
           if (err) { 
-                 console.log('Error saving job: ' + err); 
+                console.log('Error saving job: ' + err); 
               } else {
                 console.log('Success saving job'); 
               }
@@ -194,7 +196,7 @@ module.exports.addCandidate = function addCandidate(cand) {
 
 
 //clean them all
-/*conceptModel.find({}, function (err, docs) {
+/*jobModel.find({}, function (err, docs) {
   docs.forEach(function(d){ 
     console.log(d)
     d.remove();

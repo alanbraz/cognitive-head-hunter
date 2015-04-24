@@ -46,28 +46,30 @@ $(document).ready(function() {
 function loadJobs() {
   $('#jobs-loading').show();
   $("#jobs-list").empty();
+  $("#pending-jobs-list").empty();
 
   $.ajax({
       type: 'GET',
-      url: '/db/jobs',
+      url: '/db/jobs/?select=concept_id%20title%20code%20requiredConcepts%20concepts&sort=code',
       dataType: 'json',
       success: function(data) {
         $('#num-jobs').html(data.length + ' jobs');
         data.forEach(function(job) {
+          var list = (job.requiredConcepts.length>0)?'#jobs-list':'#pending-jobs-list';
           job.id = (job.concept_id || job._id);
-          $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' +
+          $('<li>'+job.code+' '+'<strong>'+ job.title + ' ('+job.concepts + ')' + '</strong>' + ' ' +
             // (job.requiredConcepts.length==0?
             //   '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]' :
             // '[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]') +
             // '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
             // //'<span id=\'job-'+job.id+'\'></span>' +
             // '</li>')
-            '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]' +
-            '[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]' + 
+            (job.requiredConcepts.length==0?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
+            (job.requiredConcepts.length>0?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') + 
             '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
             //'<span id=\'job-'+job.id+'\'></span>' +
             '</li>')
-          .appendTo($('#jobs-list'));
+          .appendTo($(list));
         });
         //handleJobs(data);
       },
@@ -146,7 +148,7 @@ var loadCandidates = function() {
 
   $.ajax({
     type: 'GET',
-    url: '/db/candidates',
+    url: '/db/candidates/?select=concept_id%20name%20profile&sort=name',
     dataType: 'json',
     success: function(data) {
       $('#num-candidates').html(data.length + ' candidates');

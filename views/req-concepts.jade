@@ -3,33 +3,35 @@ extends ./layout.jade
 
 block specificJS
 	script(type='text/javascript', src='/js/req-concepts.js')
-	
+
 block content
-	div.row
-		div.col-lg-12.message#error(style='display:none;')
-			p.bg-danger#errorMsg
-		div.col-lg-12.message#success(style='display:none;')
-			p.bg-success#successMsg
+	div.col-lg-12.col-md-6.col-xs-12
+		div.modal-content(style='padding:10px;margin-top:10px;margin-bottom:10px;')
+			div.row
+			div.col-lg-12.message#error(style='display:none;')
+				p.bg-danger#errorMsg
+			div.col-lg-12.message#success(style='display:none;')
+				p.bg-success#successMsg
 
-		h2#job_id.hidden= job_id
-		div.row.text-center#loading(style='display:none;')
-			h2 &nbsp;
-			img(src='/images/watson.gif')
-		div.row#concepts(style='display:none;')
-			h1 Select the required concepts for this job position:
-			h2#job-title
-			p#job-description
-			div.well#concepts-form
-				form(role="form",action="javascript:submitJob();")
-					h3 Concepts extracted:
-					div.form-group.row#concepts-list
-					div.form-group.row
-						div.col-lg-9 &nbsp;
-						div.col-lg-3
-							button.btn.btn-block(type='submit') Set concepts
+			h2#job_id.hidden= job_id
+			div.row.text-center#loading(style='display:none;')
+				h2 &nbsp;
+				img(src='/images/watson.gif')
+			div.row#concepts(style='display:none;')
+				h1 Select the required concepts for this job position:
+				h2#job-title
+				p#job-description
+				div.well#concepts-form
+					form(role="form",action="javascript:submitJob();")
+						h3 Concepts extracted:
+						div.form-group.row#concepts-list
+						div.form-group.row
+							div.col-lg-9 &nbsp;
+							div.col-lg-3
+								button.btn.btn-block(type='submit') Set concepts
 
-	div.hidden
-		div#template
-			div.checkbox.col-lg-4
-				input(type="checkbox", name='conpect', value='abc')
-				label
+		div.hidden
+			div#template
+				div.checkbox.col-lg-4
+					input(type="checkbox", name='conpect', value='abc')
+					label

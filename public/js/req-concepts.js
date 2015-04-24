@@ -14,7 +14,7 @@ $(document).ready(function() {
             var table = $('#concepts-list');
             table.empty();
             var job = getJob(data.concept_id || data._id);
-            //table.html(JSON.stringify(job));  
+            //table.html(JSON.stringify(job));
 
             var concepts = [];
             job.annotations[0].forEach(function(data){
@@ -56,10 +56,10 @@ $(document).ready(function() {
           /*$('#num-jobs').html(data.length + ' jobs');
           data.forEach(function(job) {
             job.id = (job.concept_id || job._id);
-            $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' + 
+            $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' +
               (job.requiredConcepts.length==0?'[set required concepts]':'OK') +
-              '&nbsp;<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'[find candidates]'+'</a>' + 
-              //'<span id=\'job-'+job.id+'\'></span>' + 
+              '&nbsp;<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'[find candidates]'+'</a>' +
+              //'<span id=\'job-'+job.id+'\'></span>' +
               '</li>')
             .appendTo($('#jobs-list'));
           });*/
@@ -85,27 +85,27 @@ function showError(error) {
   var defaultErrorMsg = 'Error processing the request, please try again later.';
   $('#error').show();
   $('#errorMsg').text( (typeof error === "string")?error:JSON.stringify(error) || defaultErrorMsg);
-} 
+}
 
 function showSuccess(message) {
   $('#success').show();
   $('#successMsg').text(message);
-} 
+}
 
 function cleanMessages() {
   $('#success').hide();
   $('#successMsg').text('');
   $('#error').hide();
   $('#errorMsg').text('');
-} 
+}
 
 function submitJob() {
   $('.btn').blur();
   $('#loading').show();
-  cleanMessages(); 
-  
+  cleanMessages();
+
   var con = [];
-  console.log(JSON.stringify($("#concepts-form input:checkbox:checked")));
+  console.log(JSON.stringify($("#concepts-form input:checkbox:checked").val()));
 
   $("#concepts-form input:checkbox:checked").each(function(){
       con.push($(this).val());// add $(this).val() to your array
@@ -124,7 +124,7 @@ function submitJob() {
     url: '/db/jobs/'+$('#job_id').html(),
     data: { requiredConcepts: con },
     dataType: 'json',
-    success: function(data) { 
+    success: function(data) {
       console.log(data);
     },
     error: function(err) {

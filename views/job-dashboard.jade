@@ -2,63 +2,33 @@
 extends ./layout.jade
 
 block specificJS
-	script(type='text/javascript', src='/js/jobs.js')
+	script(type='text/javascript', src='/js/candidatesearch.js')
 
 block content
 	//
-		div.row
-			div.col-lg-1.col-xs-12.text-center.chh_logo
-				img(src='/images/logo2.png')
-			div.col-lg-9.col-xs-0.text-center
-			div.col-lg-2.col-xs-12.text-center
-				img(src='/images/ibmpos_blue.jpg',style='padding-top:25px;')
-	div.row#test.loading1(style='display:none;')
-		div.col-lg-1.col-xs-12.text-center.chh_logo
-			img(src='/images/logo2.png')
 	div.row
 		div.col-lg-12.col-md-6.col-xs-12
 			div.modal-content(style='padding:10px;margin-top:10px;margin-bottom:10px;')
 				div.row
-					div.col-lg-3.col-xs-12.text-center(style='padding-top:40px;')
-						img(src='/images/Cognitive-Head-Hunter.png')
-						h2 #{job.id}
-						p #{job.label}
-					div#loading.row.col-lg-9.col-xs-12.text-center(style='display:none;')
+					div.col-lg-12.message#error(style='display:none;')
+						p.bg-danger#errorMsg
+					div.col-lg-12.message#success(style='display:none;')
+						p.bg-success#successMsg
+					span#job_id.hidden=jobid
+					div.row.text-center#loading(style='display:none;')
+						h2 &nbsp;
 						img(src='/images/watson.gif')
-					div.row.col-lg-9.col-xs-12#summary
-						div.row.col-lg-12.col-xs-12
-							div
-								textarea.content.form-control(rows='10', required='true',
-									placeholder='Please enter the text to analyze (minimum of 100 words)...')
-									| #{job.parts[0].data}
-								div.text-right
-									span.wordsCount.small
-						div.row.form-group.text-right
-							div.col-lg-3.col-lg-push-3.col-xs-3
-								button.btn.btn-block#back-btn(type='button',onClick='javascript:history.back();') Back
-							div.col-lg-3.col-lg-push-3.col-xs-3
-								button.btn.btn-block.clear-btn(type='button') Clear
-							div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-								button#analyze-job.btn.btn-block.analysis-btn(type='button') Analyze
-					div#positions.col-lg-9.col-xs-12(style='display: none;min-height:200px;')
-						div.content
-				div.col-lg-6.col-md-6.col-xs-12
-					div.row
-						div.form-group.row.loading1.text-center(style='display:none;')
+					div.row#concepts(style='display:none;')
+						div.col-lg-12.col-sm-12
+							h2#job-title
+						div.col-lg-8.col-sm-12
+							div#job-description(style='overflow:auto;height:200px;border:1px solid #ccc;background:#f2f2f2;margin-bottom:20px;')
+						div.col-lg-4.col-sm-12
+								div.well#concepts-list
+						div.row.text-center#loading2(style='display:none;')
 							h2 &nbsp;
 							img(src='/images/watson.gif')
-						div.form-group.row.error(style='display: none;')
-							h2 &nbsp;
-							div.well
-								p.errorMsg
-				div.row.text-center.results(style='display:none;')
-					div.row.row.col-lg-12.col-xs-12.text-center(style='margin:10px;')
-						img(src='/images/ibm_watson.jpg',style='width:100px;')
-					div.row
-						div#concepts.col-lg-4.col-md-5.col-xs-12(style='display: none;')
-							h3(style='height: 29px;') Top concepts
-							div.well.content
-		div#raw.hidden #{JSON.stringify(job)}
-
-
-			
+					div.row.text-center#candidates
+	div.hidden
+		div#template
+			label

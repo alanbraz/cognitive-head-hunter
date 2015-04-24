@@ -122,8 +122,8 @@ app.get('/jobsearch', function(req, res){
 	res.render('user-dashboard', { user: req.session.user });
 });
 
-app.get('/candidatesearch/', function(req, res){
-	res.render('job-dashboard', { job: req.session.job });
+app.get('/candidatesearch/:jobid', function(req, res){
+	res.render('job-dashboard', { jobid: req.params.jobid });
 });
 
 app.get('/manage', function(req, res){
@@ -199,8 +199,7 @@ var ci_credentials = {
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
 
-// migrate jobs
-/*conceptInsights.getDocumentIds({ 
+/*conceptInsights.getDocumentIds({
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs
   }, function(error, result) {
@@ -224,24 +223,6 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 				});
   		});
 });*/
-
-// migrate candidates
-/*conceptInsights.getDocumentIds({ 
-	  user: ci_credentials.username,
-	  corpus: ci_credentials.corpus_candidates
-  }, function(error, result) {
-  		result.forEach(function(cand){
-  			//console.log(job);
-  			conceptInsights.getDocument({ 
-				  user: ci_credentials.username,
-				  corpus: ci_credentials.corpus_candidates,
-				  documentid: cand
-			  }, function(error, result) {
-			  		db.addCandidate(result);			  
-				});	
-  		});
-});*/
-
 
 function reloadCache() {
 	console.log("reloading concepts cache...");

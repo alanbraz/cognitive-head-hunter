@@ -40,7 +40,7 @@ $(document).ready(function() {
    * 3. Call the methods to display the results
    */
   //$('.job-add-form').submit(function( event ){
-  
+
 });
 
 function loadJobs() {
@@ -55,12 +55,17 @@ function loadJobs() {
         $('#num-jobs').html(data.length + ' jobs');
         data.forEach(function(job) {
           job.id = (job.concept_id || job._id);
-          $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' + 
-            (job.requiredConcepts.length==0?
-              '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':
-            '[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]') + 
+          $('<li>'+job.code+' '+'<strong>'+ job.title + '</strong>' + ' ' +
+            // (job.requiredConcepts.length==0?
+            //   '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]' :
+            // '[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]') +
+            // '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
+            // //'<span id=\'job-'+job.id+'\'></span>' +
+            // '</li>')
+            '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]' +
+            '[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]' + 
             '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
-            //'<span id=\'job-'+job.id+'\'></span>' + 
+            //'<span id=\'job-'+job.id+'\'></span>' +
             '</li>')
           .appendTo($('#jobs-list'));
         });
@@ -74,7 +79,7 @@ function loadJobs() {
         $('#jobs-loading').hide();
       }
   });
-  
+
 }
 
 
@@ -205,7 +210,7 @@ var delJob = function(dbId, ciId) {
     },
     error: function(err) {
       console.error(err);
-    }, 
+    },
     complete: function(data) {
       //loadJobs();
     }
@@ -220,7 +225,7 @@ var delJob = function(dbId, ciId) {
       },
       error: function(err) {
         console.error(err);
-      }, 
+      },
       complete: function(data) {
         loadJobs();
       }

@@ -3,7 +3,8 @@ extends ./layout.jade
 
 block specificJS
 	script(type='text/javascript', src='/js/manage.js')
-	
+	script(type='text/javascript', src='/js/analyze.js')
+
 block content
 	div.row
 		div.col-lg-12.message#error(style='display:none;')
@@ -19,10 +20,10 @@ block content
 				form(role="form")
 					div.form-group.row
 						div.col-lg-12.col-xs-12
-							input#name.form-control(type="text", required='true', placeholder='Name')
+							input#txt-name.form-control(type="text", required='true', placeholder='Name')
 					div.form-group.row
 						div.col-lg-12.col-xs-12
-							textarea#profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
+							textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
 					div.form-group.row
 						div.col-lg-3.col-lg-push-3.col-xs-3
 							button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
@@ -62,7 +63,7 @@ block content
 						div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
 							button.btn.btn-block#job-add-btn(type='submit') Add
 			div.well#job-required-form(style='display:none;')
-				h3 New job: 
+				h3 New job:
 					span#job-code
 					span.hidden#job-id
 				h4 Choose the required concepts.
@@ -91,8 +92,7 @@ block content
 			div.row.text-center#jobs-loading(style='display:none;')
 				h2 &nbsp;
 				img(src='../images/watson.gif')
-			
+
 			h3#num-jobs
 			div.well
 				ul#jobs-list
-					

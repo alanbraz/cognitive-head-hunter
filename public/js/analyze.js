@@ -1,38 +1,43 @@
 $(document).ready(function() {
 
-  $('#continue-btn').click(function(){
-    
-    $('#loading').show();
-  
-    var profile = {};
-    profile.text = $('#txt-profile').val();
-    profile.name = $('#txt-name').val();
-    
-    $.ajax({
-      type: 'GET',
-      async: false,
-      url: '/db/candidates?name='+ profile.name.toLowerCase(),
-      dataType: 'json',
-      success: function(data) {
-        if(data.length > 0){
-          console.log(data[0]._id);
-          profile.id = data[0]._id;
-          redirectToParse(profile);
-          // TODO update name and text
-        } else {
-          insertCandidate(profile);
-        }
-      },
-      error: function(xhr) {
-        console.log(xhr);
-      } 
-    });//get
-  });//click
+  $('#continue-btn').click(function() {handleCreation()});
+
+
+
 
 });//ready
 
 
- 
+function handleCreation(){
+
+  $('#loading').show();
+
+  var profile = {};
+  profile.text = $('#txt-profile').val();
+  profile.name = $('#txt-name').val();
+
+  $.ajax({
+    type: 'GET',
+    async: false,
+    url: '/db/candidates?name='+ profile.name.toLowerCase(),
+    dataType: 'json',
+    success: function(data) {
+      if(data.length > 0){
+        console.log(data[0]._id);
+        profile.id = data[0]._id;
+        redirectToParse(profile);
+        // TODO update name and text
+      } else {
+        insertCandidate(profile);
+      }
+    },
+    error: function(xhr) {
+      console.log(xhr);
+    }
+  });//get
+
+}
+
 function insertCandidate(profile) {
   if (!profile.profile && profile.text) {
     profile.profile = profile.text;
@@ -42,7 +47,7 @@ function insertCandidate(profile) {
     url: '/db/candidates',
     data: profile,
     dataType: 'json',
-    success: function(data) { 
+    success: function(data) {
       profile.id = data._id;
       console.log(data);
       redirectToParse(profile);

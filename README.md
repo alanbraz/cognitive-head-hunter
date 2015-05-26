@@ -123,12 +123,3 @@ To troubleshoot your Bluemix app the main useful source of information are the l
 [cloud_foundry]: https://github.com/cloudfoundry/cli
 [getting_started]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/getting_started/
 [sign_up]: https://apps.admin.ibmcloud.com/manage/trial/bluemix.html?cm_mmc=WatsonDeveloperCloud-_-LandingSiteGetStarted-_-x-_-CreateAnAccountOnBluemixCLI
-
-Read more at
-
-https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter?lang=en
-
-cf api https://api.stage1.ng.bluemix.net
-
-cf login -u alanbraz@br.ibm.com -o gbs_watson_org -s dev
-

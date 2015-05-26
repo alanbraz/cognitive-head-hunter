@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
 	$('#loading').show();
 	$('#loading2').show();
 	$('#concepts').hide();
@@ -17,10 +16,10 @@ function findJob(id) {
 		success: function (data) {
 			$('#job-title').text(data.id + ' ' + data.label);
 			$('#job-description').text(data.parts[0].data);
-			var table = $('#concepts-list');
+			var concepts, table = $('#concepts-list');
+
 			table.empty();
 
-			var concepts = [];
 			data.annotations[0].forEach(function (data) {
 				//console.log(JSON.stringify(data));
 				var obj = {
@@ -82,9 +81,8 @@ function findCandidates(id) {
 
 
 function showCandidates(candidates) {
-  candidates.results.forEach(function (candidate) {
-    var score = Math.ceil(candidate.score * 100) + "%";
-    $('<div class="col-lg-1"/>').html('<div><img src=\"'+ candidate.candidatePictureUrl + '\"/></div>'
-    + '<div>'+ candidate.label + '<p class=\'_'+ Math.round(candidate.score * 10) + '\'>'+score+'</p></div>').appendTo("#candidates");
-  });
+	candidates.results.forEach(function (candidate) {
+		var score = Math.ceil(candidate.score * 100) + "%";
+		$('<div class="col-lg-1"/>').html('<div><img src=\"' + candidate.candidatePictureUrl + '\"/></div>' + '<div>' + candidate.label + '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' + score + '</p></div>').appendTo("#candidates");
+	});
 }

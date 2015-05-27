@@ -16,8 +16,8 @@ function findJob(id) {
 		success: function (data) {
 			$('#job-title').text(data.id + ' ' + data.label);
 			$('#job-description').text(data.parts[0].data);
-			var concepts, table = $('#concepts-list');
-
+			var table = $('#concepts-list');
+			var concepts = [];
 			table.empty();
 
 			data.annotations[0].forEach(function (data) {

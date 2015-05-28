@@ -25,7 +25,7 @@ $(document).ready(function () {
 		minWords = 200;
 
 	// Jquery variables
-	var $content = $('.content'),
+	var $content = $('#text'),
 		$loading = $('.loading1'),
 		$error = $('.error'),
 		$errorMsg = $('.errorMsg'),
@@ -68,7 +68,8 @@ $(document).ready(function () {
 
 		$('#summary').hide();
 		$('#loading').show();
-
+		$('#userInfo').removeClass( "col-lg-3" );
+		$('#userInfo').addClass( "col-lg-7" );
 		// usando desse #raw escondido, acho q o melhor é usar o conteudo do textbox
 		// $content.val()
 		var $user = JSON.parse($('#raw').html());
@@ -90,7 +91,7 @@ $(document).ready(function () {
 				if (data.error) {
 					showError(data.error);
 				} else {
-					$results.show();
+//					$results.show();
 					$personality.show();
 					showTextSummary(data);
 					showVizualization(data);
@@ -191,34 +192,12 @@ $(document).ready(function () {
 				}
 			}
 			populateConcepts(concepts);
-
-			/*console.log("db concepts");
-			for(var j=0; j < conceptsWiki.length; j++){
-				var c = conceptsWiki[j];
-				c.key = conceptsArray[j];
-				conceptsCache[c.key] = c;
-				console.log("cache: " + JSON.stringify(c));
-				$.ajax({
-				  type: "GET",
-				  url: '/db/concepts?key='+encodeURIComponent(c.key),
-				  success: function(data) { 
-				  	if (data.length == 0) { // not found, so insert
-							addConcept(c);
-						}
-				  },
-				  error: function(err) { 
-						
-					},
-				  dataType: 'json'
-				});
-
-			}*/
 		});
 
 		$.ajax({
 			type: 'GET',
-			async: false,
-			url: '/ci/semantic_search/candidate/' + $user.id + "/20", // ab: 20 to degub, old value was 10
+			async: true,
+			url: '/ci/semantic_search/candidate/' + $user.id + "/10", // ab: 20 to degub, old value was 10
 			dataType: 'json',
 			success: function (data) {
 				//console.log(JSON.stringify(data));
@@ -272,22 +251,17 @@ $(document).ready(function () {
 		var html;
 		var position;
 		var score;
-		//console.log(positions);
-		//$('#positions .loading').hide();
-
-		//console.log("cache: " + JSON.stringify(cache));
 
 		for (var i = 0, length = positions.length; i < length; i++) {
 			position = positions[i];
 			score = Math.ceil(position.score * 100) + "%";
 			html = '<div id=' + position.id + ' class="row">' +
 				'<div class=\'_' + Math.round(position.score * 10) + ' col-lg-1\'>' + score + '</div>' +
-				'<div class=\'col-lg-9\'><strong> ' + position.label + '</strong><br/>' +
-				//'&nbsp;<small><a id="show-'+ position.id + '">show concepts</a></small>' +
+				'<div class=\'col-lg-11\'><strong> ' + position.label + '</strong><br/>' +
 				'<small class=\'row\' id=\'tags-' + position.id + '\' style=\'display:block;\'></small>' +
 				'</div>' +
-				'<div class=\'col-lg-2\'>' +
-				'<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id=' + position.id + '\' target=\'_blank\' >' + position.id + '</a>' +
+//				'<div class=\'col-lg-2\'>' +
+//				'<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id=' + position.id + '\' target=\'_blank\' >' + position.id + '</a>' +
 				'</div>';
 			html += '</div>';
 

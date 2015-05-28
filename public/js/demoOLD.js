@@ -68,6 +68,8 @@ $(document).ready(function () {
 
 		$('#summary').hide();
 		$('#loading').show();
+		$('#userInfo').removeClass( "col-lg-3" );
+		$('#userInfo').addClass( "col-lg-7" );
 		// usando desse #raw escondido, acho q o melhor é usar o conteudo do textbox
 		// $content.val()
 		var $user = JSON.parse($('#raw').html());
@@ -216,7 +218,7 @@ $(document).ready(function () {
 	function populateConcepts(concepts) {
 		$('#concepts .loading').hide();
 		//console.log(concepts);
-		conceptsToPie(concepts);
+		conceptsToHtml(concepts);
 		$('#concepts').show();
 		$('#concepts .content').show();
 	}
@@ -239,29 +241,6 @@ $(document).ready(function () {
 					//' (debug: '+ weight +' ' +
 					//(ont || ' ') +//' ' +')' + // TODO
 					'</div>'));
-				show--;
-			}
-		}
-	}
-	function conceptsToPie(concepts) {
-		var top = 4; //concepts.length
-		var conceptPie;
-		for (var i = 0, show = top, length = concepts.length;
-			(i < length && show > 0); i++) {
-			var label = concepts[i].label;
-			var weight = concepts[i].weight;
-			var ont = concepts[i].ontology;
-
-			var ignore = false;
-			// Removing location and dates
-			ignore = ignore || ($.inArray("Year", ont) > -1);
-			ignore = ignore || ($.inArray("Place", ont) > -1);
-			if (!ignore) {
-				conceptPie = $('#concept' + (i+1));
-				conceptPie.attr("data-percent", weight);
-				conceptPie.attr("data-text", weight+"%");
-				conceptPie.attr("data-info", label);
-				conceptPie.circliful();
 				show--;
 			}
 		}
@@ -298,6 +277,29 @@ $(document).ready(function () {
 			}
 			console.log("tags: " + tags);
 			printLabels('#tags-' + position.id, tags);
+
+			/*$.ajax({
+		        type: 'GET',
+		        async: false,
+			    	url: '/ci/graph_search',
+			    	data: { ids: tags },
+		        dataType: 'json',
+		        success: function(data) {
+		          var labels = [];
+		        	data.forEach(function(c) {
+		        		labels.push(c.label);
+		        	});
+		        	printLabels('#tags-'+ position.id, labels);
+		        },
+		        error: function(xhr) {
+		          var error;
+		          try {
+		            error = JSON.parse(xhr.responseText);
+		          } catch(e) {}
+		          console.log(error.error || error);
+		          showError(error.error || error);
+		        }
+		    });*/
 		}
 		$('#positions .content').show();
 		$('#loading').hide();

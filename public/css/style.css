@@ -158,3 +158,33 @@
 .message p {
   padding: 15px;
 }
+
+.circliful {
+    position: relative;
+}
+
+.circle-text, .circle-info, .circle-text-half, .circle-info-half {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    display: inline-block;
+}
+
+.circle-info, .circle-info-half {
+	color: #000;
+}
+
+.circliful .fa {
+	margin: -10px 3px 0 3px;
+	position: relative;
+	bottom: 4px;
+}
+.circle {
+  margin: 0 auto;
+  display: inline-block;
+  margin-right: 1em;
+}
+div#concepts .circle-info-half {
+	line-height: 15px !important;
+	bottom: -30px;
+}

@@ -188,3 +188,17 @@ div#concepts .circle-info-half {
 	line-height: 15px !important;
 	bottom: -30px;
 }
+#chart {
+	width: 200px;
+	margin-top: 20px;
+}
+#chart div {
+	font: 15px sans-serif;
+	background-color: steelblue;
+	text-align: right;
+	padding: 3px;
+	margin-bottom: 8px;
+	color: #000;
+	height: 25px;
+	white-space: nowrap;
+}

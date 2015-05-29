@@ -8,8 +8,8 @@ html(lang='en')
 		meta(http-equiv='X-UA-Compatible', content='IE=edge')
 		meta(name='viewport', content='width=device-width, initial-scale=1')
 
-		link(rel='shortcut icon', href='/images/favicon.ico', type='image/x-icon')
-		link(rel='icon', href='/images/favicon.ico', type='image/x-icon')
+		link(rel='shortcut icon', href='/images/favicon.ico?v=2', type='image/x-icon')
+		link(rel='icon', href='/images/favicon.ico?v=2', type='image/x-icon')
 		link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
 		link(rel='stylesheet', href='/css/style.css')
 
@@ -21,11 +21,10 @@ html(lang='en')
 	body
 		div.container
 			div.row.top-nav(style='background-color: #003F69;')
-				div.col-lg-12
-					h3.heading.left 
+				div.col-lg-6
 					a(href='/')
-						img(src='/images/logo-blue.jpg',height='70px;') 
-					a.right(href='https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter',target='_blank') Challenge blog post
+						img(src='/images/logo-blue.jpg',height='70px;')
+				div.col-lg-6
 					a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
 			div.row.modal-content(style='padding:10px;margin-top:10px;margin-bottom:10px; min-height: 600px;')
 				block content

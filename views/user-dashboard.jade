@@ -42,6 +42,11 @@ block content
 			div.summary-div
 			div.text-right(style='color: gray')
 				em.small *Compared to most people who participated in our surveys.
+			div.row
+				div.well#vizcontainer.col-lg-12.text-center.results(style='display:none;')
+					
+			div.row
+				div#chart
 		div#loading.row.col-lg-6.col-xs-12.text-center(style='display:none;')
 			img(src='/images/watson.gif')
 		div#positions.col-lg-6.col-xs-12(style='display: none;min-height:200px;')
@@ -55,10 +60,4 @@ block content
 				h2 &nbsp;
 				div.well
 					p.errorMsg
-	div.row.text-center.results(style='display:none;')
-		div.results(style='display: none;')
-			div.row
-				div.col-lg-12.col-xs-12.col-md-7
-					h3 Visualization of Personality Data
-					div.well#vizcontainer
-		div#raw.hidden #{JSON.stringify(user)}
+			div#raw.hidden #{JSON.stringify(user)}

@@ -93,6 +93,7 @@ $(document).ready(function () {
 					$personality.show();
 					showTextSummary(data);
 					showVizualization(data);
+					showVizualizationSumamry(data);
 				}
 
 			},
@@ -359,6 +360,46 @@ $(document).ready(function () {
 			$('<p></p>').text(sentences.join(' ')).appendTo(div);
 		});
 	}
+
+	function createBar(chartElement, values) {
+
+		function sortObj(a, b) {
+			return a.percentage < b.percentage ? 0 : 1;
+		}
+
+		values.sort(sortObj);
+		var highest = values[values.length - 1];
+		var highest_percentage = Math.round(highest.percentage * 100);
+		var lowest = values[0];
+		var lowest_percentage = Math.round(lowest.percentage * 100);
+
+		chartElement.append($("<div/>").text(highest_percentage + "% - " + highest.name).css({
+			'width': (highest.percentage * 200) + 'px'
+		}));
+
+		chartElement.append($("<div/>").text(lowest_percentage + "% - " + lowest.name).css({
+			'width': (lowest.percentage * 200) + 'px'
+		}));
+	}
+
+	function showVizualizationSumamry(theProfile) {
+		var big5 = theProfile.tree.children[0];
+		var needs = theProfile.tree.children[1];
+		var values = theProfile.tree.children[2];
+
+		var big5_items = big5.children[0].children;
+		var needs_items = needs.children[0].children;
+		var values_items = values.children[0].children;
+
+		var chartDiv = $('#chart');
+
+
+
+		createBar(chartDiv, big5_items);
+		createBar(chartDiv, needs_items);
+		createBar(chartDiv, values_items);
+	}
+
 
 	/**
 	 * Renders the sunburst visualization. The parameter is the tree as returned

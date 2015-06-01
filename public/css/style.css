@@ -102,7 +102,7 @@
 }
 
 #vizcontainer svg {
-  min-width: 480px;
+  min-width: 100px;
   width: 100%;
   height: 100%;
 }
@@ -189,16 +189,21 @@ div#concepts .circle-info-half {
 	bottom: -30px;
 }
 #chart {
-	width: 200px;
 	margin-top: 20px;
 }
 #chart div {
-	font: 15px sans-serif;
-	background-color: steelblue;
-	text-align: right;
-	padding: 3px;
-	margin-bottom: 8px;
-	color: #000;
+	width: 100%;
+	background-color: cornflowerblue;
+}
+
+#chart div div {
+	font-weight: bold;
+	color: white;
+	background: rgba(59, 89, 141, 1);
+	margin-bottom: 4px;
+	border-radius: 2px;
 	height: 25px;
 	white-space: nowrap;
+	  padding: 4px;
+	animation: grow-width-right 1s;
 }

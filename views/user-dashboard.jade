@@ -43,14 +43,14 @@ block content
 			div.text-right(style='color: gray')
 				em.small *Compared to most people who participated in our surveys.
 			div.row
-				div.well#vizcontainer.col-lg-12.text-center.results(style='display:none;')
-					
-			div.row
-				div#chart
+				div.col-lg-12
+					div#chart.col-lg-6
+					div.well#vizcontainer.col-lg-6.text-center.results(style='display:none;')
 		div#loading.row.col-lg-6.col-xs-12.text-center(style='display:none;')
 			img(src='/images/watson.gif')
-		div#positions.col-lg-6.col-xs-12(style='display: none;min-height:200px;')
-			div.content
+		div.col-lg-6
+			div#positions.col-lg-12.col-xs-12(style='display: none;min-height:200px;')
+				div.content
 	div.col-lg-6.col-md-6.col-xs-12
 		div.row
 			div.form-group.row.loading1.text-center(style='display:none;')

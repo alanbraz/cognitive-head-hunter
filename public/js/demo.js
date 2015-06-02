@@ -109,7 +109,7 @@ $(document).ready(function () {
 
 		// check candidate
 		var candidate = getCandidate($user.id);
-		console.log(candidate);
+//		console.log(candidate);
 
 		// alanbraz: only insert if not there, will not consider update this time.
 		if (!candidate) {
@@ -373,13 +373,17 @@ $(document).ready(function () {
 		var lowest = values[0];
 		var lowest_percentage = Math.round(lowest.percentage * 100);
 
-		chartElement.append($("<div/>").text(highest_percentage + "% - " + highest.name).css({
-			'width': (highest.percentage * 200) + 'px'
+		var h_div = $("<div/>");
+		h_div.append($("<div/>").text(highest_percentage + "% - " + highest.name).css({
+			'width': (highest.percentage * 100) + '%'
 		}));
+		chartElement.append(h_div);
 
-		chartElement.append($("<div/>").text(lowest_percentage + "% - " + lowest.name).css({
-			'width': (lowest.percentage * 200) + 'px'
+		var l_div = $("<div/>");
+		l_div.append($("<div/>").text(lowest_percentage + "% - " + lowest.name).css({
+			'width': (lowest.percentage * 100) + '%'
 		}));
+		chartElement.append(l_div);
 	}
 
 	function showVizualizationSumamry(theProfile) {

@@ -12,34 +12,6 @@ block content
 		div.col-lg-12.message#success(style='display:none;')
 			p.bg-success#successMsg
 
-		div.col-lg-6#candidates
-			h2 Candidates
-				button.btn.pull-right#candidate-new-btn(type='button') New
-
-			div.well#candidate-add-form(style='display:none;')
-				form(role="form")
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							input#txt-name.form-control(type="text", required='true', placeholder='Name')
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
-					div.form-group.row
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#candidate-clear-btn(type='reset') Clear
-						div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-							button.btn.btn-block#candidate-add-btn(type='button') Add
-
-			div.row.text-center#candidates-loading(style='display:none;')
-				h2 &nbsp;
-				img(src='../images/watson.gif')
-
-			h3#num-candidates
-			div.well
-				ul#candidates-list
-
 		div.col-lg-6#jobs
 			h2 Job positions
 				button.btn.pull-right#job-new-btn(type='button') New
@@ -74,3 +46,31 @@ block content
 			h4 Pending jobs
 			div.well
 				ul#pending-jobs-list
+
+		div.col-lg-6#candidates
+			h2 Candidates
+				button.btn.pull-right#candidate-new-btn(type='button') New
+
+			div.well#candidate-add-form(style='display:none;')
+				form(role="form")
+					div.form-group.row
+						div.col-lg-12.col-xs-12
+							input#txt-name.form-control(type="text", required='true', placeholder='Name')
+					div.form-group.row
+						div.col-lg-12.col-xs-12
+							textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
+					div.form-group.row
+						div.col-lg-3.col-lg-push-3.col-xs-3
+							button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
+						div.col-lg-3.col-lg-push-3.col-xs-3
+							button.btn.btn-block#candidate-clear-btn(type='reset') Clear
+						div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
+							button.btn.btn-block#candidate-add-btn(type='button') Add
+
+			div.row.text-center#candidates-loading(style='display:none;')
+				h2 &nbsp;
+				img(src='../images/watson.gif')
+
+			h3#num-candidates
+			div.well
+				ul#candidates-list

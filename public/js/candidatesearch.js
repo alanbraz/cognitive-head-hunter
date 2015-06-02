@@ -45,7 +45,7 @@ function findJob(id) {
 				return a.label.localeCompare(b.label)
 			});
 			concepts.forEach(function (c) {
-				$('<span/>').html(c.label).appendTo(table);
+				$('<div/>').html(c.label).appendTo(table);
 			});
 		},
 		error: function (xhr) {

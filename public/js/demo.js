@@ -211,11 +211,11 @@ $(document).ready(function() {
     $.ajax({
         type: 'GET',
         async: false,
-	    	url: '/ci/semantic_search/candidate/' + $user.id + "/20", // ab: 20 to degub, old value was 10
+	    	url: '/ci/semantic_search/candidate/' + $user.id + "/10", // ab: 20 to degub, old value was 10
         dataType: 'json',
         success: function(data) {
           //console.log(JSON.stringify(data));
-          positionsToHtml(data.results);
+          positionsToHtml(data);
         },
         error: function(xhr) {
           var error;
@@ -259,11 +259,20 @@ $(document).ready(function() {
     }
   }
   
-  function positionsToHtml(positions) {
+  function positionsToHtml(data) {
     var tags;
     var html;
     var position;
     var score;
+
+    var positions = data.results;
+    
+		data.concepts.sort(function (a, b) {
+				return a.label.localeCompare(b.label)
+			});
+    data.concepts.forEach(function(c) {
+    	$('<div/>').html(c.label).appendTo($('#matchedConceptsList'));
+    });
     //console.log(positions);
     //$('#positions .loading').hide();
 
@@ -322,6 +331,7 @@ $(document).ready(function() {
     $('#positions .content').show();
 	  $('#loading').hide();
     $('#positions').show();
+    $('#matchedConcepts').show();
   }
   
   function printLabels(id, labels) {

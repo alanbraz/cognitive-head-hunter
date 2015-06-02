@@ -198,8 +198,8 @@ var ci_credentials = {
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);
-
-/*conceptInsights.getDocumentIds({
+/*
+conceptInsights.getDocumentIds({
 	  user: ci_credentials.username,
 	  corpus: ci_credentials.corpus_jobs
   }, function(error, result) {
@@ -211,18 +211,18 @@ var conceptInsights = watson.concept_insights(ci_credentials);
 				  documentid: job
 			  }, function(error, result) {
 			  		db.addJob(result);
-			  		result.annotations[0].forEach(function(concept){
+			  		//result.annotations[0].forEach(function(concept){
 			  			//console.log(concept.concept);
-			  			getConceptDetails(concept.concept, function(d) {
+			  			//getConceptDetails(concept.concept, function(d) {
 							//console.log(d);
-							db.addConcept(d);
-						});
-			  		});
+							//db.addConcept(d);
+						//});
+			  		//});
 					//console.log(result);
 
 				});
   		});
-});*/
+});
 
 function reloadCache() {
 	console.log("reloading concepts cache...");
@@ -235,9 +235,9 @@ function reloadCache() {
 			//console.log(JSON.stringify(c));
 		});*/
 	//});
-}
+//}
 
-reloadCache();
+//reloadCache();
 
 console.log("conceptsCache:");
 /*for (var key in conceptsCache) {

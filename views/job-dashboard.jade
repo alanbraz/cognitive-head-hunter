@@ -5,31 +5,32 @@ block specificJS
 	script(type='text/javascript', src='/js/candidatesearch.js')
 
 block content
-	//
 	div.row
 		div.col-lg-12.col-md-6.col-xs-12
-			div.modal-content(style='padding:10px;margin-top:10px;margin-bottom:10px;')
-				div.row
-					div.col-lg-12.message#error(style='display:none;')
-						p.bg-danger#errorMsg
-					div.col-lg-12.message#success(style='display:none;')
-						p.bg-success#successMsg
-					span#job_id.hidden=jobid
-					div.row.text-center#loading(style='display:none;')
-						h2 &nbsp;
-						img(src='/images/watson.gif')
-					div.row#concepts(style='display:none;')
-						div.col-lg-12.col-sm-12
-							h2#job-title
-						div.col-lg-8.col-sm-12
-							div#job-description(style='overflow:auto;height:200px;border:1px solid #ccc;background:#f2f2f2;margin-bottom:20px;')
-						div.col-lg-4.col-sm-12
-								div.well.text-center#concepts-list
-						div.row.text-center#loading2(style='display:none;')
-							h2 &nbsp;
-							img(src='/images/watson.gif')
+			div.col-lg-12.message#error(style='display:none;')
+				p.bg-danger#errorMsg
+			div.col-lg-12.message#success(style='display:none;')
+				p.bg-success#successMsg
+			span#job_id.hidden=jobid
+			div.row.text-center#loading(style='display:none;')
+				h2 &nbsp;
+				img(src='/images/watson.gif')
+			div.row#concepts(style='display:none;')
+				div.col-lg-12.col-sm-12
+					h2#job-title
+				div.col-lg-8.col-sm-12
+					h4 Job description
+					div#job-description(style='overflow:auto;height:200px;border:1px solid #ccc;background:#f2f2f2;margin-bottom:20px;')
+				div.col-lg-4.col-sm-12
+						h4 Job concepts
+						div.well.text-center#concepts-list
+				div.row.text-center#loading2(style='display:none;')
+					h2 &nbsp;
+					img(src='/images/watson.gif')
+				div.col-lg-12.col-sm-12
 					h3 Suggested candidates
-					div.row.text-center#candidates
+					div.text-center#candidates
+
 	div.hidden
-		div#template
-			label
+	div#template
+	label

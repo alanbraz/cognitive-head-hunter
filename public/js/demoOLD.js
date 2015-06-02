@@ -68,6 +68,8 @@ $(document).ready(function () {
 
 		$('#summary').hide();
 		$('#loading').show();
+		$('#userInfo').removeClass( "col-lg-3" );
+		$('#userInfo').addClass( "col-lg-7" );
 		// usando desse #raw escondido, acho q o melhor é usar o conteudo do textbox
 		// $content.val()
 		var $user = JSON.parse($('#raw').html());
@@ -93,7 +95,6 @@ $(document).ready(function () {
 					$personality.show();
 					showTextSummary(data);
 					showVizualization(data);
-					showVizualizationSumamry(data);
 				}
 
 			},
@@ -109,7 +110,7 @@ $(document).ready(function () {
 
 		// check candidate
 		var candidate = getCandidate($user.id);
-//		console.log(candidate);
+		console.log(candidate);
 
 		// alanbraz: only insert if not there, will not consider update this time.
 		if (!candidate) {
@@ -211,12 +212,13 @@ $(document).ready(function () {
 				showError(error.error || error);
 			}
 		});
+
 	}); //click analyze button
 
 	function populateConcepts(concepts) {
 		$('#concepts .loading').hide();
 		//console.log(concepts);
-		conceptsToPie(concepts);
+		conceptsToHtml(concepts);
 		$('#concepts').show();
 		$('#concepts .content').show();
 	}
@@ -239,29 +241,6 @@ $(document).ready(function () {
 					//' (debug: '+ weight +' ' +
 					//(ont || ' ') +//' ' +')' + // TODO
 					'</div>'));
-				show--;
-			}
-		}
-	}
-	function conceptsToPie(concepts) {
-		var top = 4; //concepts.length
-		var conceptPie;
-		for (var i = 0, show = top, length = concepts.length;
-			(i < length && show > 0); i++) {
-			var label = concepts[i].label;
-			var weight = concepts[i].weight;
-			var ont = concepts[i].ontology;
-
-			var ignore = false;
-			// Removing location and dates
-			ignore = ignore || ($.inArray("Year", ont) > -1);
-			ignore = ignore || ($.inArray("Place", ont) > -1);
-			if (!ignore) {
-				conceptPie = $('#concept' + (i+1));
-				conceptPie.attr("data-percent", weight);
-				conceptPie.attr("data-text", weight+"%");
-				conceptPie.attr("data-info", label);
-				conceptPie.circliful();
 				show--;
 			}
 		}
@@ -298,6 +277,29 @@ $(document).ready(function () {
 			}
 			console.log("tags: " + tags);
 			printLabels('#tags-' + position.id, tags);
+
+			/*$.ajax({
+		        type: 'GET',
+		        async: false,
+			    	url: '/ci/graph_search',
+			    	data: { ids: tags },
+		        dataType: 'json',
+		        success: function(data) {
+		          var labels = [];
+		        	data.forEach(function(c) {
+		        		labels.push(c.label);
+		        	});
+		        	printLabels('#tags-'+ position.id, labels);
+		        },
+		        error: function(xhr) {
+		          var error;
+		          try {
+		            error = JSON.parse(xhr.responseText);
+		          } catch(e) {}
+		          console.log(error.error || error);
+		          showError(error.error || error);
+		        }
+		    });*/
 		}
 		$('#positions .content').show();
 		$('#loading').hide();
@@ -359,50 +361,6 @@ $(document).ready(function () {
 			$('<p></p>').text(sentences.join(' ')).appendTo(div);
 		});
 	}
-
-	function createBar(chartElement, values) {
-
-		function sortObj(a, b) {
-			return a.percentage < b.percentage ? 0 : 1;
-		}
-
-		values.sort(sortObj);
-		var highest = values[values.length - 1];
-		var highest_percentage = Math.round(highest.percentage * 100);
-		var lowest = values[0];
-		var lowest_percentage = Math.round(lowest.percentage * 100);
-
-		var h_div = $("<div/>");
-		h_div.append($("<div/>").text(highest_percentage + "% - " + highest.name).css({
-			'width': (highest.percentage * 100) + '%'
-		}));
-		chartElement.append(h_div);
-
-		var l_div = $("<div/>");
-		l_div.append($("<div/>").text(lowest_percentage + "% - " + lowest.name).css({
-			'width': (lowest.percentage * 100) + '%'
-		}));
-		chartElement.append(l_div);
-	}
-
-	function showVizualizationSumamry(theProfile) {
-		var big5 = theProfile.tree.children[0];
-		var needs = theProfile.tree.children[1];
-		var values = theProfile.tree.children[2];
-
-		var big5_items = big5.children[0].children;
-		var needs_items = needs.children[0].children;
-		var values_items = values.children[0].children;
-
-		var chartDiv = $('#chart');
-
-
-
-		createBar(chartDiv, big5_items);
-		createBar(chartDiv, needs_items);
-		createBar(chartDiv, values_items);
-	}
-
 
 	/**
 	 * Renders the sunburst visualization. The parameter is the tree as returned

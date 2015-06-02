@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
 	$('#loading').show();
 	$('#loading2').show();
 	$('#concepts').hide();
@@ -18,9 +17,9 @@ function findJob(id) {
 			$('#job-title').text(data.id + ' ' + data.label);
 			$('#job-description').text(data.parts[0].data);
 			var table = $('#concepts-list');
+			var concepts = [];
 			table.empty();
 
-			var concepts = [];
 			data.annotations[0].forEach(function (data) {
 				//console.log(JSON.stringify(data));
 				var obj = {
@@ -65,7 +64,7 @@ function findCandidates(id) {
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url: '/ci/semantic_search/job/' + id + "/10",
+		url: '/ci/semantic_search/job/' + id + "/12",
 		dataType: 'json',
 		success: function (data) {
 			showCandidates(data);
@@ -82,9 +81,13 @@ function findCandidates(id) {
 
 
 function showCandidates(candidates) {
-  candidates.results.forEach(function (candidate) {
-    var score = Math.ceil(candidate.score * 100) + "%";
-    $('<div class="col-lg-1"/>').html('<div><img src=\"'+ candidate.candidatePictureUrl + '\"/></div>'
-    + '<div>'+ candidate.label + '<p class=\'_'+ Math.round(candidate.score * 10) + '\'>'+score+'</p></div>').appendTo("#candidates");
-  });
+	candidates.results.forEach(function (candidate) {
+		var score = Math.ceil(candidate.score * 100) + "%";
+		$('<div class="col-lg-1"/>')
+			.html('<div><img src=\"' + candidate.candidatePictureUrl + '\"/></div>' 
+				+ '<div>' + candidate.label 
+				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 
+				+ score + '</p></div>')
+			.appendTo("#candidates");
+	});
 }

@@ -1,30 +1,30 @@
 //- layout.jade
 doctype html
 html(lang='en')
-  head
-    block title
-      title Cognitive Head Hunter
-    meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE=edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1')
+	head
+		block title
+		title Cognitive Head Hunter
+		meta(charset='utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		meta(name='viewport', content='width=device-width, initial-scale=1')
 
-    link(rel='shortcut icon', href='/images/favicon.ico', type='image/x-icon')
-    link(rel='icon', href='/images/favicon.ico', type='image/x-icon')
-    link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
-    link(rel='stylesheet', href='/css/style.css')
+		link(rel='shortcut icon', href='/images/favicon.ico?v=2', type='image/x-icon')
+		link(rel='icon', href='/images/favicon.ico?v=2', type='image/x-icon')
+		link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
+		link(rel='stylesheet', href='/css/style.css')
 
-    script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
-    script(type='text/javascript', src='/js/d3.v2.min.js')
+		script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
+		script(type='text/javascript', src='/js/d3.v2.min.js')
 
-    block specificJS 
+		block specificJS 
 
-  body
-    div.container
-      div.row.top-nav(style='background-color: #333333;')
-        div.col-lg-12
-          h3.heading.left 
-            a(href='/')
-                img(src='/images/logo-black.jpg',height='60px;') 
-          a.right(href='https://w3-connections.ibm.com/blogs/2015teamblog/entry/Cognitive_Head_Hunter',target='_blank') Challenge blog post
-          a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
-      block content
+	body
+		div.container
+			div.row.top-nav(style='background-color: #004468;')
+				div.col-lg-6
+					a(href='/')
+						img(src='/images/logo-blue.jpg',height='70px;')
+				div.col-lg-6
+					a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
+			div.row.modal-content(style='padding:10px;margin-top:10px;margin-bottom:10px; min-height: 600px;')
+				block content

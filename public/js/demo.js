@@ -25,7 +25,7 @@ $(document).ready(function () {
 		minWords = 200;
 
 	// Jquery variables
-	var $content = $('#text'),
+	var $content = $('#txt-profile'),
 		$loading = $('.loading1'),
 		$error = $('.error'),
 		$errorMsg = $('.errorMsg'),

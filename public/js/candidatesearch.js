@@ -45,8 +45,7 @@ function findJob(id) {
 			});
 			concepts.forEach(function (c) {
 				$('<div/>').html(c.label).appendTo(table);
-			});
-		},
+			});		},
 		error: function (xhr) {
 			console.error(xhr);
 			r = null;
@@ -83,12 +82,12 @@ function findCandidates(id) {
 function showCandidates(candidates) {
 	candidates.results.forEach(function (candidate) {
 		
-		console.log(candidate.candidatePictureUrl);
-		//candidate.candidatePictureUrl = "./images/user.png";
+		if(candidate.candidatePictureUrl === "images/user.png" || candidate.candidatePictureUrl === "" || candidate.candidatePictureUrl === undefined )
+			candidate.candidatePictureUrl = "/images/user.png";
 		
 		var score = Math.ceil(candidate.score * 100) + "%";
 		$('<div class="col-lg-1"/>')
-			.html('<div><a href=\'/user/'+ candidate.id +'\' target=\'_blank\'><img src=\"' + candidate.candidatePictureUrl + '\"/></a></div>' 
+			.html('<div><a href=\'/user/'+ candidate.id +'\' target=\'_blank\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>' 
 				+ '<div>' + candidate.label 
 				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 
 				+ score + '</p></div>')

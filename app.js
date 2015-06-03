@@ -671,7 +671,7 @@ function cleanTextProfile(data) {
 
 	profile.id = data.id || "";
 	profile.fullName = data.name;
-	profile.pictureUrl = (data.pictureUrl || "images/user.png");
+	profile.pictureUrl = (data.pictureUrl || "/images/user.png");
 	profile.publicProfileUrl = (data.publicProfileUrl || "");
 	profile.emailAddress = (data.emailAddress || "");
 

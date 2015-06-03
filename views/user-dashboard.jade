@@ -8,22 +8,26 @@ block specificJS
 	script(type='text/javascript', src='/js/jquery.circliful.min.js')
 
 block content
-	div.row(style='margin-bottom:40px;')
-		div#userInfo.col-lg-4.col-xs-12.text-center(style='padding-top:40px;')
+	div.row(style="min-height: 210px")
+		div#userInfo.col-lg-4.col-xs-12.text-center(style='padding-top:25px;padding-bottom:55px;')
 			span.col-lg-4.col-xs-12.text-center
-				img(src='#{user.pictureUrl}')
-			span.col-lg-7.col-xs-12.text-center
+				h2
+					img(src='#{user.pictureUrl}')
+			span.col-lg-7.col-xs-12.text-left
 				h2 #{user.fullName}
 				p #{user.headline}
-		div#concepts.text-right.col-lg-8.col-md-5.col-xs-12(style='display: none;')
-			div#concept1.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#61a9dc',data-bgcolor='#eee',data-fill='#ddd')
-			div#concept2.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#61a9dc',data-bgcolor='#eee',data-fill='#ddd')
-			div#concept3.circle(data-dimension='120',data-width='15',data-fontsize='15',data-fgcolor='#61a9dc',data-bgcolor='#eee',data-fill='#ddd')
-			div#concept4.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#61a9dc',data-bgcolor='#eee',data-fill='#ddd')
+		div#space.col-lg-2
+		div#concepts.col-lg-6(style='display: none;')
+			H3 Your top concepts
+			div#concept1.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
+			div#concept2.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
+			div#concept3.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
+			div#concept4.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF	',data-bgcolor='#eee',data-fill='#ddd')
 			//div.well.content(style='display:none;')
 		div.col-lg-8.col-xs-12#summary
-			div.row.col-lg-12.col-xs-12
-				div
+			div.row.form-group
+				div.col-lg-12.col-xs-12
+					h3 Review and update your profile text
 					textarea#txt-profile.content.form-control(rows='10', required='true',
 						placeholder='Please enter the text to analyze (minimum of 100 words)...')
 						|#{user.data}
@@ -36,20 +40,28 @@ block content
 					button.btn.btn-block.clear-btn(type='button') Clear
 				div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
 					button#analysis-btn.btn.btn-block.analysis-btn(type='button') Analyze
-	div.row(style='padding-top:20px;')
+	div.row(style='padding-top:10px;')
 		div.col-lg-6.col-xs-12.text-justify.personality(style='display:none;')
-			h3(style='height: 29px;') #{user.fullName}'s Personality*
-			div.summary-div
-			div.text-right(style='color: gray')
-				em.small *Compared to most people who participated in our surveys.
 			div.row
+				h3 #{user.fullName}'s Personality*
+				div.well
+					div.summary-div
+					div.text-right(style='color: gray')
+						em.small *Compared to most people who participated in our surveys.
+			//
+				div.row
+					div.col-lg-12
+						div#chart
+			div.row
+				h2 Visualization
+				p Big 5, Needs and Values attributes
 				div.col-lg-12
-					div#chart.col-lg-6
-					div.well#vizcontainer.col-lg-6.text-center.results(style='display:none;')
+					div.well#vizcontainer.text-center.results(style='display:none;')
 		div#loading.row.col-lg-6.col-xs-12.text-center(style='display:none;')
 			img(src='/images/watson.gif')
 		div.col-lg-6
 			div#positions.col-lg-12.col-xs-12(style='display: none;min-height:200px;')
+				h3 Suggested jobs
 				div.content
 	div.col-lg-6.col-md-6.col-xs-12
 		div.row
@@ -60,4 +72,4 @@ block content
 				h2 &nbsp;
 				div.well
 					p.errorMsg
-			div#raw.hidden #{JSON.stringify(user)}
+	div#raw.hidden #{JSON.stringify(user)}

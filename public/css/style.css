@@ -193,13 +193,13 @@ div#concepts .circle-info-half {
 }
 #chart div {
 	width: 100%;
-	background-color: cornflowerblue;
+	background-color: #B2D7EA;
 }
 
 #chart div div {
 	font-weight: bold;
 	color: white;
-	background: rgba(59, 89, 141, 1);
+	background: #30ACFF;
 	margin-bottom: 4px;
 	border-radius: 2px;
 	height: 25px;

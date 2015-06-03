@@ -52,8 +52,16 @@ See the full [Getting Started][getting_started] documentation for more details, 
 
 ## Running locally
   The application uses [Node.js](http://nodejs.org/) and [npm](https://www.npmjs.com/) so you will have to download and install them as part of the steps below.
+  
+1. Create two corpus in the `concept-insights-service` service in Bluemix, one for the candidates and other for the jobs opportunities, using Concept Insights REST API. You can see the API [Here][watson_api].
 
-1. Copy the credentials from your `concept-insights-service` and `personality-insights-service` services in Bluemix to `app.js`, you can see the credentials using:
+2. Create two environment variables in Bluemix named `candidates_corpus` and `jobs_corpus` and copy the two `Corpus ID` you created to the variables accordingly
+
+3. Create a new Linkedin application to obtain keys needed to our integration. You can create it [Here][linkedin_app]
+
+4. Create two environment variables in Bluemix named `linkedin_appKey` and `linkedin_appSecret` and copy the `appKey` and `appSecret` from your Linkedin app to the variables
+ 
+5. Copy the credentials from your `concept-insights-service` and `personality-insights-service` services in Bluemix to `app.js`, you can see the credentials using:
 
     ```sh
     $ cf env <application-name>
@@ -93,12 +101,12 @@ See the full [Getting Started][getting_started] documentation for more details, 
 
     You need to copy `username`, `password` and `url`.
 
-2. Install [Node.js](http://nodejs.org/)
-3. Go to the project folder in a terminal and run:
+6. Install [Node.js](http://nodejs.org/)
+7. Go to the project folder in a terminal and run:
     `npm install`
-4. Start the application
-5.  `node app.js`
-6. Go to `http://localhost:3000`
+8. Start the application
+9.  `node app.js`
+10. Go to `http://localhost:3000`
 
 ## Troubleshooting
 
@@ -119,7 +127,8 @@ To troubleshoot your Bluemix app the main useful source of information are the l
 ## Open Source @ IBM
   Find more open source projects on the [IBM Github Page](http://ibm.github.io/)
 
-[service_url]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/text-to-speech.html
 [cloud_foundry]: https://github.com/cloudfoundry/cli
 [getting_started]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/getting_started/
 [sign_up]: https://apps.admin.ibmcloud.com/manage/trial/bluemix.html?cm_mmc=WatsonDeveloperCloud-_-LandingSiteGetStarted-_-x-_-CreateAnAccountOnBluemixCLI
+[watson_api]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/concept-insights/createCorpus
+[linkedin_app]: https://www.linkedin.com/developer/apps/new

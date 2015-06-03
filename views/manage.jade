@@ -2,6 +2,7 @@
 extends ./layout.jade
 
 block specificJS
+	script(type='text/javascript', src='/js/bootstrap.min.js')
 	script(type='text/javascript', src='/js/manage.js')
 	script(type='text/javascript', src='/js/analyze.js')
 
@@ -12,61 +13,95 @@ block content
 		div.col-lg-12.message#success(style='display:none;')
 			p.bg-success#successMsg
 
-		div.col-lg-6#candidates
-			h2 Candidates
-				button.btn.pull-right#candidate-new-btn(type='button') New
+		// Nav tabs
+		ul.nav.nav-pills#myTab
+			li.active
+				a(href="#candidates",data-toggle="tab") Candidates
+			li
+				a(href="#jobs",data-toggle="tab") Job positions 
+			
+		// Tab panes
+		div.tab-content
+			
+			div.tab-pane.active#candidates 
+				
+				div#candidate-add-form(style='display:none;')
+					h3 Add candidate
+					div.well
+						form(role="form")
+							div.form-group.row
+								div.col-lg-12.col-xs-12
+									input#txt-name.form-control(type="text", required='true', placeholder='Name')
+							div.form-group.row
+								div.col-lg-12.col-xs-12
+									textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
+							div.form-group.row
+								div.col-lg-3.col-lg-push-3.col-xs-3
+									button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
+								div.col-lg-3.col-lg-push-3.col-xs-3
+									button.btn.btn-block#candidate-clear-btn(type='reset') Clear
+								div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
+									button.btn.btn-block#candidate-add-btn(type='button') Add
 
-			div.well#candidate-add-form(style='display:none;')
-				form(role="form")
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							input#txt-name.form-control(type="text", required='true', placeholder='Name')
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
-					div.form-group.row
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#candidate-clear-btn(type='reset') Clear
-						div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-							button.btn.btn-block#candidate-add-btn(type='button') Add
+				div.row.text-center#candidates-loading(style='display:none;')
+					h2 &nbsp;
+					img(src='../images/watson.gif')
 
-			div.row.text-center#candidates-loading(style='display:none;')
-				h2 &nbsp;
-				img(src='../images/watson.gif')
+				div.row
+					h2
+						span#num-candidates
+						button.btn.pull-right#candidate-new-btn(type='button') New candidate
+					p Click at the candidate's name to find jobs.
 
-			h3#num-candidates
-			div.well
-				ul#candidates-list
+				table.table.table-condensed.table-striped
+					thead
+						tr
+							th Name
+							th # of words
+							th Action
+					tbody#candidates-table
+					
 
-		div.col-lg-6#jobs
-			h2 Job positions
-				button.btn.pull-right#job-new-btn(type='button') New
 
-			div.well#job-add-div(style='display:none;')
-				form(role="form",action="javascript:submitJob();")
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							input#code.form-control(type="text", required='true', placeholder='Position code (like GBS-0730663)')
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							input#title.form-control(type="text", required='true', placeholder='Position tile (like Technical Support Representative)')
-					div.form-group.row
-						div.col-lg-12.col-xs-12
-							textarea#description.form-control(rows='15', required='true', placeholder='Description text')
-					div.form-group.row
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#job-cancel-btn(type='button') Cancel
-						div.col-lg-3.col-lg-push-3.col-xs-3
-							button.btn.btn-block#job-clear-btn(type='reset') Clear
-						div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-							button.btn.btn-block#job-add-btn(type='submit') Add
 
-			div.row.text-center#jobs-loading(style='display:none;')
-				h2 &nbsp;
-				img(src='../images/watson.gif')
 
-			h3#num-jobs
-			div.well
-				ul#jobs-list
+			div.tab-pane#jobs
+				
+				div#job-add-div(style='display:none;')
+					h2 Add job
+					div.well
+						form(role="form",action="javascript:submitJob();")
+							div.form-group.row
+								div.col-lg-12.col-xs-12
+									input#code.form-control(type="text", required='true', placeholder='Position code (like GBS-0730663)')
+							div.form-group.row
+								div.col-lg-12.col-xs-12
+									input#title.form-control(type="text", required='true', placeholder='Position tile (like Technical Support Representative)')
+							div.form-group.row
+								div.col-lg-12.col-xs-12
+									textarea#description.form-control(rows='15', required='true', placeholder='Description text')
+							div.form-group.row
+								div.col-lg-3.col-lg-push-3.col-xs-3
+									button.btn.btn-block#job-cancel-btn(type='button') Cancel
+								div.col-lg-3.col-lg-push-3.col-xs-3
+									button.btn.btn-block#job-clear-btn(type='reset') Clear
+								div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
+									button.btn.btn-block#job-add-btn(type='submit') Add
+
+				div.row.text-center#jobs-loading(style='display:none;')
+					h2 &nbsp;
+					img(src='../images/watson.gif')
+				
+				div.row
+					h2
+						span#num-jobs
+						button.btn.pull-right#job-new-btn(type='button') New job
+					p Click at the job's title to find candidates.
+				table.table.table-condensed.table-striped
+					thead
+						tr
+							th Code
+							th Title
+							th # of concepts
+							th Action
+					tbody#jobs-table

@@ -1,5 +1,10 @@
 $(document).ready(function() {
 
+  $('#myTab a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  });
+
   $('#job-new-btn').click(function(){
     $('#job-new-btn').blur();
     $('#job-add-div').show();
@@ -45,8 +50,8 @@ $(document).ready(function() {
 
 function loadJobs() {
   $('#jobs-loading').show();
-  $("#jobs-list").empty();
-  $("#pending-jobs-list").empty();
+  $("#jobs-table").empty();
+  $("#pending-jobs-table").empty();
 
   $.ajax({
       type: 'GET',
@@ -55,21 +60,17 @@ function loadJobs() {
       success: function(data) {
         $('#num-jobs').html(data.length + ' jobs');
         data.forEach(function(job) {
-          var list = (job.requiredConcepts.length>0)?'#jobs-list':'#pending-jobs-list';
+          // TODO alanbraz: ignore pending list for demo
+          //var list = (job.requiredConcepts.length>0)?'#jobs-list':'#pending-jobs-list';
           job.id = (job.concept_id || job._id);
-          $('<li>'+job.code+' '+'<strong>'+ job.title + ' ('+job.concepts + ')' + '</strong>' + ' ' +
-            // (job.requiredConcepts.length==0?
-            //   '[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]' :
-            // '[<a href=\'/analyze-jobs/'+job._id+'\' target=\'_blank\'>'+'find candidates'+'</a>]') +
-            // '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
-            // //'<span id=\'job-'+job.id+'\'></span>' +
-            // '</li>')
-            (job.requiredConcepts.length==0?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
-            (job.requiredConcepts.length>0?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') + 
-            '&nbsp;[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]' +
-            //'<span id=\'job-'+job.id+'\'></span>' +
-            '</li>')
-          .appendTo($(list));
+          $('<tr><td>'+job.code+'</td> '+
+            '<td>'+ '<a href=\'/candidatesearch/'+job.code+'\'>'+job.title+'</a>' + '</td>'+
+            '<td> '+job.concepts + '' + '</td>' + ' ' +
+            //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
+            //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') + 
+            '<td>[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]</td>' +
+            '</tr>')
+          .appendTo($('#jobs-table'));
         });
         //handleJobs(data);
       },
@@ -110,11 +111,11 @@ function handleCandidates(cands) {
     $('#candidates-loading').show();
     cands.forEach(function(c) {
 
-      $('<li><a href=\'/user/'+(c.concept_id || c._id)+'\' target=\'_blank\'>'+
-        c.name + '</a> ' + ' ' +
-        ' ' + words(c.profile || "") + ' words ' +
-        '[<a href=\'javascript:delCandidate(\"'+c._id+'\",\"'+(c.concept_id || c._id)+'\")\'>delete</a>]</li>')
-      .appendTo($('#candidates-list'));
+      $('<tr><td><a href=\'/user/'+(c.concept_id || c._id)+'\'>'+ c.name + '</a></td> ' + ' ' +
+        '<td>' + words(c.profile || "") + ' </td>' +
+        '<td>[<a href=\'javascript:delCandidate(\"'+c._id+'\",\"'+(c.concept_id || c._id)+'\")\'>delete</a>]</td>' +
+        '</tr>')
+      .appendTo($('#candidates-table'));
 
       /*$.ajax({
         type: 'GET',
@@ -144,7 +145,7 @@ function handleCandidates(cands) {
 var loadCandidates = function() {
   $('#candidates-loading').show();
   cleanMessages();
-  $("#candidates-list").empty();
+  $("#candidates-table").empty();
 
   $.ajax({
     type: 'GET',

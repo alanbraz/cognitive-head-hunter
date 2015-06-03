@@ -38,7 +38,6 @@ if (appInfo.application_uris) {
 	uri = "http://" + appInfo.application_uris[0];
 }
 
-
 var express = require('express'),
 	app = express(),
 	bluemix = require('./config/bluemix'),
@@ -52,19 +51,17 @@ var db = require('./config/db');
 db(app);
 
 var conceptsCache = [];
-// TODO externalize linked, ci and pi stuff
 
-var appKey = '781og0rurwqsom',
-	appSecret = '9FnyK7slh4CuPxFo';
+var appKey = extend(process.env.linkedin_appKey,'781og0rurwqsom'),
+	appSecret = extend(process.env.linkedin_appSecret,'9FnyK7slh4CuPxFo');
 
 var linkedin_client = require('linkedin-js')
 	(appKey, appSecret, uri + '/auth');
 
-//https://developer.linkedin.com/docs/fields/full-profile
 var full_profile = "proposal-comments,associations,interests,projects," +
 	"publications,patents,languages,skills,certifications," +
 	"educations,courses,volunteer,recommendations-received,honors-awards";
-//https://developer.linkedin.com/docs/fields/basic-profile
+
 var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," +
 	"positions,picture-url,public-profile-url,email-address";
 
@@ -74,9 +71,9 @@ var ci_credentials = {
 	username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
 	password: 'J4DjaOigWNuU',
 	use_vcap_services: false,
-	corpus_jobs: 'testmatchmyjob',
-	corpus_candidates: 'candidates'
-}; // Bluemix externo, bind manual
+	corpus_jobs: extend(process.env.jobs_corpus,'testmatchmyjob'),
+	corpus_candidates: extend(process.env.candidates_corpus,'candidates')
+}; 
 
 
 // Create the service wrapper
@@ -108,8 +105,6 @@ app.get('/analyze-jobs/:id', function (req, res) {
 		if (error) {
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		} else {
-			console.log("result: ");
-			console.log(JSON.stringify(result));
 			req.session.job = result;
 			res.render('analyze-jobs', {
 				job: result
@@ -140,41 +135,31 @@ app.get('/auth', function (req, res) {
 	linkedin_client.getAccessToken(req, res, function (error, token) {
 
 		if (error) {
-			console.error('error authenticating accessToken');
 			return console.error(error);
 		} else {
 			req.session.token = token;
-			console.log('success on getting access token');
-			console.log(token);
 			return res.redirect('/profile');
 		}
 
 	});
 });
 app.post('/parse', function (req, res) {
-	console.log('/parse ' + JSON.stringify(req.body));
-	// do not use session
 	req.session.user = cleanTextProfile(req.body);
-	console.log('success on cleaning text profile');
-	//return res.redirect('/jobsearch');
 	return res.json(req.session.user);
 });
 
 app.get('/profile', function (req, res) {
 	// the first time will redirect to linkedin
-	console.log(req.session);
 	if (req.session.token) {
 		linkedin_client.apiCall('GET', '/people/~:' +
 			'(' + basic_profile + ',' + full_profile + ')', {
 				token: req.session.token
 			},
 			function (error, result) {
-				console.log('api call callback');
 				if (error) {
 					res.json(error);
 				} else {
 					req.session.user = transformProfile(result);
-					console.log("transformProfile");
 					res.redirect('/jobsearch');
 				}
 			});
@@ -197,17 +182,13 @@ function getConceptDetails(id, callback) {
 	var payload = {
 		user: ci_credentials.username
 	};
-	// ids needs to be stringify
-	payload.ids = [id]; //JSON.stringify(payload.ids);
-	//console.log(payload);
+	payload.ids = [id]; 
 	var concept;
 
 	conceptInsights.getConceptsMetadata(payload, function (error, result) {
 		if (error)
 			console.log(error.error ? error.error.code || 500 : 500);
 		else {
-			//console.log(result.length);
-			//console.log(result);
 			result[0].key = id;
 			callback(result[0]);
 		}
@@ -235,7 +216,6 @@ app.put('/ci/jobs', function (req, res) {
 		documentid: input.id
 	};
 	conceptInsights.createDocument(params, function (error, result) {
-		console.log('createDocument: ' + error + ' > ' + result);
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).send(error);
 		else
@@ -271,9 +251,6 @@ app.post('/ci/jobs', function (req, res) {
 });
 
 app.get('/ci/jobs', function (req, res) {
-	console.log('inside .get /jobs');
-	console.log(ci_credentials);
-	console.log(req.query);
 
 	var params = {
 		user: ci_credentials.username,
@@ -356,7 +333,6 @@ app.get('/user/:id', function (req, res) {
 			newUser.publicProfileUrl = temp.candidatePublicProfileUrl;
 			console.log(temp.lastmodified);
 			newUser.data = temp.parts[0].data;
-			// clearSession(req.session);
 
 			return res.render('user-dashboard', {
 				user: newUser
@@ -422,7 +398,7 @@ app.post('/ci/candidates', function (req, res) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
-			return res.json(result); // TODO tratar melhor
+			return res.json(result);
 	});
 
 });
@@ -468,11 +444,8 @@ app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
 		ids: ['/corpus/' + ci_credentials.username + '/' + ci_credentials.corpus_candidates + '/' + req.params.candidate],
 		limit: req.params.limit || 5,
 	}, req.query);
-	//console.log(payload);
 
-	// ids needs to be stringify
 	payload.ids = JSON.stringify(payload.ids);
-	//console.log(payload.ids);
 
 	conceptInsights.semanticSearch(payload, function (error, result) {
 		if (error)
@@ -491,11 +464,8 @@ app.get('/ci/semantic_search/job/:job/:limit', function (req, res) {
 		ids: ['/corpus/' + ci_credentials.username + '/' + ci_credentials.corpus_jobs + '/' + req.params.job],
 		limit: req.params.limit || 5,
 	}, req.query);
-	//console.log(payload);
 
-	// ids needs to be stringify
 	payload.ids = JSON.stringify(payload.ids);
-	//console.log(payload.ids);
 
 	conceptInsights.semanticSearch(payload, function (error, result) {
 		if (error)
@@ -511,7 +481,6 @@ app.get('/ci/graph_search', function (req, res) {
 	}, req.query);
 	console.log(payload);
 
-	// ids needs to be stringify
 	payload.ids = JSON.stringify(payload.ids);
 	console.log(payload.ids);
 
@@ -700,6 +669,4 @@ function clearSession(session) {
 }
 
 
-// leave always at the end of the file
 app.listen(port);
-console.log('listening at:', port);

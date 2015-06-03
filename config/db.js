@@ -58,7 +58,6 @@ var candidateModel = restful.model('candidate', candidateSchema);
 
 var dbURL = extend({
   uri: "mongodb://IbmCloud_lkdhl1bh_vv39s5g4_jb7t8j47:3RFllDMGweSCnJuO0li0Br1_z-c5eDnP@ds055110.mongolab.com:55110/IbmCloud_lkdhl1bh_vv39s5g4"
-  //"mongodb://localhost/chh"
 }, bluemix.getServiceCreds('mongolab')); // VCAP_SERVICES
 
 module.exports = function (app) {
@@ -80,7 +79,6 @@ module.exports = function (app) {
 };
 
 module.exports.addConcept = function addConcept(concept) {
-  //console.log(concept);
   conceptModel.findOne({ key: concept.key }, function (err, doc) {
     if (err) {
       console.log(err);
@@ -103,11 +101,6 @@ module.exports.addConcept = function addConcept(concept) {
       });
     }
   });
-    
-  /*var instance = new conceptModel;
-  instance.key = concept;
-  */
-
 };
 
 module.exports.getAllConcepts = function getAllConcepts(cache) {
@@ -115,11 +108,8 @@ module.exports.getAllConcepts = function getAllConcepts(cache) {
     if (err) {
       console.log(err);
     } else {
-      //callback(docs);
       docs.forEach(function(d){
-        //console.log("db >>> " + d.key + " : " + d.label);
         cache.push(d);
-        //console.log(ret);
       });
     }
   });
@@ -127,7 +117,6 @@ module.exports.getAllConcepts = function getAllConcepts(cache) {
 
 function copyAttributes(src, obj) {
     for (var key in src) {
-        //copy all the fields
         obj[key] = src[key];
     }
 }
@@ -138,7 +127,6 @@ module.exports.addJob = function addJob(job) {
       console.log(err);
     } else {
       if (!doc) {
-        //console.log("add: " + job.id);
         doc = new jobModel;
         doc.code = job.code || job.id;
         doc.concept_id = job.id;
@@ -159,11 +147,6 @@ module.exports.addJob = function addJob(job) {
       }
     }
   });
-    
-  /*var instance = new conceptModel;
-  instance.key = concept;
-  */
-
 };
 
 module.exports.addCandidate = function addCandidate(cand) {
@@ -193,44 +176,3 @@ module.exports.addCandidate = function addCandidate(cand) {
   });
 
 };
-
-
-//clean them all
-/*jobModel.find({}, function (err, docs) {
-  docs.forEach(function(d){ 
-    console.log(d)
-    d.remove();
-  }); 
-});*/
-
-
-
-//module.exports.Concept = conceptModel;
-
-/*
-  http://mongoosejs.com/docs/guide.html
-
-  var blogSchema = new Schema({
-    title:  String,
-    author: String,
-    body:   String,
-    comments: [{ body: String, date: Date }],
-    date: { type: Date, default: Date.now },
-    hidden: Boolean,
-    meta: {
-      votes: Number,
-      favs:  Number
-    }
-  });
-
-  The permitted SchemaTypes are
-
-      String
-      Number
-      Date
-      Buffer
-      Boolean
-      Mixed
-      ObjectId
-      Array
-  */

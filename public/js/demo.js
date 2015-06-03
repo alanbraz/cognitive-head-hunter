@@ -245,7 +245,7 @@ $(document).ready(function () {
 	}
 	function conceptsToPie(concepts) {
 		var top = 4; //concepts.length
-		var conceptPie;
+		var conceptsToShow = [];
 		for (var i = 0, show = top, length = concepts.length;
 			(i < length && show > 0); i++) {
 			var label = concepts[i].label;
@@ -256,14 +256,23 @@ $(document).ready(function () {
 			// Removing location and dates
 			ignore = ignore || ($.inArray("Year", ont) > -1);
 			ignore = ignore || ($.inArray("Place", ont) > -1);
+			ignore = ignore || ($.inArray("Organisation", ont) > -1);
+			ignore = ignore || ($.inArray("Company", ont) > -1);
+
 			if (!ignore) {
-				conceptPie = $('#concept' + (i+1));
-				conceptPie.attr("data-percent", weight);
-				conceptPie.attr("data-text", weight+"%");
-				conceptPie.attr("data-info", label);
-				conceptPie.circliful();
+				var c = { label: concepts[i].label, weight: concepts[i].weight };
+				conceptsToShow.push(c);
 				show--;
 			}
+		}
+		for( var j=0; j < conceptsToShow.length; j++) {
+			var c = conceptsToShow[j];
+			var percentage = (c.weight*100)/conceptsToShow[0].weight;
+			var conceptPie = $('#concept' + (j+1));
+				conceptPie.attr("data-percent", percentage);
+				conceptPie.attr("data-text", Math.round(percentage)+"%");
+				conceptPie.attr("data-info", c.label);
+				conceptPie.circliful();
 		}
 	}
 

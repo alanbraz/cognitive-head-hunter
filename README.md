@@ -55,9 +55,9 @@ See the full [Getting Started][getting_started] documentation for more details, 
   
 1. Create two corpus in the `concept-insights-service` service in Bluemix, one for the candidates and other for the jobs opportunities, using Concept Insights REST API. You can see the API [Here][watson_api].
 
-2. Create two environment variables in Bluemix named `candidates_corpus` and `jobs_corpus` and copy the two `Corpus ID` you created to the variables accordingly
+2. Create two environment variables in Bluemix named `candidates_corpus` and `jobs_corpus` and copy the two `Corpus ID` from the corpus you created to the variables accordingly
 
-3. Create a new Linkedin application to obtain keys needed to our integration. You can create it [Here][linkedin_app]
+3. Create a new Linkedin application to obtain keys needed in our integration. You can create it [Here][linkedin_app]
 
 4. Create two environment variables in Bluemix named `linkedin_appKey` and `linkedin_appSecret` and copy the `appKey` and `appSecret` from your Linkedin app to the variables
  

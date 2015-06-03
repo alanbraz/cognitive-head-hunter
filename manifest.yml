@@ -1,6 +1,6 @@
 applications:
 - services:
-  - Tradeoff Analytics.chh
+  - Concept Insights CHH
   - Personality Insights.chh
   - MongoLab-lc
   disk_quota: 128M

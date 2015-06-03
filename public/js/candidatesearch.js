@@ -82,9 +82,13 @@ function findCandidates(id) {
 
 function showCandidates(candidates) {
 	candidates.results.forEach(function (candidate) {
+		
+		console.log(candidate.candidatePictureUrl);
+		//candidate.candidatePictureUrl = "./images/user.png";
+		
 		var score = Math.ceil(candidate.score * 100) + "%";
 		$('<div class="col-lg-1"/>')
-			.html('<div><img src=\"' + candidate.candidatePictureUrl + '\"/></div>' 
+			.html('<div><a href=\'/user/'+ candidate.id +'\' target=\'_blank\'><img src=\"' + candidate.candidatePictureUrl + '\"/></a></div>' 
 				+ '<div>' + candidate.label 
 				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 
 				+ score + '</p></div>')

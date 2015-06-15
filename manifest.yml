@@ -1,3 +1,13 @@
+declared-services: 
+  Concept Insights CHH: 
+    label: concept_insights 
+    plan: free 
+  Personality Insights.chh: 
+    label: personality_insights 
+    plan: IBM Watson Personality Insights Monthly Plan 
+  MongoLab-lc: 
+    label: mongolab 
+    plan: sandbox 
 applications:
 - services:
   - Concept Insights CHH

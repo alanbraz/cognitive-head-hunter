@@ -1,22 +1,20 @@
 declared-services: 
   Concept Insights CHH: 
     label: concept_insights 
-    plan: free 
-  Personality Insights.chh: 
-    label: personality_insights 
-    plan: IBM Watson Personality Insights Monthly Plan 
+    plan: free
   MongoLab-lc: 
     label: mongolab 
     plan: sandbox 
+  Personality Insights.chh: 
+    label: personality_insights 
+    plan: IBM Watson Personality Insights Monthly Plan 
 applications:
 - services:
   - Concept Insights CHH
-  - Personality Insights.chh
   - MongoLab-lc
+  - Personality Insights.chh
   disk_quota: 128M
-  host: chh
-  name: chh
+  buildpack: sdk-for-nodejs
   path: .
-  domain: stage1.mybluemix.net
   instances: 1
   memory: 896M

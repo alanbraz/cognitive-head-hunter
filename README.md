@@ -99,4 +99,4 @@ To troubleshoot your Bluemix app the main useful source of information are the l
 [watson_api]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/concept-insights/createCorpus
 [linkedin_app]: https://www.linkedin.com/developer/apps/new
 [linkedin]: https://www.linkedin.com/
-[deploy-to-Bluemix]: https://bluemix.net/deploy?repository=<git_repository_URL>
+[deploy-to-Bluemix]: https://bluemix.net/deploy?repository=

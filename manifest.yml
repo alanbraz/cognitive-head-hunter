@@ -6,7 +6,7 @@ declared-services:
     label: mongolab 
     plan: sandbox 
   Personality Insights CHH: 
-    label: personality_insights 
+    label: personality_insights
     plan: IBM Watson Personality Insights Monthly Plan 
 applications:
 - services:

@@ -2,6 +2,8 @@
 
   Cognitive Head Hunter is a cognitive based system to designed to help both a candidate and a HR professional make a good match more quickly and more reliably using Watson to read and extract cognitive information from the both the candidates providing a better match between them, not only by analyzing keywords but also by understanding the concepts outlined within a resume or a job posting.
   
+  [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)][deploy-to-Bluemix]
+  
 ## Getting Started
 
 1. Create a Bluemix Account
@@ -97,3 +99,4 @@ To troubleshoot your Bluemix app the main useful source of information are the l
 [watson_api]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/apis/#!/concept-insights/createCorpus
 [linkedin_app]: https://www.linkedin.com/developer/apps/new
 [linkedin]: https://www.linkedin.com/
+[deploy-to-Bluemix]: https://bluemix.net/deploy?repository=<git_repository_URL>

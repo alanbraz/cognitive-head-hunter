@@ -67,7 +67,7 @@ function loadJobs() {
             '<td>'+ '<a href=\'/candidatesearch/'+job.code+'\'>'+job.title+'</a>' + '</td>'+
             '<td> '+job.concepts + '' + '</td>' + ' ' +
             //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
-            //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') + 
+            //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') +
             '<td>[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]</td>' +
             '</tr>')
           .appendTo($('#jobs-table'));

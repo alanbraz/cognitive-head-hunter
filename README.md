@@ -18,7 +18,8 @@ And that's about it! You successfully just created a `Node.js` application in Bl
 Now it's time to configure your project. 
 
 ## Configuration instructions
-	This application uses [LinkedIn][linkedin] integration so you will have to create an application on [Linkedin][linkedin] as part of the steps below.
+
+This application uses [LinkedIn][linkedin] integration so you will have to create an application on [Linkedin][linkedin] as part of the steps below.
   
 1. Create two corpus in the `concept-insights` service in Bluemix, one for the candidates and other for the jobs opportunities, using Concept Insights REST API. You can see the API [Here][watson_api].
 

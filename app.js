@@ -98,6 +98,14 @@ app.get('/', function (req, res) {
 	res.render('home');
 });
 
+app.get('/about', function (req, res) {
+	res.render('about');
+});
+
+app.get('/tos', function (req, res) {
+	res.render('tos');
+});
+
 app.get('/analyze', function (req, res) {
 	res.render('analyze');
 });

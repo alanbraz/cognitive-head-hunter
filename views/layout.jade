@@ -8,8 +8,8 @@ html(lang='en')
 		meta(http-equiv='X-UA-Compatible', content='IE=edge')
 		meta(name='viewport', content='width=device-width, initial-scale=1')
 
-		link(rel='shortcut icon', href='/images/favicon.ico?v=2', type='image/x-icon')
-		link(rel='icon', href='/images/favicon.ico?v=2', type='image/x-icon')
+		link(rel='shortcut icon', href='/images/favicon.ico', type='image/x-icon')
+		link(rel='icon', href='/images/favicon.ico', type='image/x-icon')
 		link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
 		link(rel='stylesheet', href='/css/style.css')
 
@@ -19,13 +19,33 @@ html(lang='en')
 		block specificJS 
 
 	body
+
+		a#jazzhub(href="https://hub.jazz.net/git/alanbraz/job-hunters")
+			img(src="/images/forkme.png",alt="Fork me on JazzHub",style="position: absolute; top: 0; right: 0; border: 0;z-index:16;")
+
 		div.container
-			div.row.top-nav(style='background-color: #004468;')
-				div.col-lg-6
-					a(href='/')
-						img(src='/images/logo-blue.jpg',height='70px;')
-				div.col-lg-6
-					a.right.fork(href='https://hub.jazz.net/project/alanbraz/job-hunters/overview',target='_blank') Git repository
+
+			div.row.nav.top-nav(style='background-color: #004468;')
+				div.col-lg-3
+					a.left(href='/')
+						img(src='/images/logo-blue.jpg',height='70px;',style="float: left")
+				div.col-lg-9
+					ul.nav.navbar-nav.right
+						li 
+							a(href="/") Home
+						li 
+							a(href="/about") About
+
 			div.row.modal-content#modal(style='padding:10px;margin-top:10px;margin-bottom:10px; min-height: 600px;')
 				block content
+
 			block home-content
+
+			div.footer(style='padding:20px;')
+				p.text-center
+					a(href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/") Built with IBM Watson
+					| &nbsp;|&nbsp;
+					a(href="/tos") Terms of use
+					| &nbsp;|&nbsp;
+					a(href="http://www.ibm.com/privacy/us/en/") Privacy Policy
+

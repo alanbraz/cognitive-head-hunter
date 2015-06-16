@@ -52,8 +52,8 @@ db(app);
 
 var conceptsCache = [];
 
-var appKey = process.env.linkedin_appKey,
-	appSecret = process.env.linkedin_appSecret;
+var appKey = extend(process.env.linkedin_appKey,'781og0rurwqsom'),
+	appSecret = extend(process.env.linkedin_appSecret,'9FnyK7slh4CuPxFo');
 
 var linkedin_client = require('linkedin-js')
 	(appKey, appSecret, uri + '/auth');
@@ -67,15 +67,25 @@ var basic_profile = "id,formatted-name,headline,location,industry,summary,specia
 
 var ci_values = bluemix.getServiceCreds("concept_insights.pstg");
 
+/*var ci_credentials = {
+	version: 'v1',
+	url: ci_values.url || 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+	username: ci_values.username || '58236fbc-904e-4317-ad6d-c98a34744e9c',
+	password: ci_values.password || 'J4DjaOigWNuU',
+	use_vcap_services: false,
+	corpus_jobs: extend(process.env.jobs_corpus,'testmatchmyjob'),
+	corpus_candidates: extend(process.env.candidates_corpus,'candidates')
+}; */
+
 var ci_credentials = {
 	version: 'v1',
-	url: ci_values.url,
-	username: ci_values.username,
-	password: ci_values.password,
+	url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
+	username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
+	password: 'J4DjaOigWNuU',
 	use_vcap_services: false,
-	corpus_jobs: process.env.jobs_corpus),
-	corpus_candidates: process.env.candidates_corpus)
-}; 
+	corpus_jobs: 'testmatchmyjob',
+	corpus_candidates: 'candidates'
+};
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);

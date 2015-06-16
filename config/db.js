@@ -167,7 +167,6 @@ module.exports.addCandidate = function addCandidate(cand) {
               } else {
                 console.log('Success saving candidate'); 
               }
-          
         });
       } else {
         console.log("nothing to do ");

@@ -77,7 +77,8 @@ var ci_values = bluemix.getServiceCreds("concept_insights.pstg");
 	corpus_candidates: extend(process.env.candidates_corpus,'candidates')
 }; */
 
-var ci_credentials = {
+/*
+ * OLD var ci_credentials = {
 	version: 'v1',
 	url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
 	username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
@@ -85,9 +86,17 @@ var ci_credentials = {
 	use_vcap_services: false,
 	corpus_jobs: 'testmatchmyjob',
 	corpus_candidates: 'candidates'
-}; 
+};*/
 
-
+var ci_credentials = {
+	version: 'v1',
+	url: "https://gateway-s.watsonplatform.net/concept-insights-beta/api",
+    username: "1ff1c1aa-d33b-49fd-b3b1-a6bb6cefbb94",
+    password: "1mnzl8Mf1x64"
+	use_vcap_services: false,
+	corpus_jobs: 'testmatchmyjob',
+	corpus_candidates: 'candidates'
+};
 
 // Create the service wrapper
 var conceptInsights = watson.concept_insights(ci_credentials);

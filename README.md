@@ -12,7 +12,7 @@
 
 Click on the buttom bellow to deploy your own copy of Cognitive Head Hunter into your Bluemix account.
 
-	[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)][deploy-to-Bluemix]
+[![Deploy to Bluemix](https://bluemix.net/deploy/button.png)][deploy-to-Bluemix]
 
 And that's about it! You successfully just created a `Node.js` application in Bluemix together with a `Concept Insights`, `Personality Insights` and `Mongo Lab` services required to this project.
 
@@ -70,3 +70,4 @@ Find more open source projects on the [IBM Github Page](http://ibm.github.io/)
 [deploy-to-Bluemix]: https://bluemix.net/deploy?repository=
 [concept-insights]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/concept-insights.html
 [personality-insights]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html
+[vcap_environment]: https://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/getting_started/#VcapEnvVar

@@ -14,16 +14,17 @@
  * limitations under the License.
  */
  $(document).ready(function () {
-	$('#loading').show();
+	$('#loading').hide();
 	$('#loading2').show();
 	$('#concepts').hide();
+	$('#sug-cand').hide();
 	var job_id = $('#job_id').html();
 	findJob(job_id);
 	findCandidates(job_id);
 });
 
 function findJob(id) {
-	var job;
+	
 	$.ajax({
 	    type: 'GET',
 	    async: false,
@@ -81,7 +82,6 @@ function findJob(id) {
 			r = null;
 		},
 		complete: function (data) {
-			$('#loading2').hide();
 			$('#loading').hide();
 			$('#concepts').show();
 		}
@@ -90,6 +90,8 @@ function findJob(id) {
 
 
 function findCandidates(id) {
+	$('#loading2').show();
+	$('#sug-cand').hide();
 	$.ajax({
 		type: 'GET',
 		async: false,
@@ -104,6 +106,7 @@ function findCandidates(id) {
 		},
 		complete: function (data) {
 			$('#loading2').hide();
+			$('#sug-cand').show();
 		}
 	});
 }
@@ -117,7 +120,7 @@ function showCandidates(candidates) {
 		
 		var score = Math.ceil(candidate.score * 100) + "%";
 		$('<div class="col-lg-1"/>')
-			.html('<div><a href=\'/user/'+ candidate.id +'\' target=\'_blank\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>' 
+			.html('<div><a href=\'/user/'+ candidate.id +'\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>' 
 				+ '<div>' + candidate.label 
 				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 
 				+ score + '</p></div>')

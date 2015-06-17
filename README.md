@@ -22,15 +22,13 @@ Now it's time to configure your project.
 
 This application uses [LinkedIn][linkedin] integration so you will have to create an application on it as part of the steps below.
   
-1. Create two corpus in the `concept-insights` service in Bluemix, one for the candidates and other for the jobs opportunities, using Concept Insights REST API. You can see the API [Here][watson_api].
+1. Create a new [LinkedIn][linkedin] application to obtain keys needed in our integration. [You can create it here][linkedin_app]
 
-2. Create two environment variables in Bluemix named `candidates_corpus` and `jobs_corpus` and copy the two `Corpus ID` from the corpus you created to the variables accordingly
+2. Go to your application page at Bluemix and update the value of the two `USER_DEFINED` under Environment Variables.
 
-3. Create a new [LinkedIn][linkedin] application to obtain keys needed in our integration. [You can create it here][linkedin_app]
-
-4. Create two environment variables in Bluemix named `linkedin_appKey` and `linkedin_appSecret` and copy the `appKey` and `appSecret` from your [LinkedIn][linkedin] app to this variables
-   
-5. Go to `<application-name>.mybluemix.net` to see your own copy up and running!
+3. Restart your application.
+  
+4. Go to `<application-name>.mybluemix.net` to see your own copy up and running!
 
 # Operating instructions
 
@@ -38,7 +36,9 @@ Watch the live demo video at https://vimeo.com/ibmwatson/review/130135189/c27aa6
 
 # Name and email for the distributor or programmer
 
-# Known bugs
+- Alan Braz - <alanbraz@br.ibm.com>
+- Paulo Cavoto - <pcavoto@br.ibm.com>
+- Paulo Caldeira - <pmcjr@br.ibm.com>
 
 # Troubleshooting
 

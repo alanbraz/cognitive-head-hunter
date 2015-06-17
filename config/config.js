@@ -49,9 +49,9 @@ var services = {
 
 // Get the service
 if (env === 'prod') {
-  services.mongodb = bluemix.serviceStartsWith('mongolab').uri;
-  services.personality_insights = extend({'version':'v2'}, bluemix.serviceStartsWith('personality_insights'));
-  services.concept_insights = extend({'version':'v1'}, bluemix.serviceStartsWith('concept_insights'));
+  services.mongodb = bluemix.getServiceCreds('mongolab').uri;
+  services.personality_insights = extend({'version':'v2'}, bluemix.getServiceCreds('personality_insights'));
+  services.concept_insights = extend({'version':'v1'}, bluemix.getServiceCreds('concept_insights'));
   services.linkedin.app_key = process.env.LINKEDIN_APPKEY;
   services.linkedin.app_secret = process.env.LINKEDIN_APPSECRET;
 } else {

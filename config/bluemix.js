@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 IBM Corp. All Rights Reserved.
+ * Copyright 2015 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ module.exports.getServiceCreds = function(name) {
             if (service_name.indexOf(name) === 0) {
                 var service = services[service_name][0];
                 return {
-                    url: service.credentials.url,
+                    url: (service.credentials.url || service.credentials.uri),
                     username: service.credentials.username,
                     password: service.credentials.password
                 };

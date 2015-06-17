@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 IBM Corp. All Rights Reserved.
+ * Copyright 2015 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ db(app);
 var conceptsCache = [];
 
 var linkedin_client = require('linkedin-js')
-	(config.services.linkedin.app_key, 
+	(	config.services.linkedin.app_key, 
 		config.services.linkedin.app_secret, 
 		uri + '/auth');
 
@@ -73,6 +73,36 @@ var corpus = {
 // Create the service wrapper
 var ci_credentials = config.services.concept_insights;
 var conceptInsights = watson.concept_insights(ci_credentials);
+
+// create both corpus automatically
+var params = {
+	user: ci_credentials.username,
+	corpus: corpus.jobs,
+	access: "private",
+  	users: [
+	    {
+	      uid: ci_credentials.username,
+	      permission: "ReadWriteAdmin"
+	    }
+  	]
+};
+
+conceptInsights.createCorpus(params, function (error, result) {
+	if (error) {
+		console.log(JSON.stringify(error));
+	} else {
+		console.log(JSON.stringify(result));
+	}
+});
+
+params.corpus = corpus.candidates;
+conceptInsights.createCorpus(params, function (error, result) {
+	if (error) {
+		console.log(JSON.stringify(error));
+	} else {
+		console.log(JSON.stringify(result));
+	}
+});
 
 app.get('/', function (req, res) {
 	res.render('home');
@@ -206,6 +236,7 @@ app.put('/ci/jobs', function (req, res) {
 	var params = {
 		document: {
 			id: input.id,
+			label: input.title,
 			parts: [
 				{
 					data: input.description,

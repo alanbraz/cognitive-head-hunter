@@ -41,6 +41,7 @@ if (appInfo.application_uris) {
 var express = require('express'),
 	app = express(),
 	bluemix = require('./config/bluemix'),
+	config  = require('./config/config'),
 	watson = require('watson-developer-cloud'),
 	extend = require('util')._extend;
 
@@ -52,11 +53,10 @@ db(app);
 
 var conceptsCache = [];
 
-var appKey = extend(process.env.linkedin_appKey,'781og0rurwqsom'),
-	appSecret = extend(process.env.linkedin_appSecret,'9FnyK7slh4CuPxFo');
-
 var linkedin_client = require('linkedin-js')
-	(appKey, appSecret, uri + '/auth');
+	(config.services.linkedin.app_key, 
+		config.services.linkedin.app_secret, 
+		uri + '/auth');
 
 var full_profile = "proposal-comments,associations,interests,projects," +
 	"publications,patents,languages,skills,certifications," +
@@ -65,45 +65,16 @@ var full_profile = "proposal-comments,associations,interests,projects," +
 var basic_profile = "id,formatted-name,headline,location,industry,summary,specialties," +
 	"positions,picture-url,public-profile-url,email-address";
 
-var ci_values = bluemix.getServiceCreds("concept_insights.pstg");
-
-/*var ci_credentials = {
-	version: 'v1',
-	url: ci_values.url || 'https://gateway.watsonplatform.net/concept-insights-beta/api',
-	username: ci_values.username || '58236fbc-904e-4317-ad6d-c98a34744e9c',
-	password: ci_values.password || 'J4DjaOigWNuU',
-	use_vcap_services: false,
-	corpus_jobs: extend(process.env.jobs_corpus,'testmatchmyjob'),
-	corpus_candidates: extend(process.env.candidates_corpus,'candidates')
-}; */
-
-/*
- * OLD var ci_credentials = {
-	version: 'v1',
-	url: 'https://gateway.watsonplatform.net/concept-insights-beta/api',
-	username: '58236fbc-904e-4317-ad6d-c98a34744e9c',
-	password: 'J4DjaOigWNuU',
-	use_vcap_services: false,
-	corpus_jobs: 'testmatchmyjob',
-	corpus_candidates: 'candidates'
-};*/
-
-var ci_credentials = {
-	version: 'v1',
-	url: "https://gateway-s.watsonplatform.net/concept-insights-beta/api",
-    username: "1ff1c1aa-d33b-49fd-b3b1-a6bb6cefbb94",
-    password: "1mnzl8Mf1x64"
-	use_vcap_services: false,
-	corpus_jobs: 'testmatchmyjob',
-	corpus_candidates: 'candidates'
+var corpus = {
+	jobs: 'jobs',
+	candidates: 'candidates'
 };
 
 // Create the service wrapper
+var ci_credentials = config.services.concept_insights;
 var conceptInsights = watson.concept_insights(ci_credentials);
 
 app.get('/', function (req, res) {
-	console.log(ci_values);
-	console.log(ci_credentials);
 	res.render('home');
 });
 
@@ -129,7 +100,7 @@ app.get('/analyze-jobs/:id', function (req, res) {
 
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
+		corpus: corpus.jobs,
 		documentid: req.params.id
 	};
 
@@ -244,7 +215,7 @@ app.put('/ci/jobs', function (req, res) {
 		]
 		},
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
+		corpus: corpus.jobs,
 		documentid: input.id
 	};
 	conceptInsights.createDocument(params, function (error, result) {
@@ -271,7 +242,7 @@ app.post('/ci/jobs', function (req, res) {
 		]
 		},
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
+		corpus: corpus.jobs,
 		documentid: input.code
 	};
 	conceptInsights.updateDocument(params, function (error, result) {
@@ -286,7 +257,7 @@ app.get('/ci/jobs', function (req, res) {
 
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs //+"?limit=0",
+		corpus: corpus.jobs //+"?limit=0",
 	};
 
 	conceptInsights.getDocumentIds(params, function (error, result) {
@@ -302,7 +273,7 @@ app.get('/ci/jobs', function (req, res) {
 app.get('/ci/jobs/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
+		corpus: corpus.jobs,
 		documentid: req.params.id
 	};
 
@@ -317,7 +288,7 @@ app.get('/ci/jobs/:id', function (req, res) {
 app.delete('/ci/jobs/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
+		corpus: corpus.jobs,
 		documentid: req.params.id
 	};
 
@@ -332,7 +303,7 @@ app.delete('/ci/jobs/:id', function (req, res) {
 app.get('/ci/candidates', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates //+"?limit=0"
+		corpus: corpus.candidates //+"?limit=0"
 	};
 
 	conceptInsights.getDocumentIds(params, function (error, result) {
@@ -346,7 +317,7 @@ app.get('/ci/candidates', function (req, res) {
 app.get('/user/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
+		corpus: corpus.candidates,
 		documentid: req.params.id
 	};
 
@@ -376,7 +347,7 @@ app.get('/user/:id', function (req, res) {
 app.get('/ci/candidates/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
+		corpus: corpus.candidates,
 		documentid: req.params.id
 	};
 
@@ -391,7 +362,7 @@ app.get('/ci/candidates/:id', function (req, res) {
 app.delete('/ci/candidates/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
+		corpus: corpus.candidates,
 		documentid: req.params.id
 	};
 	conceptInsights.deleteDocument(params, function (error, result) {
@@ -422,7 +393,7 @@ app.post('/ci/candidates', function (req, res) {
 			candidateHeadline: input.headline
 		},
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
+		corpus: corpus.candidates,
 		documentid: input.id
 	};
 
@@ -455,7 +426,7 @@ app.put('/ci/candidates', function (req, res) {
 			candidateHeadline: input.headline
 		},
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
+		corpus: corpus.candidates,
 		documentid: input.id
 	};
 
@@ -472,8 +443,8 @@ app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
 	var payload = extend({
 		func: 'semanticSearch',
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_jobs,
-		ids: ['/corpus/' + ci_credentials.username + '/' + ci_credentials.corpus_candidates + '/' + req.params.candidate],
+		corpus: corpus.jobs,
+		ids: ['/corpus/' + ci_credentials.username + '/' + corpus.candidates + '/' + req.params.candidate],
 		limit: req.params.limit || 5,
 	}, req.query);
 
@@ -492,8 +463,8 @@ app.get('/ci/semantic_search/job/:job/:limit', function (req, res) {
 	var payload = extend({
 		func: 'semanticSearch',
 		user: ci_credentials.username,
-		corpus: ci_credentials.corpus_candidates,
-		ids: ['/corpus/' + ci_credentials.username + '/' + ci_credentials.corpus_jobs + '/' + req.params.job],
+		corpus: corpus.candidates,
+		ids: ['/corpus/' + ci_credentials.username + '/' + corpus.jobs + '/' + req.params.job],
 		limit: req.params.limit || 5,
 	}, req.query);
 

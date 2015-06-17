@@ -18,3 +18,6 @@ applications:
   path: .
   instances: 1
   memory: 896M
+  env:
+    LINKEDIN_APPKEY: ENTER VALUE
+    LINKEDIN_APPSECRET: ENTER VALUE

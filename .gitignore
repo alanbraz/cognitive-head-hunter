@@ -1,3 +1,4 @@
 launchConfigurations/
 /node_modules/*
 .project
+config/local.json

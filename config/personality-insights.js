@@ -3,19 +3,12 @@
 // Module dependencies
 var express = require('express'),
   bluemix = require('./bluemix'),
+  config  = require('./config'),
   watson = require('watson-developer-cloud'),
   extend = require('util')._extend;
 
-
-//var pi_credentials = bluemix.getServiceCreds('personality_insights_pstg')); // VCAP_SERVICES
-var pi_credentials = extend({
-	version: 'v2',
-	url: "https://gateway-s.watsonplatform.net/personality-insights/api",
-	username: "f6fe0c12-fb84-41a5-8f19-50032d6cad29",
-	password: "QHGtHD142ZhU"
-}, bluemix.getServiceCreds('personality_insights_pstg'));
 // Create the service wrapper
-var personalityInsights = new watson.personality_insights(pi_credentials);
+var personalityInsights = new watson.personality_insights(config.services.personality_insights);
 
 module.exports = function (app) {
 

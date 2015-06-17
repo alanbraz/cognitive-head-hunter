@@ -20,6 +20,7 @@
 var express    = require('express'),
     restful = require('node-restful'),
     extend = require('util')._extend,
+    config  = require('./config'),
     bluemix = require('./bluemix'),
     mongoose = restful.mongoose;
 
@@ -56,13 +57,9 @@ var candidateSchema = mongoose.Schema({
 
 var candidateModel = restful.model('candidate', candidateSchema);
 
-var dbURL = extend({
-  uri: "mongodb://IbmCloud_lkdhl1bh_vv39s5g4_jb7t8j47:3RFllDMGweSCnJuO0li0Br1_z-c5eDnP@ds055110.mongolab.com:55110/IbmCloud_lkdhl1bh_vv39s5g4"
-}, bluemix.getServiceCreds('mongolab')); // VCAP_SERVICES
-
 module.exports = function (app) {
 
-  mongoose.connect(dbURL.uri); 
+  mongoose.connect(config.services.mongodb); 
 
   var Concept = app.resource = conceptModel;
   Concept.methods(['get', 'post', 'put', 'delete']);

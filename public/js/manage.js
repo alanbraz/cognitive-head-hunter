@@ -68,6 +68,8 @@ function loadJobs() {
   $("#jobs-table").empty();
   $("#pending-jobs-table").empty();
 
+  // TODO get all jobs without concepts numbers and update them all
+
   $.ajax({
       type: 'GET',
       url: '/db/jobs/?select=concept_id%20title%20code%20requiredConcepts%20concepts&sort=code',
@@ -77,9 +79,18 @@ function loadJobs() {
         data.forEach(function(job) {
           // TODO alanbraz: ignore pending list for demo
           //var list = (job.requiredConcepts.length>0)?'#jobs-list':'#pending-jobs-list';
+
           job.id = (job.concept_id || job._id);
+
+          if (!job.concepts) {
+            var ciJob = getJob(job.id);
+            //console.log(JSON.stringify(ciJob));
+            job.concepts = ciJob.annotations["0"].length;
+            updateJob(job);
+          }
+
           $('<tr><td>'+job.code+'</td> '+
-            '<td>'+ '<a href=\'/candidatesearch/'+job.code+'\'>'+job.title+'</a>' + '</td>'+
+            '<td>'+ '<a href=\'/candidatesearch/'+job.id+'\'>'+job.title+'</a>' + '</td>'+
             '<td> '+job.concepts + '' + '</td>' + ' ' +
             //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
             //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') +
@@ -303,9 +314,11 @@ function submitJob() {
       //showSuccess("Job " + $input.code + ' added.' + ' ' + JSON.stringify($input));
       //$('#jobs-loading').hide();
       //event.preventDefault();
-      showSuccess("Job concepts processed. Redirecting...");
-      var url = window.location.protocol + "//" + window.location.host + "/concepts/required/"+$input.id;
-      window.location.href = url;
+      showSuccess("Job concepts processed.");
+      //var url = window.location.protocol + "//" + window.location.host + "/concepts/required/"+$input.id;
+      //window.location.href = url;
+      // ignore the required concepts for now
+      loadJobs();
     }
   });
 
@@ -333,6 +346,8 @@ function addJobConcept(job) {
         newJob = getJob(job.id);
         console.log(newJob.state || "no newJob yet");
       }
+      job.concepts = newJob.annotations["0"].length;
+      updateJob(job);
     },
     error: function(err) {
       showError(err);
@@ -366,4 +381,19 @@ function getJob(id) {
       }
   });
   return r;
+}
+
+function updateJob(job) {
+  $.ajax({
+    type: "PUT",
+    url: '/db/jobs/' + job._id,
+    data: job,
+    dataType: 'json',
+    success: function(data) {
+      console.log("job updated");
+    },
+    error: function(err) {
+      showError(err);
+    }
+  });
 }

@@ -18,18 +18,32 @@
 	$('#loading2').show();
 	$('#concepts').hide();
 	var job_id = $('#job_id').html();
-	findCandidates(job_id);
 	findJob(job_id);
+	findCandidates(job_id);
 });
 
 function findJob(id) {
+	var job;
+	$.ajax({
+	    type: 'GET',
+	    async: false,
+	    url: '/db/jobs/' + id,
+	    dataType: 'json',
+	    success: function(data) {
+	      job = data;
+	      $('#job-title').text(data.title + ' - ' + data.code);
+	    },
+	    error: function(err) {
+	      console.error(err);
+	    }
+	});
+
 	$.ajax({
 		type: 'GET',
 		async: false,
 		url: '/ci/jobs/' + id,
 		dataType: 'json',
 		success: function (data) {
-			$('#job-title').text(data.id + ' ' + data.label);
 			$('#job-description').text(data.parts[0].data);
 			var table = $('#concepts-list');
 			var concepts = [];
@@ -60,7 +74,8 @@ function findJob(id) {
 			});
 			concepts.forEach(function (c) {
 				$('<div/>').html(c.label).appendTo(table);
-			});		},
+			});		
+		},
 		error: function (xhr) {
 			console.error(xhr);
 			r = null;

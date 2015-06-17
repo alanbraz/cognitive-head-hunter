@@ -32,7 +32,7 @@ module.exports.getServiceCreds = function(name) {
             if (service_name.indexOf(name) === 0) {
                 var service = services[service_name][0];
                 return {
-                    url: service.credentials.url,
+                    url: (service.credentials.url || service.credentials.uri),
                     username: service.credentials.username,
                     password: service.credentials.password
                 };

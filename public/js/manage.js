@@ -88,8 +88,9 @@ function loadJobs() {
             job.concepts = ciJob.annotations["0"].length;
             updateJob(job);
           }
-
-          $('<tr><td>'+job.code+'</td> '+
+          
+          $('<tr>'+ 
+            '<td>'+ '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+job.code+'\' target=\'_blank\'>'+job.code+'</a>' + '</td> '+
             '<td>'+ '<a href=\'/candidatesearch/'+job.id+'\'>'+job.title+'</a>' + '</td>'+
             '<td> '+job.concepts + '' + '</td>' + ' ' +
             //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +

@@ -116,6 +116,10 @@ app.get('/tos', function (req, res) {
 	res.render('tos');
 });
 
+app.get('/import', function (req, res) {
+	res.render('import');
+});
+
 app.get('/analyze', function (req, res) {
 	res.render('analyze');
 });

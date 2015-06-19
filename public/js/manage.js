@@ -68,14 +68,13 @@ function loadJobs() {
   $("#jobs-table").empty();
   $("#pending-jobs-table").empty();
 
-  // TODO get all jobs without concepts numbers and update them all
-
   $.ajax({
       type: 'GET',
       url: '/db/jobs/?select=concept_id%20title%20code%20requiredConcepts%20concepts&sort=code',
       dataType: 'json',
       success: function(data) {
         $('#num-jobs').html(data.length + ' jobs');
+        var lastJob = "";
         data.forEach(function(job) {
           // TODO alanbraz: ignore pending list for demo
           //var list = (job.requiredConcepts.length>0)?'#jobs-list':'#pending-jobs-list';
@@ -85,19 +84,29 @@ function loadJobs() {
           if (!job.concepts) {
             var ciJob = getJob(job.id);
             //console.log(JSON.stringify(ciJob));
-            job.concepts = ciJob.annotations["0"].length;
-            updateJob(job);
-          }
-          
+            if (ciJob.annotations) {
+              job.concepts = ciJob.annotations["0"].length;
+              updateJob(job);
+            } else {
+              console.log(JSON.stringify(ciJob));
+              //delJob(job._id, job.id);
+              //return;
+            } 
+          } 
+
           $('<tr>'+ 
             '<td>'+ '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+job.code+'\' target=\'_blank\'>'+job.code+'</a>' + '</td> '+
             '<td>'+ '<a href=\'/candidatesearch/'+job.id+'\'>'+job.title+'</a>' + '</td>'+
-            '<td> '+job.concepts + '' + '</td>' + ' ' +
+            '<td> ' + job.concepts + //' ' + ((job.ci.state)?job.ci.state.status:"MISSING") +  
+            ((lastJob == job.id)?" REPETED":"") + 
+            '</td>' + ' ' +
             //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
             //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') +
-            '<td>[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+(job.concept_id || job._id)+'\")\'>delete</a>]</td>' +
+            '<td>[<a href=\'javascript:delJob(\"'+job._id+'\",\"'+job.id+'\");loadJobs();\'>delete</a>]</td>' +
             '</tr>')
           .appendTo($('#jobs-table'));
+
+          lastJob = job.id;
         });
         //handleJobs(data);
       },
@@ -221,10 +230,12 @@ var delCandidate = function(dbId, ciId) {
     dataType: 'json',
     success: function(data) {
       showSuccess("Candidate " + dbId + " removed.");
-      loadCandidates();
     },
     error: function(err) {
       console.error(err);
+    },
+    complete: function(data) {
+      loadCandidates();
     }
   });
 }
@@ -242,7 +253,6 @@ var delJob = function(dbId, ciId) {
       console.error(err);
     },
     complete: function(data) {
-      //loadJobs();
     }
   });
   $.ajax({
@@ -257,7 +267,6 @@ var delJob = function(dbId, ciId) {
         console.error(err);
       },
       complete: function(data) {
-        loadJobs();
       }
   });
 }
@@ -373,12 +382,12 @@ function getJob(id) {
           r = data;
         } else {
           console.error(data);
-          r = null;
+          r = data;
         }
       },
       error: function(xhr) {
         console.error(xhr);
-        r = null;
+        r = xhr.responseJSON;
       }
   });
   return r;
@@ -387,7 +396,7 @@ function getJob(id) {
 function updateJob(job) {
   $.ajax({
     type: "PUT",
-    url: '/db/jobs/' + job._id,
+    url: '/db/jobs/' + job.id,
     data: job,
     dataType: 'json',
     success: function(data) {

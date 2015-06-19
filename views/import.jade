@@ -1,0 +1,104 @@
+extends ./layout.jade
+
+block specificJS
+	script(type='text/javascript', src='/js/manage.js')
+
+block content
+
+	h1 Import jobs
+
+	div.well
+		form#importForm(role="form")
+			div.form-group.row
+				div.col-lg-12.col-xs-12
+					textarea#text.form-control(rows='20', required='true', placeholder='Paste a JSON array with: [ { "code" : string , "title" : string , "description" : string } , ... ]')
+			div.form-group.row
+				div.col-lg-offset-9.col-lg-3
+					button.btn.btn-block#importButton(type='button') Import
+	div.row
+		div.col-lg-12.message#error(style='display:none;')
+			p.bg-danger#errorMsg
+		div.col-lg-12.message#success(style='display:none;')
+			p.bg-success#successMsg
+		div.col-lg-12.message#info(style='display:none;')
+			p.bg-info#infoMsg
+
+	div.well
+		ul#results
+
+	script.
+		$(document).ready(function() {
+			console.log("ready");
+		});
+
+		$("#importButton").click(function() {
+			$("#importButton").blur();
+			$("#info").show();
+			$('#results').empty();
+			//console.log($("#text").val());
+			var json = JSON.parse($("#text").val());
+			console.log(json);
+
+			json.forEach(function(job, i, ar) {
+				$("#infoMsg").html('Processing ' + i + ' of ' + ar.length + '.');
+				console.log(i);
+				if (isJob(job)) {
+					$('<li>' + job.code + ': ' + job.title  + ' ignored.</li>').appendTo($('#results'));
+					$("html, body").animate({ scrollTop: $(document).height() }, 200);
+				} else {
+					importJob(job);
+				}
+				
+			});
+			$("#info").hide();
+			$("#error").hide();
+			$("#success").hide();
+			//JSON.stringify(job)
+
+		});
+
+		function importJob(job) {
+			var $input = {
+			    code: job.code,
+			    title: job.title,
+			    description: job.description.replace(/(\r\n|\n|\r)/gm," ")
+			};
+
+		  $.ajax({
+		    type: "POST",
+		    url: '/db/jobs',
+		    data: $input,
+		    dataType: 'json',
+		    success: function(data) {
+		      $input.id = data._id;
+		      addJobConcept($input);
+		    },
+		    error: function(err) {
+		      console.log(err);
+		    },
+		    complete: function(data) {
+		    	$('<li>' + job.code + ': ' + job.title  + ' inserted.</li>').appendTo($('#results'));
+		    	$("html, body").animate({ scrollTop: $(document).height() }, 200);
+		    }
+		  });
+			
+		}
+
+		function isJob(job) {
+			var r;
+			$.ajax({
+			    type: "GET",
+			    url: '/db/jobs?code=' + job.code,
+			    dataType: 'json',
+			    async: false,
+			    success: function(data) {
+			    	//console.log(JSON.stringify(data));
+			      	r = (data.length > 0) ? true : false;
+			    },
+			    error: function(err) {
+			      console.log(err);
+			    }
+		  	});
+		  	return r;
+			
+		}

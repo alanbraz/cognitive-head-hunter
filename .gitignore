@@ -2,3 +2,4 @@ launchConfigurations/
 /node_modules/*
 .project
 config/local.json
+jobs.json

@@ -1,21 +1,21 @@
 {
-  "name": "CognitiveHeadHunter",
-  "version": "0.0.1",
-  "description": "A sample nodejs app for Bluemix",
+  "name": "cognitive-headh-hunter",
+  "version": "1.0.0",
+  "description": "A Cognitive based system to Help finding the best job opportunity for a candidate. Using Watson to read and extract cognitive information from both the candidates and the job openings we are able to provide a better match between them, not only analyzing keywords but rather understanding the concepts between the text. A user will be able to quickly find a tailored new opportunity, the HR department will speed up the triage of curriculum and improve the interview results sending only the right candidates to it and the company could speed up the process of creating and replacing positions.",
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "body-parser": "*",
-    "cookie-parser": "*",
-    "errorhandler": "*",
+    "body-parser": "1.12.3",
+    "cookie-parser": "1.3.4",
+    "errorhandler": "1.3.5",
     "express": "4.11.*",
-    "express-session": "*",
-    "jade": "*",
-    "linkedin-js": "*",
-    "serve-favicon": "*",
+    "express-session": "1.11.*",
+    "jade": "1.9.2",
+    "linkedin-js": "0.1.4",
+    "serve-favicon": "2.3.0",
     "watson-developer-cloud": "0.9.*",
-    "node-restful": "*"
+    "node-restful": "0.1.18"
   },
   "engines": {
     "node": "0.10.*"
@@ -23,6 +23,9 @@
   "repository": {
     "type": "git",
     "url": "https://hub.jazz.net/git/alanbraz/job-hunters"
+  },
+  "bugs": {
+    "url": "https://hub.jazz.net/project/alanbraz/job-hunters/track"
   },
   "author": "IBM Corp.",
   "contributors": [
@@ -42,5 +45,8 @@
       "name": "Rafael Cintra",
       "email": "rccintra@br.ibm.com"
     }
-  ]
+  ],
+  "homepage": "http://chh.mybluemix.net/",
+  "readmeFilename": "README.md",
+  "license": "Apache-2.0"
 }

@@ -43,7 +43,8 @@ var express = require('express'),
 	bluemix = require('./config/bluemix'),
 	config  = require('./config/config'),
 	watson = require('watson-developer-cloud'),
-	extend = require('util')._extend;
+	extend = require('util')._extend,
+	parser = require('./controllers/parser');
 
 // Bootstrap application settings
 require('./config/express')(app);
@@ -54,8 +55,8 @@ db(app);
 var conceptsCache = [];
 
 var linkedin_client = require('linkedin-js')
-	(	config.services.linkedin.app_key, 
-		config.services.linkedin.app_secret, 
+	(	config.services.linkedin.app_key,
+		config.services.linkedin.app_secret,
 		uri + '/auth');
 
 var full_profile = "proposal-comments,associations,interests,projects," +
@@ -189,15 +190,21 @@ app.get('/profile', function (req, res) {
 	// the first time will redirect to linkedin
 	if (req.session.token) {
 		linkedin_client.apiCall('GET', '/people/~:' +
-			'(' + basic_profile + ',' + full_profile + ')', {
+			  '(' + basic_profile + ')', {
 				token: req.session.token
 			},
 			function (error, result) {
 				if (error) {
 					res.json(error);
 				} else {
+
 					req.session.user = transformProfile(result);
-					res.redirect('/jobsearch');
+					parser.getLinkedInFullProfile(req.session.user.publicProfileUrl, req, res, function(req, res, data){
+						
+						req.session.user.data += data;
+						console.log(req.session.user);
+						res.redirect('/jobsearch');
+					});
 				}
 			});
 	} else {
@@ -219,7 +226,7 @@ function getConceptDetails(id, callback) {
 	var payload = {
 		user: ci_credentials.username
 	};
-	payload.ids = [id]; 
+	payload.ids = [id];
 	var concept;
 
 	conceptInsights.getConceptsMetadata(payload, function (error, result) {
@@ -231,6 +238,10 @@ function getConceptDetails(id, callback) {
 		}
 	});
 	return concept;
+}
+
+function getFullProfile(public_url){
+
 }
 
 

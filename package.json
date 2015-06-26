@@ -7,15 +7,16 @@
   },
   "dependencies": {
     "body-parser": "*",
+    "cheerio": "^0.19.0",
     "cookie-parser": "*",
     "errorhandler": "*",
     "express": "4.11.*",
     "express-session": "*",
     "jade": "*",
     "linkedin-js": "*",
+    "node-restful": "*",
     "serve-favicon": "*",
-    "watson-developer-cloud": "0.9.*",
-    "node-restful": "*"
+    "watson-developer-cloud": "0.9.*"
   },
   "engines": {
     "node": "0.10.*"

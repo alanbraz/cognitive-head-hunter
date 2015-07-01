@@ -51,6 +51,7 @@ require('./config/express')(app);
 require('./config/personality-insights')(app);
 var db = require('./config/db');
 db(app);
+console.log(config.services);
 
 var conceptsCache = [];
 
@@ -200,8 +201,8 @@ app.get('/profile', function (req, res) {
 
 					req.session.user = transformProfile(result);
 					parser.getLinkedInFullProfile(req.session.user.publicProfileUrl, req, res, function(req, res, data){
-						
-						req.session.user.data += data;
+
+						req.session.user.data = clearText(data);
 						console.log(req.session.user);
 						res.redirect('/jobsearch');
 					});
@@ -671,14 +672,7 @@ function transformProfile(data) {
 	profile.data += (data.specialties || "") + ". ";
 
 
-	profile.data = profile.data.replace(/(\n)/g, ' ');
-	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
-	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
-	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
-	profile.data = profile.data.replace(/\.\,/g, '.');
-	profile.data = profile.data.replace(/\,\./g, '.');
-	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
-	profile.data = profile.data.replace(/\\/g, '');
+	profile.data = clearText(profile.data);
 
 	return profile;
 }
@@ -693,15 +687,7 @@ function cleanTextProfile(data) {
 	profile.publicProfileUrl = (data.publicProfileUrl || "");
 	profile.emailAddress = (data.emailAddress || "");
 
-	profile.data = data.text;
-	profile.data = profile.data.replace(/(\n)/g, ' ');
-	profile.data = profile.data.replace(/\s(\s)+/g, ' ');
-	profile.data = profile.data.replace(/\,\s(\,\s)+/g, ', ');
-	profile.data = profile.data.replace(/\.\s(\.\s)+/g, '. ');
-	profile.data = profile.data.replace(/\.\,/g, '.');
-	profile.data = profile.data.replace(/\,\./g, '.');
-	profile.data = profile.data.replace(/\,\s\.\s/g, '. ');
-	profile.data = profile.data.replace(/\\/g, '');
+	profile.data = clearText(data.text);
 
 	return profile;
 }
@@ -717,5 +703,19 @@ function clearSession(session) {
 	}
 }
 
+function clearText(text){
+
+	var cleanText = text;
+	cleanText = cleanText.replace(/(\n)/g, ' ');
+	cleanText = cleanText.replace(/\s(\s)+/g, ' ');
+	cleanText = cleanText.replace(/\,\s(\,\s)+/g, ', ');
+	cleanText = cleanText.replace(/\.\s(\.\s)+/g, '. ');
+	cleanText = cleanText.replace(/\.\,/g, '.');
+	cleanText = cleanText.replace(/\,\./g, '.');
+	cleanText = cleanText.replace(/\,\s\.\s/g, '. ');
+	cleanText = cleanText.replace(/\\/g, '');
+
+	return cleanText;
+}
 
 app.listen(port);

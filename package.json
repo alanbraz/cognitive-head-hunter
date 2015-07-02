@@ -16,7 +16,8 @@
     "linkedin-js": "*",
     "node-restful": "*",
     "serve-favicon": "*",
-    "watson-developer-cloud": "0.9.*"
+    "watson-developer-cloud": "0.9.*",
+    "request": "*"
   },
   "engines": {
     "node": "0.10.*"
@@ -41,10 +42,6 @@
     {
       "name": "Paulo Marques",
       "email": "pmcjr@br.ibm.com"
-    },
-    {
-      "name": "Rafael Cintra",
-      "email": "rccintra@br.ibm.com"
     }
   ],
   "homepage": "http://chh.mybluemix.net/",

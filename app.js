@@ -241,11 +241,6 @@ function getConceptDetails(id, callback) {
 	return concept;
 }
 
-function getFullProfile(public_url){
-
-}
-
-
 app.put('/ci/jobs', function (req, res) {
 
 	var input = req.body;

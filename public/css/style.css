@@ -194,12 +194,13 @@
 }
 .circle {
   margin: 0 auto;
+  margin-bottom: 40px;
   display: inline-block;
   margin-right: 1em;
 }
 div#concepts .circle-info-half {
 	line-height: 15px !important;
-	bottom: -30px;
+	top: 120px;
 }
 #chart {
 	margin-top: 20px;
@@ -223,4 +224,14 @@ div#concepts .circle-info-half {
 
 .wrap {
   white-space: normal !important; 
+}
+
+.candidate {
+  min-height: 200px;
+}
+
+.img-persona {
+  border: 2px solid #333;
+  margin: 15px;
+  width: 150px;
 }

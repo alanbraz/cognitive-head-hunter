@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ var NUM_OF_CANDIDATES = 128;
+
  $(document).ready(function () {
 	$('#loading').hide();
 	$('#loading2').show();
@@ -95,7 +97,7 @@ function findCandidates(id) {
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url: '/ci/semantic_search/job/' + id + "/12",
+		url: '/ci/semantic_search/job/' + id + "/" + NUM_OF_CANDIDATES,
 		dataType: 'json',
 		success: function (data) {
 			showCandidates(data);
@@ -119,7 +121,7 @@ function showCandidates(candidates) {
 			candidate.candidatePictureUrl = "/images/user.png";
 		
 		var score = Math.ceil(candidate.score * 100) + "%";
-		$('<div class="col-lg-1"/>')
+		$('<div class="candidate col-lg-1 col-md-3 col-sm-4 col-xs-6"/>')
 			.html('<div><a href=\'/user/'+ candidate.id +'\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>' 
 				+ '<div>' + candidate.label 
 				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 

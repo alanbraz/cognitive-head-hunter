@@ -16,6 +16,8 @@
 
 'use strict';
 
+ var NUM_OF_JOBS = 32;
+ 
 $(document).ready(function () {
 
 	var widgetId = 'vizcontainer', // Must match the ID in index.jade
@@ -35,17 +37,12 @@ $(document).ready(function () {
 	/**
 	 * Clear the "textArea"
 	 */
-	$('.clear-btn').click(function () {
-		$('.clear-btn').blur();
+	$('#clear-btn').click(function () {
+		$('#clear-btn').blur();
 		$content.val('');
 		$('#txt-name').val('');
 		updateWordsCount();
 	});
-
-	/*$('#back-btn').click(function(){
-	  $('#back-btn').blur();
-	  $.get("/analyze", function(data) {});
-	});*/
 
 	/**
 	 * Update words count on change
@@ -114,7 +111,7 @@ $(document).ready(function () {
 		if (!candidate) {
 			// add or update
 			$.ajax({
-				type: (candidate)?'POST':'PUT'
+				type: (candidate)?'POST':'PUT',
 				async: false,
 				data: $user,
 				url: '/ci/candidates',
@@ -194,7 +191,7 @@ $(document).ready(function () {
 		$.ajax({
 			type: 'GET',
 			async: true,
-			url: '/ci/semantic_search/candidate/' + $user.id + "/10", // ab: 20 to degub, old value was 10
+			url: '/ci/semantic_search/candidate/' + $user.id + "/" + NUM_OF_JOBS, // ab: 20 to degub, old value was 10
 			dataType: 'json',
 			success: function (data) {
 				//console.log(JSON.stringify(data));
@@ -284,8 +281,11 @@ $(document).ready(function () {
 			position = positions[i];
 			score = Math.ceil(position.score * 100) + "%";
 			html = '<div id=' + position.id + ' class="row">' +
-				'<div class=\'_' + Math.round(position.score * 10) + ' col-lg-1\'>' + score + '</div>' +
-				'<div class=\'col-lg-11\'><strong> ' + position.label + '</strong><br/>' +
+				'<div class=\'_' + Math.round(position.score * 10) + ' col-xs-2 col-md-1\'>' + score + '</div>' +
+				'<div class=\'col-xs-10 col-md-11\'><strong> ' +
+					'<a href="/candidatesearch/'+ position.id +'">' +
+					 position.label + 
+				'</a></strong><br/>' +
 				'<small class=\'row\' id=\'tags-' + position.id + '\' style=\'display:block;\'></small>' +
 				'</div>' +
 //				'<div class=\'col-lg-2\'>' +
@@ -532,9 +532,9 @@ $(document).ready(function () {
 		$('.wordsCount').css('color', wordsCount < minWords ? 'red' : 'gray');
 		$('.wordsCount').text(wordsCount + ' words');
 		if (wordsCount < minWords) {
-			$('.analysis-btn').attr('disabled', 'disabled');
+			$('#analysis-btn').attr('disabled', 'disabled');
 		} else {
-			$('.analysis-btn').removeAttr('disabled');
+			$('#analysis-btn').removeAttr('disabled');
 		}
 	}
 	$content.keyup(updateWordsCount);

@@ -16,14 +16,14 @@ block content
 			span.col-lg-7.col-xs-12.text-left
 				h2 #{user.fullName}
 				p #{user.headline}
-		div#space.col-lg-2
-		div#concepts.col-lg-6(style='display: none;')
+		div#concepts.col-lg-offset-2.col-lg-6.col-xs-12(style='display: none;')
 			H3 Your top concepts
 			div#concept1.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
 			div#concept2.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
 			div#concept3.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF',data-bgcolor='#eee',data-fill='#ddd')
 			div#concept4.circle(data-dimension='120',data-width='10',data-fontsize='15',data-fgcolor='#00B2EF	',data-bgcolor='#eee',data-fill='#ddd')
 			//div.well.content(style='display:none;')
+		
 		div.col-lg-8.col-xs-12#summary
 			div.row.form-group
 				div.col-lg-12.col-xs-12
@@ -33,13 +33,14 @@ block content
 						|#{user.data}
 					div.text-right
 						span.wordsCount.small
-			div.row.form-group.text-right
-				div.col-lg-3.col-lg-push-3.col-xs-3
-					button.btn.btn-block#back-btn(type='button',onClick='javascript:history.back();') Back
-				div.col-lg-3.col-lg-push-3.col-xs-3
-					button.btn.btn-block.clear-btn(type='button') Clear
-				div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-					button#analysis-btn.btn.btn-block.analysis-btn(type='button') Analyze
+			div.row.form-group
+				div.col-xs-3
+					button#back-btn.btn.btn-block(type='button',onClick='javascript:history.back();') Back
+				div.col-xs-3
+					button#clear-btn.btn.btn-block(type='button') Clear
+				div.col-xs-4.col-xs-offset-2
+					button#analysis-btn.btn.btn-block(type='button') Analyze
+	
 	div.row(style='padding-top:10px;')
 		div.col-lg-6.col-xs-12.text-justify.personality(style='display:none;')
 			div.row
@@ -57,12 +58,17 @@ block content
 				p Big 5, Needs and Values attributes
 				div.col-lg-12
 					div.well#vizcontainer.text-center.results(style='display:none;')
+		
 		div#loading.row.col-lg-6.col-xs-12.text-center(style='display:none;')
 			img(src='/images/watson.gif')
-		div.col-lg-6
+		
+		div.col-lg-6.col-xs-12
 			div#positions.col-lg-12.col-xs-12(style='display: none;min-height:200px;')
 				h3 Suggested jobs
+				h4 
+					small Click the job title to see other candidates.
 				div.content
+	
 	div.col-lg-6.col-md-6.col-xs-12
 		div.row
 			div.form-group.row.loading1.text-center(style='display:none;')

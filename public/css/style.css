@@ -20,7 +20,7 @@
 }
 
 .top-nav {
-  background-color: #333333; //#404041;
+  background-color: #333333; //#404041
   padding-top: 5px;
   padding-bottom: 5px;
   margin-bottom: 15px;
@@ -219,4 +219,8 @@ div#concepts .circle-info-half {
 	white-space: nowrap;
 	  padding: 4px;
 	animation: grow-width-right 1s;
+}
+
+.wrap {
+  white-space: normal !important; 
 }

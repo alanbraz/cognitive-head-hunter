@@ -211,7 +211,7 @@ function extractData($){
 				var publicationsTitle = findByProperty(publicationsHeader.children, 'name', 'h4');
 				var publicationsText = "";
 
-				//publicationsText += publicationsTitle.children[0].children[0].data;
+
 				if(publicationsTitle.children[0].children[0].data){
 					publicationsText += publicationsTitle.children[0].children[0].data + " ";
 				}

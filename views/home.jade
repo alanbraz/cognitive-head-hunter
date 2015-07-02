@@ -5,38 +5,38 @@ block home-content
 
 	div.jumbotron(style='margin-top:40px;')
 		h1 Cognitive Head Hunter
-		p.lead Helps a candidate to find the next job position using its own LinkedIn profile or custom text. 
+		p.lead Helps a candidate to find the next job position using its own LinkedIn profile or custom text.
 		//p.lead Cognitive Head Hunter is a cognitive application that uses Watson services to build an enhanced job openings knowledge based that will support candidates and HR professionals to find the best match between a candidate and a position.
 		//h3 Choose one role and try it out:
 		div.row
-			div.col-lg-6.col-xs-6.text-center
+			div.col-lg-6.col-xs-12.text-center
 				div.row
 					img.img-circle(src="/images/miguel.png",width='150px',style='padding:15px;')
 				div.row
-					a#btn-candidate.btn.btn-default.btn-lg.btn-block(href='/analyze',role="button") Candidate looking for new job
-			div.col-lg-6.col-xs-6.text-center
+					a#btn-candidate.btn.btn-default.btn-lg.btn-block.wrap(href='/analyze',role="button") Candidate looking for new job
+			div.col-lg-6.col-xs-12.text-center
 				div.row
 					img.img-circle(src="/images/adrian.png",width='150px',style='padding:15px;')
 				div.row
-					a#btn-hrAnalyst.btn.btn-default.btn-lg.btn-block(href='/manage',role="button") HR Prossional matching jobs and candidates 
+					a#btn-hrAnalyst.btn.btn-default.btn-lg.btn-block.wrap(href='/manage',role="button") HR Prossional matching jobs and candidates
 
-	div.row			
-		div.col-lg-6.col-xs-6
-			div.avatar.img-container.col-lg-2
+	div.row
+		div.col-lg-6.col-xs-12
+			div.avatar.img-container.col-lg-2.col-xs-2
 				img(src="/images/ci.png")
-			div.col-lg-10
+			div.col-lg-10.col-xs-10
 				h2 Concept Insights
 				p The Concept Insights service links documents that you provide with a pre-existing graph of concepts based on Wikipedia (e.g. 'Cognitive Systems', 'Solar Energy', etc.). Users of this service can also search for documents that are relevant to a concept or collection of concepts by exploring concepts that are explicitly contained in your queries or are implicitly referenced through related concepts.
 				a.learn-more(href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/concept-insights.html", target='_blank') More about this service
 
-		div.col-lg-6.col-xs-6
-			div.avatar.img-container.col-lg-2
+		div.col-lg-6.col-xs-12
+			div.avatar.img-container.col-lg-2.col-xs-2
 				img(src="/images/pi.png")
-			div.col-lg-10
+			div.col-lg-10.col-xs-10
 				h2 Personality Insights
 				p The Watson Personality Insights service uses linguistic analytics to extract a spectrum of cognitive and social characteristics from the text data that a person generates through blogs, tweets, forum posts, and more.
 				a.learn-more(href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html", target='_blank') More about this service
-	
+
 
 	script(type="text/javascript").
 		$(document).ready(function () {

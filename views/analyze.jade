@@ -6,12 +6,12 @@ block specificJS
 	script(type='text/javascript', src='/js/analyze.js')
 
 block content
-		h2.text-center Import your LinkedIn profile 
+		h2.col-lg-12.col-xs-12.text-center Import your LinkedIn profile
 		div.row(style='padding:10px;margin-top:10px;margin-bottom:10px;')
-			div.row.col-lg-12.col-xs-12.text-center
+			div.row.col-lg-12.text-center
 				a.text-center(href='/auth')
-					img(src='/images/Sign-In-Large---Default.png')		
-		h2.text-center Or input your profile text below: 
+					img(src='/images/Sign-In-Large---Default.png')
+		h2.text-center.col-lg-12.col-xs-12 Or input your profile text below:
 		div.row(style='padding:10px;margin-top:10px;margin-bottom:10px;')
 			div#loading.row.col-lg-12.col-xs-12(style='display:none;')
 				img(src='/images/watson.gif')
@@ -21,7 +21,7 @@ block content
 					div
 						div.form-group.col-xs-6
 							label(for="txt-name") Name
-							input#txt-name.form-control(type="text" required='true' 
+							input#txt-name.form-control.wrap(type="text" required='true'
 								placeholder='Please enter your full name')
 						div.col-lg-12.col-xs-12
 							label(for="txt-profile") Profile

@@ -11,6 +11,7 @@ html(lang='en')
 		link(rel='shortcut icon', href='/images/favicon.ico', type='image/x-icon')
 		link(rel='icon', href='/images/favicon.ico', type='image/x-icon')
 		link(rel='stylesheet', href='/css/watson-bootstrap-dark.css')
+		link(rel="stylesheet", href="/css/font-awesome.min.css")
 		link(rel='stylesheet', href='/css/style.css')
 
 		script(type='text/javascript', src='/js/jquery-1.11.1.min.js')
@@ -20,7 +21,7 @@ html(lang='en')
 
 	body
 
-		a#jazzhub(href="https://hub.jazz.net/git/alanbraz/job-hunters")
+		a.visible-lg.visible-md#jazzhub(href="https://hub.jazz.net/git/alanbraz/job-hunters", target="_blank")
 			img(src="/images/forkme.png",alt="Fork me on JazzHub",style="position: absolute; top: 0; right: 0; border: 0;z-index:16;")
 
 		div.container
@@ -28,13 +29,27 @@ html(lang='en')
 			div.row.nav.top-nav(style='background-color: #004468;')
 				div.col-lg-3
 					a.left(href='/')
-						img(src='/images/logo-blue.jpg',height='70px;',style="float: left")
+						img.chh_logo(src='/images/logo-transp.png')
 				div.col-lg-9
-					ul.nav.navbar-nav.right
+					ul.nav.navbar-nav.right.hidden-xs
 						li 
 							a(href="/") Home
 						li 
 							a(href="/about") About
+						li.visible-sm
+							a(href="https://hub.jazz.net/git/alanbraz/job-hunters", target="_blank") 
+								span.fa.fa-code-fork  
+								|  Fork me
+					ul.nav.navbar-nav.nav-pills.right.visible-xs
+						li 
+							a(href="/")
+								span.fa.fa-home
+						li 
+							a(href="/about")
+								span.fa.fa-info
+						li
+							a(href="https://hub.jazz.net/git/alanbraz/job-hunters", target="_blank")
+								span.fa.fa-code-fork
 
 			div.row.modal-content#modal(style='padding:10px;margin-top:10px;margin-bottom:10px; min-height: 600px;')
 				block content
@@ -43,9 +58,9 @@ html(lang='en')
 
 			div.footer(style='padding:20px;')
 				p.text-center
-					a(href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/") Built with IBM Watson
+					a(href="http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/", target="_blank") Built with IBM Watson
 					| &nbsp;|&nbsp;
 					a(href="/tos") Terms of use
 					| &nbsp;|&nbsp;
-					a(href="http://www.ibm.com/privacy/us/en/") Privacy Policy
-
+					a(href="http://www.ibm.com/privacy/us/en/", target="_blank") Privacy Policy
+					a.visible-xs#jazzhub(href="https://hub.jazz.net/git/alanbraz/job-hunters", target="_blank") Fork me on JazzHub

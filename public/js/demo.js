@@ -109,14 +109,12 @@ $(document).ready(function () {
 
 		// check candidate
 		var candidate = getCandidate($user.id);
-//		console.log(candidate);
 
-		// alanbraz: only insert if not there, will not consider update this time.
+
 		if (!candidate) {
 			// add or update
-			// TODO insert db before
 			$.ajax({
-				type: 'PUT', //(candidate)?'POST':'PUT'
+				type: (candidate)?'POST':'PUT'
 				async: false,
 				data: $user,
 				url: '/ci/candidates',

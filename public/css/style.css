@@ -28,7 +28,7 @@
 .top-nav a {
   font-size: 14px;
   font-weight: 300;
-  text-decoration: underline;
+  text-decoration: none;
   color: white;
 }
 .top-nav a:hover {
@@ -38,7 +38,7 @@
 .top-nav .right {
   float: right;
   margin-right: 20px;
-  margin-top: 30px;
+  margin-top: 10px;
 }
 .top-nav .left {
   float: left;
@@ -141,11 +141,8 @@
 	border-top: double #ddd;
 }
 .chh_logo{
-	padding-top: 10px;
-}
-
-.chh_logo img {
-	width: 200px
+	height: 40px !important;
+  margin: 10px !important;
 }
 
 ._8, ._9, ._10 {

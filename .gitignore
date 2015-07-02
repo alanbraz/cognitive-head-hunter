@@ -1,6 +1,3 @@
-launchConfigurations/
-/node_modules/*
-.project
+node_modules
 config/local.json
-config/stage1.json
 jobs.json

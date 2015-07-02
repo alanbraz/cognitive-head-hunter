@@ -20,19 +20,19 @@ Now it's time to configure your project.
 
 # Internal Bluemix Installation
 
-1. Fork or clone this repository.
-2. Open your terminal and navigate to your clone/fork in your system.
-3. Push your application to Bluemix using no manifest file.
+1- Fork or clone this repository.
+2- Open your terminal and navigate to your clone/fork in your system.
+3- Push your application to Bluemix using no manifest file.
 
 ```sh
 $ cf push <application-name> --no-manifest
 ```
 
-4. Go to your Bluemix app which you just created in your Bluemix account.
-5. Include a [Concept Insights][concept-insights] service in your application.
-6. Include a [Personality Insights][personality-insights] service in your application.
-7. Include a `MongoLab` service in your application.
-8. Restart your application.
+4- Go to your Bluemix app which you just created in your Bluemix account.
+5- Include a [Concept Insights][concept-insights] service in your application.
+6- Include a [Personality Insights][personality-insights] service in your application.
+7- Include a `MongoLab` service in your application.
+8- Restart your application.
 
 Now you just need to configure your project, follow instructions bellow.
 

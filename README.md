@@ -18,11 +18,11 @@ And that's about it! You successfully just created a `Node.js` application in Bl
 
 Now it's time to configure your project.
 
-# Internal Bluemix Installation
+# Manual installation
 
 1. Fork or clone this repository.
 
-2. Open your terminal and navigate to your clone/fork in your system.
+2. Open your terminal and navigate to your cloned/forked project in your system.
 
 3. Push your application to Bluemix using no manifest file. Type `cf push <application-name> --no-manifest` in your terminal.
 
@@ -36,7 +36,7 @@ Now it's time to configure your project.
 
 8. Restart your application.
 
-Now you just need to configure your project, follow instructions bellow.
+Now you just need to configure your project, follow the instructions bellow.
 
 ## Configuration instructions
 

@@ -34,7 +34,9 @@ Now it's time to configure your project.
 
 7. Include a `MongoLab` service in your application.
 
-8. Restart your application.
+8. Create two `USER_DEFINED` Environment Variables in your bluemix app named `LINKEDIN_APPKEY` and `LINKEDIN_APPSECRET`, initially with no values.
+
+9. Restart your application.
 
 Now you just need to configure your project, follow the instructions bellow.
 

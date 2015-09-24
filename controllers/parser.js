@@ -295,11 +295,15 @@ function extractData($){
 
 module.exports.getLinkedInFullProfile = function(profileUrl, req, response, callback){
 	request(profileUrl, function (err, res, html) {
-
-	  var $ = cheerio.load(html);
-		var profile = extractData($);
-
-		callback(req, response, profile);
-
+		try {
+			var $ = cheerio.load(html);
+			console.log("\n\ngetLinkedInFullProfile HTML: " + $);
+			var profile = extractData($);
+			console.log("\n\ngetLinkedInFullProfile: " + profile);
+			callback(req, response, profile);
+		} catch (error) {
+			console.log("Error parsing full profile: " + error);
+			callback(req, response, null);
+		}
 	});
 };

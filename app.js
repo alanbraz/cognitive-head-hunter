@@ -201,9 +201,10 @@ app.get('/profile', function (req, res) {
 
 					req.session.user = transformProfile(result);
 					parser.getLinkedInFullProfile(req.session.user.publicProfileUrl, req, res, function(req, res, data){
-
-						req.session.user.data = clearText(data);
-						console.log(req.session.user);
+						if (data) {
+							req.session.user.data = clearText(data);
+							console.log(req.session.user);
+						}
 						res.redirect('/jobsearch');
 					});
 				}

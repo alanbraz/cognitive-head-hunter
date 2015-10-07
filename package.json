@@ -24,10 +24,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://hub.jazz.net/git/alanbraz/job-hunters"
+    "url": "https://github.com/alanbraz/cognitive-head-hunter"
   },
   "bugs": {
-    "url": "https://hub.jazz.net/project/alanbraz/job-hunters/track"
+    "url": "https://github.com/alanbraz/cognitive-head-hunter/issues"
   },
   "author": "IBM Corp.",
   "contributors": [

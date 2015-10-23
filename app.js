@@ -72,39 +72,54 @@ var corpus = {
 	candidates: 'candidates'
 };
 
+var accountId = "";
+
 // Create the service wrapper
 var ci_credentials = config.services.concept_insights;
 var conceptInsights = watson.concept_insights(ci_credentials);
 
 // create both corpus automatically
-var params = {
-	user: ci_credentials.username,
-	corpus: corpus.jobs,
-	access: "private",
-  	users: [
-	    {
-	      uid: ci_credentials.username,
-	      permission: "ReadWriteAdmin"
-	    }
-  	]
-};
-
-conceptInsights.createCorpus(params, function (error, result) {
+//Already adapted to V2
+conceptInsights.accounts.getAccountsInfo({}, function(error, data){
 	if (error) {
-		console.log(JSON.stringify(error));
-	} else {
-		console.log(JSON.stringify(result));
+		return res.status(error.error ? error.error.code || 500 : 500).json(error);
 	}
+	accountId = data.accounts[0].account_id;
+	console.log("account : " + accountId);
+
+	corpus.jobs = "/corpora/"+accountId+"/"+corpus.jobs;
+	corpus.candidates = "/corpora/"+accountId+"/"+corpus.candidates;
+
+	 var params = {
+	 	user: ci_credentials.username,
+	 	corpus: corpus.jobs,
+	 	access: "private",
+	   	users: [
+	 	    {
+	 	      uid: ci_credentials.username,
+	 	      permission: "ReadWriteAdmin"
+	 	    }
+	   	]
+	 };
+
+	 conceptInsights.corpora.createCorpus(params, function (error, result) {
+		if (error) {
+			console.log(JSON.stringify(error));
+		} else {
+			console.log(JSON.stringify(result));
+		}
+	 });
+
+	  params.corpus = corpus.candidates;
+		conceptInsights.corpora.createCorpus(params, function (error, result) {
+		 	if (error) {
+		 		console.log(JSON.stringify(error));
+		 	} else {
+		 		console.log(JSON.stringify(result));
+		 	}
+	 });
 });
 
-params.corpus = corpus.candidates;
-conceptInsights.createCorpus(params, function (error, result) {
-	if (error) {
-		console.log(JSON.stringify(error));
-	} else {
-		console.log(JSON.stringify(result));
-	}
-});
 
 app.get('/', function (req, res) {
 	res.render('home');
@@ -140,7 +155,7 @@ app.get('/analyze-jobs/:id', function (req, res) {
 		documentid: req.params.id
 	};
 
-	conceptInsights.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error) {
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		} else {
@@ -242,10 +257,12 @@ function getConceptDetails(id, callback) {
 	return concept;
 }
 
+//Already adapted to V2
 app.put('/ci/jobs', function (req, res) {
 
 	var input = req.body;
 	var params = {
+		id: corpus.jobs + "/documents/" + input.id,
 		document: {
 			id: input.id,
 			label: input.title,
@@ -253,7 +270,7 @@ app.put('/ci/jobs', function (req, res) {
 				{
 					data: input.description,
 					name: "Job description",
-					type: "text"
+					"content-type": "text/plain"
 			}
 		]
 		},
@@ -261,7 +278,7 @@ app.put('/ci/jobs', function (req, res) {
 		corpus: corpus.jobs,
 		documentid: input.id
 	};
-	conceptInsights.createDocument(params, function (error, result) {
+	conceptInsights.corpora.createDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).send(error);
 		else
@@ -269,10 +286,13 @@ app.put('/ci/jobs', function (req, res) {
 	});
 });
 
+
+//Already adapted to V2
 app.post('/ci/jobs', function (req, res) {
 
 	var input = req.body;
 	var params = {
+		id: corpus.jobs + "/documents/" + input.id,
 		document: {
 			id: input.code,
 			label: input.title,
@@ -280,7 +300,7 @@ app.post('/ci/jobs', function (req, res) {
 				{
 					data: input.description,
 					name: "Job description",
-					type: "text"
+					"content-type": "text/plain"
 			}
 		]
 		},
@@ -288,7 +308,7 @@ app.post('/ci/jobs', function (req, res) {
 		corpus: corpus.jobs,
 		documentid: input.code
 	};
-	conceptInsights.updateDocument(params, function (error, result) {
+	conceptInsights.corpora.updateDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -303,7 +323,7 @@ app.get('/ci/jobs', function (req, res) {
 		corpus: corpus.jobs //+"?limit=0",
 	};
 
-	conceptInsights.getDocumentIds(params, function (error, result) {
+	conceptInsights.corpora.listDocuments(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -320,7 +340,7 @@ app.get('/ci/jobs/:id', function (req, res) {
 		documentid: req.params.id
 	};
 
-	conceptInsights.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -335,7 +355,7 @@ app.delete('/ci/jobs/:id', function (req, res) {
 		documentid: req.params.id
 	};
 
-	conceptInsights.deleteDocument(params, function (error, result) {
+	conceptInsights.corpora.deleteDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -349,7 +369,7 @@ app.get('/ci/candidates', function (req, res) {
 		corpus: corpus.candidates //+"?limit=0"
 	};
 
-	conceptInsights.getDocumentIds(params, function (error, result) {
+	conceptInsights.corpora.listDocuments(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -364,7 +384,7 @@ app.get('/user/:id', function (req, res) {
 		documentid: req.params.id
 	};
 
-	conceptInsights.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else {
@@ -391,10 +411,11 @@ app.get('/ci/candidates/:id', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
 		corpus: corpus.candidates,
-		documentid: req.params.id
+		documentid: req.params.id,
+		id: corpus.candidates +"/"+ req.params.id
 	};
 
-	conceptInsights.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -408,7 +429,7 @@ app.delete('/ci/candidates/:id', function (req, res) {
 		corpus: corpus.candidates,
 		documentid: req.params.id
 	};
-	conceptInsights.deleteDocument(params, function (error, result) {
+	conceptInsights.corpora.deleteDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -416,10 +437,12 @@ app.delete('/ci/candidates/:id', function (req, res) {
 	});
 });
 
+//Already adapted to V2
 app.post('/ci/candidates', function (req, res) {
 
 	var input = req.body;
 	var params = {
+		id: corpus.candidates + "/documents/" + input.id,
 		document: {
 			id: input.id,
 			label: input.fullName,
@@ -427,7 +450,7 @@ app.post('/ci/candidates', function (req, res) {
 				{
 					data: input.data,
 					name: "Candidate",
-					type: "text"
+					"content-type": "text/plain"
 				}
 			],
 			candidatePictureUrl: input.pictureUrl,
@@ -440,7 +463,7 @@ app.post('/ci/candidates', function (req, res) {
 		documentid: input.id
 	};
 
-	conceptInsights.updateDocument(params, function (error, result) {
+	conceptInsights.corpora.updateDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -449,10 +472,12 @@ app.post('/ci/candidates', function (req, res) {
 
 });
 
+//Already adapted to V2
 app.put('/ci/candidates', function (req, res) {
 
 	var input = req.body;
 	var params = {
+		id: corpus.candidates + "/documents/" + input.id,
 		document: {
 			id: input.id,
 			label: input.fullName,
@@ -460,7 +485,7 @@ app.put('/ci/candidates', function (req, res) {
 				{
 					data: input.data,
 					name: "Candidate",
-					type: "text"
+					"content-type": "text/plain"
 				}
 			],
 			candidatePictureUrl: input.pictureUrl,
@@ -473,7 +498,7 @@ app.put('/ci/candidates', function (req, res) {
 		documentid: input.id
 	};
 
-	conceptInsights.createDocument(params, function (error, result) {
+	conceptInsights.corpora.createDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -493,7 +518,7 @@ app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
 
 	payload.ids = JSON.stringify(payload.ids);
 
-	conceptInsights.semanticSearch(payload, function (error, result) {
+	conceptInsights.corpora.getRelatedDocuments(payload, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else {
@@ -513,7 +538,7 @@ app.get('/ci/semantic_search/job/:job/:limit', function (req, res) {
 
 	payload.ids = JSON.stringify(payload.ids);
 
-	conceptInsights.semanticSearch(payload, function (error, result) {
+	conceptInsights.corpora.getRelatedDocuments(payload, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else
@@ -530,7 +555,7 @@ app.get('/ci/graph_search', function (req, res) {
 	payload.ids = JSON.stringify(payload.ids);
 	console.log(payload.ids);
 
-	conceptInsights.getConceptsMetadata(payload, function (error, result) {
+	conceptInsights.graphs.getConceptsMetadata(payload, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else

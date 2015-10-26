@@ -21,7 +21,7 @@ var bluemix  = require('./bluemix'),
   env      = process.env.VCAP_SERVICES ? 'prod' : 'dev';
 
 var services = {
-  
+
   mongodb: 'mongodb://localhost/<db name>',
 
   personality_insights: {
@@ -35,7 +35,7 @@ var services = {
     url:      '<url>',
     username: '<username>',
     password: '<password>',
-    version: 'v1'
+    version: 'v2'
   },
 
   // LinkedIn app credentials: https://www.linkedin.com/developer/apps/new
@@ -51,7 +51,7 @@ var services = {
 if (env === 'prod') {
   services.mongodb = bluemix.getServiceCreds('mongolab').url;
   services.personality_insights = extend({'version':'v2'}, bluemix.getServiceCreds('personality_insights'));
-  services.concept_insights = extend({'version':'v1'}, bluemix.getServiceCreds('concept_insights'));
+  services.concept_insights = extend({'version':'v2'}, bluemix.getServiceCreds('concept_insights'));
   services.linkedin.app_key = process.env.LINKEDIN_APPKEY;
   services.linkedin.app_secret = process.env.LINKEDIN_APPSECRET;
 } else {

@@ -348,6 +348,21 @@ app.get('/ci/jobs/:id', function (req, res) {
 	});
 });
 
+app.get('/ci/jobs/:id/annotations', function (req, res) {
+	var params = {
+		id: corpus.jobs +"/documents/"+ req.params.id
+	};
+
+	console.log(params.id);
+
+	conceptInsights.corpora.getDocumentAnnotations(params, function (error, result) {
+		if (error)
+			return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+			return res.json(result);
+	});
+});
+
 app.delete('/ci/jobs/:id', function (req, res) {
 	var params = {
 		id: corpus.jobs +"/documents/"+ req.params.id
@@ -420,6 +435,22 @@ app.get('/ci/candidates/:id', function (req, res) {
 			return res.json(result);
 	});
 });
+
+//NEW Method: Now getDocument document didn't contains annotations; Need to get it manually
+app.get('/ci/candidates/:id/annotations', function (req, res) {
+	var params = {
+		id: corpus.candidates +"/documents/"+ req.params.id
+	};
+
+	console.log(params.id);
+	conceptInsights.corpora.getDocumentAnnotations(params, function (error, result) {
+		if (error)
+			return res.status(error.error ? error.error.code || 500 : 500).json(error);
+		else
+			return res.json(result);
+	});
+});
+
 
 app.delete('/ci/candidates/:id', function (req, res) {
 	var params = {

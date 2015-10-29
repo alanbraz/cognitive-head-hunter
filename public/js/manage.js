@@ -91,14 +91,14 @@ function loadJobs() {
               console.log(JSON.stringify(ciJob));
               //delJob(job._id, job.id);
               //return;
-            } 
-          } 
+            }
+          }
 
-          $('<tr>'+ 
+          $('<tr>'+
             '<td>'+ '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+job.code+'\' target=\'_blank\'>'+job.code+'</a>' + '</td> '+
             '<td>'+ '<a href=\'/candidatesearch/'+job.id+'\'>'+job.title+'</a>' + '</td>'+
-            '<td> ' + job.concepts + //' ' + ((job.ci.state)?job.ci.state.status:"MISSING") +  
-            ((lastJob == job.id)?" REPETED":"") + 
+            '<td> ' + job.concepts + //' ' + ((job.ci.state)?job.ci.state.status:"MISSING") +
+            ((lastJob == job.id)?" REPETED":"") +
             '</td>' + ' ' +
             //(list != '#jobs-list'?'[<a href="/concepts/required/'+job._id+'">SET REQUIRED CONCEPTS</a>]':'') +
             //(list == '#jobs-list'?'[<a href=\'/candidatesearch/'+job.code+'\' target=\'_blank\'>'+'find candidates'+'</a>]':'') +
@@ -350,8 +350,8 @@ function addJobConcept(job) {
       //$('#job-id').text(job.id);
       //$('#job-code').text(job.code);
       var newJob = getJob(job.id);
-      console.log(newJob.state || "no newJob yet");
-      while (newJob.state.stage != "ready" && newJob.state.status != "done") {
+      console.log(newJob.annotations || "no newJob yet");
+      while (!newJob.annotations) {
         setTimeout(function() { console.log("wait"); },3000);
         newJob = getJob(job.id);
         console.log(newJob.state || "no newJob yet");

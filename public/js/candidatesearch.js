@@ -20,13 +20,14 @@
 	$('#loading2').show();
 	$('#concepts').hide();
 	$('#sug-cand').hide();
-	var job_id = $('#job_id').html();
+	var job_id = $('#job_id').html().split("/").pop();
+  console.log("Job_id dentro de candidatesearch.js: " + job_id);
 	findJob(job_id);
 	findCandidates(job_id);
 });
 
 function findJob(id) {
-	
+
 	$.ajax({
 	    type: 'GET',
 	    async: false,
@@ -55,9 +56,9 @@ function findJob(id) {
 			data.annotations[0].forEach(function (data) {
 				//console.log(JSON.stringify(data));
 				var obj = {
-					"label": decodeURIComponent(data.concept.substring(data.concept.lastIndexOf('/') + 1).replace(/_/g, ' ')),
-					"key": data.concept,
-					"weight": Math.ceil(data.weight * 100)
+					"label": data.concept.label, //TODO remove if ok decodeURIComponent(data.concept.substring(data.concept.lastIndexOf('/') + 1).replace(/_/g, ' ')),
+					"key": data.concept.id,
+					"weight": Math.ceil(data.score * 100)
 				};
 				var exists = false;
 				for (var i = 0; i < concepts.length; i++) {
@@ -77,7 +78,7 @@ function findJob(id) {
 			});
 			concepts.forEach(function (c) {
 				$('<div/>').html(c.label).appendTo(table);
-			});		
+			});
 		},
 		error: function (xhr) {
 			console.error(xhr);
@@ -90,7 +91,7 @@ function findJob(id) {
 	});
 }
 
-
+//TODO verify if it works after fixing on backend
 function findCandidates(id) {
 	$('#loading2').show();
 	$('#sug-cand').hide();
@@ -116,15 +117,16 @@ function findCandidates(id) {
 
 function showCandidates(candidates) {
 	candidates.results.forEach(function (candidate) {
-		
+
 		if(candidate.candidatePictureUrl === "images/user.png" || candidate.candidatePictureUrl === "" || candidate.candidatePictureUrl === undefined )
 			candidate.candidatePictureUrl = "/images/user.png";
-		
+
+    console.log(candidate.candidatePictureUrl);
 		var score = Math.ceil(candidate.score * 100) + "%";
 		$('<div class="candidate col-lg-1 col-md-3 col-sm-4 col-xs-6"/>')
-			.html('<div><a href=\'/user/'+ candidate.id +'\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>' 
-				+ '<div>' + candidate.label 
-				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>' 
+			.html('<div><a href=\'/user/'+ candidate.id.split("/").pop() +'\'><img src=\"' + candidate.candidatePictureUrl + '\"/ height=\"80\"></a></div>'
+				+ '<div>' + candidate.label
+				+ '<p class=\'_' + Math.round(candidate.score * 10) + '\'>'
 				+ score + '</p></div>')
 			.appendTo("#candidates");
 	});

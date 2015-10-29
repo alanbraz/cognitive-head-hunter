@@ -147,21 +147,31 @@ app.get('/concepts/required/:id', function (req, res) {
 	});
 });
 
+//Already adapted to V2
 app.get('/analyze-jobs/:id', function (req, res) {
 
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.jobs,
-		documentid: req.params.id
+		id: corpus.jobs +"/documents/"+ req.params.id
 	};
 
-	conceptInsights.corpora.getDocument(params, function (error, result) {
+	console.log(params.id);
+	conceptInsights.corpora.getDocument(params, function (error, document) {
 		if (error) {
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		} else {
-			req.session.job = result;
-			res.render('analyze-jobs', {
-				job: result
+
+			conceptInsights.corpora.getDocumentAnnotations(params, function (error, annotations) {
+				if (error) {
+					return res.status(error.error ? error.error.code || 500 : 500).json(error);
+				} else {
+
+					var jobFull = extend(document, annotations);
+					console.log(jobFull);
+					req.session.job = jobFull;
+					res.render('analyze-jobs', {
+						job: jobFull
+					});
+				}
 			});
 		}
 	});
@@ -316,6 +326,7 @@ app.post('/ci/jobs', function (req, res) {
 	});
 });
 
+//Already adapted to V2
 app.get('/ci/jobs', function (req, res) {
 
 	var params = {
@@ -331,8 +342,7 @@ app.get('/ci/jobs', function (req, res) {
 	});
 });
 
-
-
+//Already adapted to V2
 app.get('/ci/jobs/:id', function (req, res) {
 	var params = {
 		id: corpus.jobs +"/documents/"+ req.params.id
@@ -340,14 +350,25 @@ app.get('/ci/jobs/:id', function (req, res) {
 
 	console.log(params.id);
 
-	conceptInsights.corpora.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, document) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
-			return res.json(result);
+		else {
+
+			conceptInsights.corpora.getDocumentAnnotations(params, function (error, annotations) {
+				if (error) {
+					return res.status(error.error ? error.error.code || 500 : 500).json(error);
+				} else {
+
+					var jobFull = extend(document, annotations);
+					return res.json(jobFull);
+				}
+			});
+		}
 	});
 });
 
+//New V2 Method
 app.get('/ci/jobs/:id/annotations', function (req, res) {
 	var params = {
 		id: corpus.jobs +"/documents/"+ req.params.id
@@ -363,6 +384,7 @@ app.get('/ci/jobs/:id/annotations', function (req, res) {
 	});
 });
 
+//Already adapted to V2
 app.delete('/ci/jobs/:id', function (req, res) {
 	var params = {
 		id: corpus.jobs +"/documents/"+ req.params.id
@@ -378,6 +400,7 @@ app.delete('/ci/jobs/:id', function (req, res) {
 	});
 });
 
+//Already adapted to V2
 app.get('/ci/candidates', function (req, res) {
 	var params = {
 		user: ci_credentials.username,
@@ -392,27 +415,27 @@ app.get('/ci/candidates', function (req, res) {
 	});
 });
 
+//Already adapted to V2; Need to check in the UI for possible problems
 app.get('/user/:id', function (req, res) {
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.candidates,
-		documentid: req.params.id
+		id: corpus.candidates +"/documents/"+ req.params.id
 	};
+	console.log(params.id);
+
 
 	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else {
 			var temp = JSON.parse(JSON.stringify(result));
-			console.log(temp.id);
+			console.log("id: " +temp.id);
 			var newUser = {};
 
 			newUser.id = temp.id;
 			newUser.fullName = temp.label;
-			newUser.pictureUrl = temp.candidatePictureUrl;
+			newUser.pictureUrl = temp.candidatePictureUrl || "/images/user.png";
 			newUser.headline = temp.candidateHeadline || '';
 			newUser.publicProfileUrl = temp.candidatePublicProfileUrl;
-			console.log(temp.lastmodified);
 			newUser.data = temp.parts[0].data;
 
 			return res.render('user-dashboard', {
@@ -422,17 +445,28 @@ app.get('/user/:id', function (req, res) {
 	});
 });
 
+//Already adapted to v2
 app.get('/ci/candidates/:id', function (req, res) {
 	var params = {
 		id: corpus.candidates +"/documents/"+ req.params.id
 	};
 
 	console.log(params.id);
-	conceptInsights.corpora.getDocument(params, function (error, result) {
+	conceptInsights.corpora.getDocument(params, function (error, document) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
-			return res.json(result);
+		else {
+
+			conceptInsights.corpora.getDocumentAnnotations(params, function (error, annotations) {
+				if (error) {
+					return res.status(error.error ? error.error.code || 500 : 500).json(error);
+				} else {
+
+					var candidateFull = extend(document, annotations);
+					return res.json(candidateFull);
+				}
+			});
+		}
 	});
 });
 
@@ -451,7 +485,7 @@ app.get('/ci/candidates/:id/annotations', function (req, res) {
 	});
 });
 
-
+//Already adapted to V2
 app.delete('/ci/candidates/:id', function (req, res) {
 	var params = {
 		id: corpus.candidates +"/documents/"+ req.params.id
@@ -536,55 +570,58 @@ app.put('/ci/candidates', function (req, res) {
 
 });
 
+//Already adapted to v2
+
 app.get('/ci/semantic_search/candidate/:candidate/:limit', function (req, res) {
-	var payload = extend({
-		func: 'semanticSearch',
-		user: ci_credentials.username,
+
+	var candidateId = corpus.candidates + "/documents/" + req.params.candidate;
+	var params = {
 		corpus: corpus.jobs,
-		ids: ['/corpus/' + ci_credentials.username + '/' + corpus.candidates + '/' + req.params.candidate],
-		limit: req.params.limit || 5,
-	}, req.query);
+		ids: [candidateId],
+		limit: req.params.limit
+	}
 
-	payload.ids = JSON.stringify(payload.ids);
-
-	conceptInsights.corpora.getRelatedDocuments(payload, function (error, result) {
+	console.log(JSON.stringify(params));
+	conceptInsights.corpora.getRelatedDocuments(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else {
+			console.log("result of search on candidate side : ");
+			console.log(JSON.stringify(result));
 			return res.json(result);
 		}
 	});
 });
 
+//Already adapted to V2
 app.get('/ci/semantic_search/job/:job/:limit', function (req, res) {
-	var payload = extend({
-		func: 'semanticSearch',
-		user: ci_credentials.username,
+	var jobId = corpus.jobs + "/documents/" + req.params.job;
+	var params = {
 		corpus: corpus.candidates,
-		ids: ['/corpus/' + ci_credentials.username + '/' + corpus.jobs + '/' + req.params.job],
-		limit: req.params.limit || 5,
-	}, req.query);
+		ids: [jobId],
+		limit: req.params.limit
+	}
 
-	payload.ids = JSON.stringify(payload.ids);
-
-	conceptInsights.corpora.getRelatedDocuments(payload, function (error, result) {
+	console.log(JSON.stringify(params));
+	conceptInsights.corpora.getRelatedDocuments(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
-		else
+		else {
+			console.log("result of search on hr manager side : ");
+			console.log(JSON.stringify(result));
 			return res.json(result);
+		}
 	});
 });
 
-app.get('/ci/graph_search', function (req, res) {
-	var payload = extend({
-		user: ci_credentials.username
-	}, req.query);
-	console.log(payload);
+//Already adapted to v2
+app.get('/ci/graph_search/:id', function (req, res) {
+	var params = {
+		id: "/graphs/wikipedia/en-20120601/concepts/" + req.params.id
+	}
 
-	payload.ids = JSON.stringify(payload.ids);
-	console.log(payload.ids);
-
-	conceptInsights.graphs.getConceptsMetadata(payload, function (error, result) {
+	console.log(params.id);
+	conceptInsights.graphs.getConcept(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
 		else

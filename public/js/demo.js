@@ -17,7 +17,7 @@
 'use strict';
 
  var NUM_OF_JOBS = 32;
- 
+
 $(document).ready(function () {
 
 	var widgetId = 'vizcontainer', // Must match the ID in index.jade
@@ -69,6 +69,7 @@ $(document).ready(function () {
 		// $content.val()
 		var $user = JSON.parse($('#raw').html());
 		$user.data = $content.val().trim();
+    $user.id = $user.id.split("/").pop();
 
 		$('#concepts .content').hide();
 
@@ -130,25 +131,26 @@ $(document).ready(function () {
 		}
 
 		// call until state.status == "done" and state.stage == "ready"
-		console.log(candidate.state || "no candidate");
-		while (candidate.state.stage != "ready" && candidate.state.status != "done") {
+		console.log(candidate.annotations || "no candidate");
+		while (!candidate.annotations) {
 			setTimeout(function () {
 				console.log("wait");
 			}, 3000);
 			candidate = getCandidate($user.id);
-			console.log(candidate.state || "no candidate");
+			console.log(candidate.annotations || "no candidate");
 		}
 
 		// consolidate repetead candidate concepts
 		var concepts = [];
 		var conceptsArray = [];
+    var conceptsToPopulate = [];
 		// 0 is the candidate cv full text
 		// will have to change if we store grad-level, language, location separated
 		$.each(candidate.annotations[0], function (i, data) {
 
 			var obj = {
-				"id": data.concept.substring(data.concept.lastIndexOf('/') + 1),
-				"weight": Math.ceil(data.weight * 100)
+				"id": data.concept.id,
+				"weight": Math.ceil(data.score * 100)
 			};
 			var exists = false;
 			for (var i = 0; i < concepts.length; i++) {
@@ -170,42 +172,45 @@ $(document).ready(function () {
 		});
 
 		// get all concept for the candidate
-		$.get('/ci/graph_search', {
-			ids: conceptsArray
-		}, function (conceptsWiki) {
-			//console.log(conceptsWiki);
-			for (var i = 0; i < concepts.length; i++) {
-				for (var j = 0; j < conceptsWiki.length; j++) {
-					if (concepts[i].id == conceptsWiki[j].id) {
-						concepts[i].summary = conceptsWiki[j].abstract;
-						concepts[i].label = conceptsWiki[j].label;
-						concepts[i].link = conceptsWiki[j].link;
-						concepts[i].ontology = conceptsWiki[j].ontology; //used to clean up cities and dates
-						break;
-					}
-				}
-			}
-			populateConcepts(concepts);
-		});
 
-		$.ajax({
-			type: 'GET',
-			async: true,
-			url: '/ci/semantic_search/candidate/' + $user.id + "/" + NUM_OF_JOBS, // ab: 20 to degub, old value was 10
-			dataType: 'json',
-			success: function (data) {
-				//console.log(JSON.stringify(data));
-				positionsToHtml(data.results);
-			},
-			error: function (xhr) {
-				var error;
-				try {
-					error = JSON.parse(xhr.responseText);
-				} catch (e) {}
-				console.log(error.error || error);
-				showError(error.error || error);
-			}
-		});
+    for(var i = 0; i < conceptsArray.length; i++){
+      $.get('/ci/graph_search/' + conceptsArray[i].id.split("/").pop(), function(concept){
+        for (var j = 0; j < concepts.length; j++){
+          if (concepts[j].id == concept.id) {
+
+						concepts[j].summary = concept.abstract;
+						concepts[j].label = concept.label;
+						concepts[j].link = concept.link;
+						concepts[j].ontology = concept.ontology; //used to clean up cities and dates
+            conceptsToPopulate.push(concepts[j]);
+            if(conceptsToPopulate.length == 5){
+              populateConcepts(conceptsToPopulate);
+						}
+            break;
+					}
+        }
+      });
+    }
+
+		 $.ajax({
+		 	type: 'GET',
+		 	async: true,
+		 	url: '/ci/semantic_search/candidate/' + $user.id + "/" + NUM_OF_JOBS, // ab: 20 to degub, old value was 10
+		 	dataType: 'json',
+		 	success: function (data) {
+		 		console.log("Result of semantic_search by candidate side");
+        console.log(JSON.stringify(data));
+		 		positionsToHtml(data.results);
+		 	},
+		 	error: function (xhr) {
+		 		var error;
+		 		try {
+		 			error = JSON.parse(xhr.responseText);
+		 		} catch (e) {}
+		 		console.log(error.error || error);
+		 		showError(error.error || error);
+		 	}
+		 });
 	}); //click analyze button
 
 	function populateConcepts(concepts) {
@@ -243,6 +248,7 @@ $(document).ready(function () {
 		var conceptsToShow = [];
 		for (var i = 0, show = top, length = concepts.length;
 			(i < length && show > 0); i++) {
+
 			var label = concepts[i].label;
 			var weight = concepts[i].weight;
 			var ont = concepts[i].ontology;
@@ -255,19 +261,19 @@ $(document).ready(function () {
 			ignore = ignore || ($.inArray("Company", ont) > -1);
 
 			if (!ignore) {
-				var c = { label: concepts[i].label, weight: concepts[i].weight };
+				var c = { label: label, weight: weight };
 				conceptsToShow.push(c);
-				show--;
+        show--;
 			}
 		}
 		for( var j=0; j < conceptsToShow.length; j++) {
 			var c = conceptsToShow[j];
 			var percentage = (c.weight*100)/conceptsToShow[0].weight;
 			var conceptPie = $('#concept' + (j+1));
-				conceptPie.attr("data-percent", percentage);
-				conceptPie.attr("data-text", Math.round(percentage)+"%");
-				conceptPie.attr("data-info", c.label);
-				conceptPie.circliful();
+			conceptPie.attr("data-percent", percentage);
+			conceptPie.attr("data-text", Math.round(percentage)+"%");
+			conceptPie.attr("data-info", c.label);
+			conceptPie.circliful();
 		}
 	}
 
@@ -280,13 +286,13 @@ $(document).ready(function () {
 		for (var i = 0, length = positions.length; i < length; i++) {
 			position = positions[i];
 			score = Math.ceil(position.score * 100) + "%";
-			html = '<div id=' + position.id + ' class="row">' +
+			html = '<div id=' + position.id.split("/").pop() + ' class="row">' +
 				'<div class=\'_' + Math.round(position.score * 10) + ' col-xs-2 col-md-1\'>' + score + '</div>' +
 				'<div class=\'col-xs-10 col-md-11\'><strong> ' +
-					'<a href="/candidatesearch/'+ position.id +'">' +
-					 position.label + 
+					'<a href="/candidatesearch/'+ position.id.split("/").pop() +'">' +
+					 position.label +
 				'</a></strong><br/>' +
-				'<small class=\'row\' id=\'tags-' + position.id + '\' style=\'display:block;\'></small>' +
+				'<small class=\'row\' id=\'tags-' + position.id.split("/").pop() + '\' style=\'display:block;\'></small>' +
 				'</div>' +
 //				'<div class=\'col-lg-2\'>' +
 //				'<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id=' + position.id + '\' target=\'_blank\' >' + position.id + '</a>' +
@@ -294,17 +300,14 @@ $(document).ready(function () {
 			html += '</div>';
 
 			$('#positions .content').append(html);
-
-			// TODO
 			tags = [];
 			var t;
-			for (var j = 0; j < position.tags.length; j++) {
-				var c = position.tags[j].concept;
-				c = c.substring(c.lastIndexOf('/') + 1);
-				tags.push(c.replace(/_/g, ' '));
+			for (var j = 0; j < position.explanation_tags.length; j++) {
+				var c = position.explanation_tags[j].concept.label;
+				tags.push(c);
 			}
 			console.log("tags: " + tags);
-			printLabels('#tags-' + position.id, tags);
+			printLabels('#tags-' + position.id.split("/").pop(), tags);
 		}
 		$('#positions .content').show();
 		$('#loading').hide();

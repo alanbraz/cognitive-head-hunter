@@ -335,10 +335,10 @@ app.get('/ci/jobs', function (req, res) {
 
 app.get('/ci/jobs/:id', function (req, res) {
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.jobs,
-		documentid: req.params.id
+		id: corpus.jobs +"/documents/"+ req.params.id
 	};
+
+	console.log(params.id);
 
 	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
@@ -350,10 +350,10 @@ app.get('/ci/jobs/:id', function (req, res) {
 
 app.delete('/ci/jobs/:id', function (req, res) {
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.jobs,
-		documentid: req.params.id
+		id: corpus.jobs +"/documents/"+ req.params.id
 	};
+	console.log(params.id);
+
 
 	conceptInsights.corpora.deleteDocument(params, function (error, result) {
 		if (error)
@@ -409,12 +409,10 @@ app.get('/user/:id', function (req, res) {
 
 app.get('/ci/candidates/:id', function (req, res) {
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.candidates,
-		documentid: req.params.id,
-		id: corpus.candidates +"/"+ req.params.id
+		id: corpus.candidates +"/documents/"+ req.params.id
 	};
 
+	console.log(params.id);
 	conceptInsights.corpora.getDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);
@@ -425,10 +423,10 @@ app.get('/ci/candidates/:id', function (req, res) {
 
 app.delete('/ci/candidates/:id', function (req, res) {
 	var params = {
-		user: ci_credentials.username,
-		corpus: corpus.candidates,
-		documentid: req.params.id
+		id: corpus.candidates +"/documents/"+ req.params.id
 	};
+
+	console.log(params.id);
 	conceptInsights.corpora.deleteDocument(params, function (error, result) {
 		if (error)
 			return res.status(error.error ? error.error.code || 500 : 500).json(error);

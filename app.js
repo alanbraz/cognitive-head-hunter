@@ -133,9 +133,13 @@ app.get('/tos', function (req, res) {
 	res.render('tos');
 });
 
-app.get('/import', function (req, res) {
-	res.render('import');
+app.get('/jobs/import', function (req, res) {
+	res.render('import-jobs');
 });
+// 
+// app.get('/candidates/import', function (req, res) {
+// 	res.render('import-candidates');
+// });
 
 app.get('/analyze', function (req, res) {
 	res.render('analyze');

@@ -36,10 +36,10 @@ block content
 			$("#info").show();
 			$('#results').empty();
 			//console.log($("#text").val());
-			var json = JSON.parse($("#text").val());
+			var inputJson = JSON.parse($("#text").val());
 			console.log(json);
 
-			json.forEach(function(job, i, ar) {
+			inputJson.forEach(function(job, i, ar) {
 				$("#infoMsg").html('Processing ' + i + ' of ' + ar.length + '.');
 				console.log(i);
 				if (isJob(job)) {
@@ -100,5 +100,4 @@ block content
 			    }
 		  	});
 		  	return r;
-			
 		}

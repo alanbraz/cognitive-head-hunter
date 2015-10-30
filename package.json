@@ -1,6 +1,6 @@
 {
   "name": "cognitive-headh-hunter",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A Cognitive based system to Help finding the best job opportunity for a candidate. Using Watson to read and extract cognitive information from both the candidates and the job openings we are able to provide a better match between them, not only analyzing keywords but rather understanding the concepts between the text. A user will be able to quickly find a tailored new opportunity, the HR department will speed up the triage of curriculum and improve the interview results sending only the right candidates to it and the company could speed up the process of creating and replacing positions.",
   "scripts": {
     "start": "node app.js"
@@ -16,7 +16,7 @@
     "linkedin-js": "*",
     "node-restful": "*",
     "serve-favicon": "*",
-    "watson-developer-cloud": "0.9.*",
+    "watson-developer-cloud": "*",
     "request": "*"
   },
   "engines": {

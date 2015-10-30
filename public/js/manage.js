@@ -48,11 +48,11 @@
   loadJobs();
   loadCandidates();
 
-  $('#candidate-add-btn').click(function(){
+  //$('#candidate-add-btn').click(function(){
     // $('#candidate-add-btn').blur();
     // showSuccess('Not implemented yet');
-    handleCreation();
-  });
+    //handleCreation();
+  //});
 
   /**
    * 1. Create the request
@@ -95,7 +95,11 @@ function loadJobs() {
           }
 
           $('<tr>'+
-            '<td>'+ '<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+job.code+'\' target=\'_blank\'>'+job.code+'</a>' + '</td> '+
+            '<td>'+
+            //'<a href=\'https://jobs3.netmedia1.com/cp/faces/job_summary?job_id='+job.code+'\' target=\'_blank\'>'+
+            job.code+
+            //'</a>' +
+            '</td> '+
             '<td>'+ '<a href=\'/candidatesearch/'+job.id+'\'>'+job.title+'</a>' + '</td>'+
             '<td> ' + job.concepts + //' ' + ((job.ci.state)?job.ci.state.status:"MISSING") +
             ((lastJob == job.id)?" REPETED":"") +

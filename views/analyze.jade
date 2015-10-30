@@ -4,6 +4,7 @@ extends ./layout.jade
 block specificJS
 	script(type='text/javascript', src='/js/demo.js')
 	script(type='text/javascript', src='/js/analyze.js')
+	script(type='text/javascript', src='/js/validator.min.js')
 
 block content
 		h2.col-lg-12.col-xs-12.text-center Import your LinkedIn profile
@@ -18,20 +19,21 @@ block content
 			div#loading.row.col-lg-12.col-xs-12(style='display:none;')
 				img(src='/images/watson.gif')
 		div.row
-			form
+			form(role="form", action="javascript:handleCreation();", data-toggle="validator")
 				div.form-group
 					label(for="txt-name") Name
-					input#txt-name.form-control(type="text" required='true'
-						placeholder='Please enter your full name')
+					input#txt-name.form-control(type="text", required='true',
+						placeholder='Please enter your full name', data-minlength="20")
+					span.help-block Minimum of 20 characters
 				div.form-group
 					label(for="txt-profile") Profile
-					textarea#txt-profile.content.form-control(rows='10', required='true',
+					textarea#txt-profile.content.form-control(rows='15', required='true',
 						placeholder='Please enter the text to analyze (minimum of 200 words)...')
-					div.text-right
-						span.wordsCount.small
+					span.help-block Minimum of 200 words - 
+						span.wordsCount.small		
 				div.form-group
 					div.row
 						div.col-xs-4
 							button.btn.btn-block(type='reset') Clear
 						div.col-xs-4.col-xs-offset-4
-							button#continue-btn.btn.btn-block(type='button') Continue
+							button#continue-btn.btn.btn-block(type='submit') Continue

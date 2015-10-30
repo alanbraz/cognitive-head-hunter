@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
- $(document).ready(function () {
-	$('#continue-btn').click(function () {
-		handleCreation();
-	});
-}); //ready
+ //$(document).ready(function () {
+	//$('#continue-btn').click(function () {
+		//handleCreation();
+	//});
+//}); //ready
 
 
 function handleCreation() {
@@ -88,4 +88,3 @@ function insertCandidate(profile) {
 		}
 	});
 }
-

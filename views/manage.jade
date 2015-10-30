@@ -3,8 +3,10 @@ extends ./layout.jade
 
 block specificJS
 	script(type='text/javascript', src='/js/bootstrap.min.js')
+	script(type='text/javascript', src='/js/demo.js')
 	script(type='text/javascript', src='/js/manage.js')
 	script(type='text/javascript', src='/js/analyze.js')
+	script(type='text/javascript', src='/js/validator.min.js')
 
 block content
 	div.row
@@ -28,20 +30,23 @@ block content
 				div#candidate-add-form(style='display:none;')
 					h3 Add candidate
 					div.well
-						form(role="form")
+						form#candidateForm(role="form", action="javascript:handleCreation();", data-toggle="validator")
 							div.form-group.row
 								div.col-lg-12.col-xs-12
-									input#txt-name.form-control(type="text", required='true', placeholder='Name')
+									input#txt-name.form-control(type="text", required='true', placeholder='Name', data-minlength="20")
+									span.help-block Minimum of 20 characters
 							div.form-group.row
 								div.col-lg-12.col-xs-12
 									textarea#txt-profile.form-control(rows='15', required='true', placeholder='Profile description (min 200 words)')
+									span.help-block Minimum of 200 words - 
+										span.wordsCount.small
 							div.form-group.row
 								div.col-lg-3.col-lg-push-3.col-xs-3
 									button.btn.btn-block#candidate-cancel-btn(type='button') Cancel
 								div.col-lg-3.col-lg-push-3.col-xs-3
 									button.btn.btn-block#candidate-clear-btn(type='reset') Clear
 								div.col-lg-3.col-lg-push-3.col-xs-3.col-xs-push-3
-									button.btn.btn-block#candidate-add-btn(type='button') Add
+									button.btn.btn-block#candidate-add-btn(type='submit') Add
 
 				div.row.text-center#candidates-loading(style='display:none;')
 					h2 &nbsp;
@@ -72,16 +77,19 @@ block content
 				div#job-add-div(style='display:none;')
 					h2 Add job
 					div.well
-						form(role="form",action="javascript:submitJob();")
+						form#jobForm(role="form", action="javascript:submitJob();", data-toggle="validator")
 							div.form-group.row
 								div.col-lg-12.col-xs-12
-									input#code.form-control(type="text", required='true', placeholder='Position code (like GBS-0730663)')
+									input#code.form-control(type="text", required='true', placeholder='Position code (like GBS-0730663)', data-minlength="10")
+									span.help-block Minimum of 10 characters
 							div.form-group.row
 								div.col-lg-12.col-xs-12
-									input#title.form-control(type="text", required='true', placeholder='Position tile (like Technical Support Representative)')
+									input#title.form-control(type="text", required='true', placeholder='Position tile (like Technical Support Representative)', data-minlength="100")
+									span.help-block Minimum of 100 characters
 							div.form-group.row
 								div.col-lg-12.col-xs-12
-									textarea#description.form-control(rows='15', required='true', placeholder='Description text')
+									textarea#description.form-control(rows='15', required='true', placeholder='Description text', data-minlength="500")
+									span.help-block Minimum of 500 characters
 							div.form-group.row
 								div.col-lg-3.col-lg-push-3.col-xs-3
 									button.btn.btn-block#job-cancel-btn(type='button') Cancel

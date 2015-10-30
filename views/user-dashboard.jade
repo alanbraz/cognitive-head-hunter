@@ -28,10 +28,10 @@ block content
 			div.row.form-group
 				div.col-lg-12.col-xs-12
 					h3 Review and update your profile text
-					textarea#txt-profile.content.form-control(rows='10', required='true',
-						placeholder='Please enter the text to analyze (minimum of 100 words)...')
+					textarea#txt-profile.content.form-control(rows='15', required='true',
+						placeholder='Please enter the text to analyze (minimum of 200 words)...')
 						|#{user.data}
-					div.text-right
+					span.help-block Minimum of 200 words - 
 						span.wordsCount.small
 			div.row.form-group
 				div.col-xs-3

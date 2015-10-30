@@ -533,11 +533,15 @@ $(document).ready(function () {
 		var text = $content.val();
 		var wordsCount = text.match(/\S+/g) ? text.match(/\S+/g).length : 0;
 		$('.wordsCount').css('color', wordsCount < minWords ? 'red' : 'gray');
-		$('.wordsCount').text(wordsCount + ' words');
+		$('.wordsCount').text(wordsCount + ' word' + (wordsCount>1?'s':''));
 		if (wordsCount < minWords) {
 			$('#analysis-btn').attr('disabled', 'disabled');
+      $('#continue-btn').attr('disabled', 'disabled');
+      $('#candidate-add-btn').attr('disabled', 'disabled');
 		} else {
 			$('#analysis-btn').removeAttr('disabled');
+      $('#continue-btn').removeAttr('disabled');
+      $('#candidate-add-btn').removeAttr('disabled');
 		}
 	}
 	$content.keyup(updateWordsCount);

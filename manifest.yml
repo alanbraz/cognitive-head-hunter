@@ -1,23 +1,23 @@
 declared-services: 
   Concept Insights CHH: 
-    label: concept_insights 
-    plan: free
-  MongoLab-lc: 
-    label: mongolab 
-    plan: sandbox 
+    label: concept_insights
+    plan: standard
   Personality Insights CHH: 
     label: personality_insights
-    plan: IBM Watson Personality Insights Monthly Plan 
+    plan: standard 
+  MongoLab-chh: 
+    label: mongolab 
+    plan: sandbox 
 applications:
 - services:
   - Concept Insights CHH
-  - MongoLab-lc
+  - MongoLab-chh
   - Personality Insights CHH
   disk_quota: 128M
   buildpack: sdk-for-nodejs
   path: .
   instances: 1
-  memory: 896M
+  memory: 256M
   env:
     LINKEDIN_APPKEY: ENTER VALUE
     LINKEDIN_APPSECRET: ENTER VALUE

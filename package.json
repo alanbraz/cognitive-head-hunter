@@ -1,50 +1,51 @@
 {
-  "name": "cognitive-headh-hunter",
-  "version": "2.0.0",
-  "description": "A Cognitive based system to Help finding the best job opportunity for a candidate. Using Watson to read and extract cognitive information from both the candidates and the job openings we are able to provide a better match between them, not only analyzing keywords but rather understanding the concepts between the text. A user will be able to quickly find a tailored new opportunity, the HR department will speed up the triage of curriculum and improve the interview results sending only the right candidates to it and the company could speed up the process of creating and replacing positions.",
-  "scripts": {
-    "start": "node app.js"
-  },
-  "dependencies": {
-    "body-parser": "*",
-    "cheerio": "^0.19.0",
-    "cookie-parser": "*",
-    "errorhandler": "*",
-    "express": "4.11.*",
-    "express-session": "*",
-    "jade": "*",
-    "linkedin-js": "*",
-    "node-restful": "*",
-    "serve-favicon": "*",
-    "watson-developer-cloud": "*",
-    "request": "*"
-  },
-  "engines": {
-    "node": "0.10.*"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/alanbraz/cognitive-head-hunter"
-  },
-  "bugs": {
-    "url": "https://github.com/alanbraz/cognitive-head-hunter/issues"
-  },
-  "author": "IBM Corp.",
-  "contributors": [
-    {
-      "name": "Alan Braz",
-      "email": "alanbraz@br.ibm.com"
-    },
-    {
-      "name": "Paulo Cavoto",
-      "email": "pcavoto@br.ibm.com"
-    },
-    {
-      "name": "Paulo Marques",
-      "email": "pmcjr@br.ibm.com"
-    }
-  ],
-  "homepage": "http://chh.mybluemix.net/",
-  "readmeFilename": "README.md",
-  "license": "Apache-2.0"
+	"name": "cognitive-headh-hunter",
+	"version": "2.1.0",
+	"description": "A Cognitive based system to Help finding the best job opportunity for a candidate. Using Watson to read and extract cognitive information from both the candidates and the job openings we are able to provide a better match between them, not only analyzing keywords but rather understanding the concepts between the text. A user will be able to quickly find a tailored new opportunity, the HR department will speed up the triage of curriculum and improve the interview results sending only the right candidates to it and the company could speed up the process of creating and replacing positions.",
+	"homepage": "http://chh.mybluemix.net/",
+	"bugs": {
+		"url": "https://github.com/alanbraz/cognitive-head-hunter/issues"
+	},
+	"license": "Apache-2.0",
+	"author": "IBM Corp.",
+	"contributors": [
+		{
+			"name": "Alan Braz",
+			"email": "alanbraz@br.ibm.com"
+		},
+		{
+			"name": "Paulo Cavoto",
+			"email": "pcavoto@br.ibm.com"
+		},
+		{
+			"name": "Paulo Marques",
+			"email": "pmcjr@br.ibm.com"
+		}
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/alanbraz/cognitive-head-hunter"
+	},
+	"scripts": {
+		"start": "node app.js"
+	},
+	"dependencies": {
+		"body-parser": "*",
+		"cheerio": "^0.19.0",
+		"cookie-parser": "*",
+		"errorhandler": "*",
+		"express": "4.11.*",
+		"express-session": "*",
+		"jade": "*",
+		"linkedin-js": "*",
+		"serve-favicon": "*",
+		"watson-developer-cloud": "*",
+		"request": "*",
+		"cradle": "0.6.7",
+		"underscore": "1.6.0"
+	},
+	"engines": {
+		"node": "0.10.*"
+	},
+	"readmeFilename": "README.md"
 }

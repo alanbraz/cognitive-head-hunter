@@ -1,17 +1,17 @@
-declared-services: 
-  Concept Insights CHH: 
+declared-services:
+  Concept Insights CHH:
     label: concept_insights
     plan: standard
-  Personality Insights CHH: 
+  Personality Insights CHH:
     label: personality_insights
-    plan: standard 
-  MongoLab-chh: 
-    label: mongolab 
-    plan: sandbox 
+    plan: standard
+  Cloudant NoSQL CHH: 
+    label: cloudantNoSQLDB
+    plan: Shared
 applications:
 - services:
   - Concept Insights CHH
-  - MongoLab-chh
+  - Cloudant NoSQL CHH
   - Personality Insights CHH
   disk_quota: 128M
   buildpack: sdk-for-nodejs

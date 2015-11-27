@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2015 IBM Corp. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,162 +13,149 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-'use strict';
+ 'use strict';
 
 // Module dependencies
 var express    = require('express'),
-    restful = require('node-restful'),
     extend = require('util')._extend,
+    _ = require("underscore"),
     config  = require('./config'),
     bluemix = require('./bluemix'),
-    mongoose = restful.mongoose;
+    cradle = require('cradle');
 
-var conceptSchema = mongoose.Schema({
-      key: "string",
-      id: "string",
-      abstract: "string",
-      label: "string",
-      type: "string",
-      link: "string",
-      thumbnail: "string",
-      ontology: [ "string" ]
+cradle.setup({
+    host: config.services.cloudant.host,
+    cache: true,
+    raw: false,
+    forceSave: true
+  });
+
+var connection = new(cradle.Connection)(config.services.cloudant.host, config.services.cloudant.port, {
+      secure: true,
+      cache: true,
+      raw: false,
+      forceSave: true,
+      auth: {
+        username: config.services.cloudant.username,
+        password: config.services.cloudant.password
+      }
+});
+
+var dbJobs = connection.database('jobs');
+var dbCandidates = connection.database('candidates');
+
+dbJobs.exists(function (err, exists) {
+  if (err) {
+    console.log('error', err);
+  } else if (exists) {
+    console.log('the jobs db is already here.');
+  } else {
+    console.log('jobs database does not exists.');
+    db.create();
+    db.save('_design/design', {
+      views: {
+        'by-code': {
+          map: 'function (doc) {  emit(doc.code, 1); }'
+        },
+        'by-title': {
+          map: 'function (doc) {  emit(doc.title, 1); }'
+        }
+      }
     });
+  }
+});
 
-var conceptModel = restful.model('concept', conceptSchema);
-
-var jobSchema = mongoose.Schema({
-      code: "string",
-      title: "string",
-      description: "string",
-      concept_id: "string",
-      concepts: "number",
-      requiredConcepts: [ "string" ]
+dbCandidates.exists(function (err, exists) {
+  if (err) {
+    console.log('error', err);
+  } else if (exists) {
+    console.log('the candidates db is already here.');
+  } else {
+    console.log('candidates database does not exists.');
+    db.create();
+    db.save('_design/design', {
+      views: {
+        'by-name': {
+          map: 'function (doc) {  emit(doc.name.toLowerCase(), 1); }'
+        }
+      }
     });
-
-var jobModel = restful.model('job', jobSchema);
-
-var candidateSchema = mongoose.Schema({
-      name: "string",
-      profile: "string",
-      concept_id: "string",
-      jobs: [ mongoose.Schema.Types.ObjectId ]
-    });
-
-var candidateModel = restful.model('candidate', candidateSchema);
+  }
+});
 
 module.exports = function (app) {
 
-  mongoose.connect(config.services.mongodb); 
+  makeRoutes(app, "jobs", "by-code", dbJobs);
+  makeRoutes(app, "candidates", "by-name", dbCandidates);
 
-  var Concept = app.resource = conceptModel;
-  Concept.methods(['get', 'post', 'put', 'delete']);
-  Concept.register(app, '/db/concepts');
+  function makeRoutes(app, name, view, db) {
 
-  var Job = app.resource = jobModel;
-  Job.methods(['get', 'post', 'put', 'delete']);
-  Job.register(app, '/db/jobs');
-
-  var Candidate = app.resource = candidateModel;
-  Candidate.methods(['get', 'post', 'put', 'delete']);
-  Candidate.register(app, '/db/candidates');
-
-};
-
-module.exports.addConcept = function addConcept(concept) {
-  conceptModel.findOne({ key: concept.key }, function (err, doc) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (!doc) {
-        console.log("add: " + concept.key);
-        doc = new conceptModel;
-      } else {
-        console.log("update: " + concept.key);
-      }
-      copyAttributes(concept, doc);
-      console.log('instance: ' +  doc);
-      doc.save(function (err) {
-        if (err) { 
-               console.log('Error saving concept: ' + err); 
-            } else {
-              console.log('Success saving concept'); 
-            }
-        
+    app.get('/db/'+name+'/'+view+'/:keyValue', function (req, res) {
+      console.log("get from view " + view + " key: " + req.params.keyValue );
+      db.view("design/"+view, { "key": req.params.keyValue.toLowerCase(), "include_docs": true }, function (err, docs) {
+        if (err) {
+          console.log(err);
+          res.status(500).json(error);
+        } else {
+          res.status(200).json(_.map(docs, function(d) { return d.doc; }));
+        }
       });
-    }
-  });
-};
+    });
 
-module.exports.getAllConcepts = function getAllConcepts(cache) {
-  conceptModel.find({ }, 'key label ontology', function (err, docs) {
-    if (err) {
-      console.log(err);
-    } else {
-      docs.forEach(function(d){
-        cache.push(d);
+    app.get('/db/'+name+'/:id', function (req, res) {
+      console.log("get from " + name + " : " + req.params.id );
+      db.get( req.params.id, function (err, doc) {
+        if (err) {
+          console.log(err);
+          return res.status(500).json(error);
+        }
+        return res.status(200).json(doc);
       });
-    }
-  });
-}
+    });
 
-function copyAttributes(src, obj) {
-    for (var key in src) {
-        obj[key] = src[key];
-    }
-}
+    app.get('/db/'+name, function (req, res) {
+      console.log("get all " + name );
+      db.view("design/"+view, { "include_docs": true }, function (err, docs) {
+        if (err) {
+          console.log(err);
+          return res.status(500).json(error);
+        }
+        var jobs = _.compact(
+          _.map(docs, function(d) {
+            return d.doc;
+          })
+        );
+        return res.status(200).json(jobs);
+      });
+    });
 
-module.exports.addJob = function addJob(job) {
-  conceptModel.findOne({ concept_id: job.id }, function (err, doc) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (!doc) {
-        doc = new jobModel;
-        doc.code = job.code || job.id;
-        doc.concept_id = job.id;
-        doc.title = job.label;
-        doc.description = job.parts[0].data;
-        doc.concepts = job.annotations[0].length;
-        //console.log('instance: ' +  doc);
-        doc.save(function (err) {
-          if (err) { 
-                console.log('Error saving job: ' + err); 
-              } else {
-                console.log('Success saving job'); 
-              }
-          
+    app.delete('/db/'+name+'/:id', function (req, res) {
+      console.log("del from " + name + " : " + req.params.id);
+      db.get( req.params.id, function (err, doc) {
+        if (err) {
+          console.log(err);
+          return res.status(500).json(error);
+        }
+        db.remove(doc._id, doc._rev, function (error, doc) {
+          if (err) {
+            console.log(err);
+            return res.status(500).json(error);
+          }
+          return res.status(200).json(doc);
         });
-      } else {
-        console.log("nothing to do ");
-      }
-    }
-  });
-};
-
-module.exports.addCandidate = function addCandidate(cand) {
-  conceptModel.findOne({ concept_id: cand.id }, function (err, doc) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (!doc) {
-        console.log("add: " + cand.id);
-        doc = new candidateModel;
-        doc.name = cand.label;
-        doc.concept_id = cand.id;
-        doc.description = cand.parts[0].data;
-        console.log('instance: ' +  doc);
-        doc.save(function (err) {
-          if (err) { 
-                 console.log('Error saving candidate: ' + err); 
-              } else {
-                console.log('Success saving candidate'); 
-              }
-        });
-      } else {
-        console.log("nothing to do ");
-      }
-    }
-  });
+      });
+    });
+    app.post('/db/'+name, function (req, res) {
+      console.log("post to " + name + "/n" + JSON.stringify(req.body));
+      db.save( req.body, function (err, doc) {
+        if (err) {
+          console.log(err);
+          res.status(500).json(error);
+        } else {
+          res.status(200).json(doc);
+        }
+      });
+    });
+  };
 
 };

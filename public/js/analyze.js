@@ -32,7 +32,7 @@ function handleCreation() {
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url: '/db/candidates?name=' + profile.name.toLowerCase(),
+		url: '/db/candidates/by-name/' + profile.name.toLowerCase(),
 		dataType: 'json',
 		success: function (data) {
 			if (data.length > 0) {
@@ -79,7 +79,7 @@ function insertCandidate(profile) {
 		data: profile,
 		dataType: 'json',
 		success: function (data) {
-			profile.id = data._id;
+			profile.id = (data._id || data.id);
 			console.log(data);
 			redirectToParse(profile);
 		},

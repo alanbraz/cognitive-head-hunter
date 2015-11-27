@@ -22,26 +22,32 @@ var bluemix  = require('./bluemix'),
 
 var services = {
 
-  mongodb: 'mongodb://localhost/<db name>',
-
-  personality_insights: {
-    url:      '<url>',
-    username: '<username>',
-    password: '<password>',
-    version: 'v2'
+  "personality_insights": {
+    "url":      '<url>',
+    "username": '<username>',
+    "password": '<password>',
+    "version": 'v2'
   },
 
-  concept_insights: {
-    url:      '<url>',
-    username: '<username>',
-    password: '<password>',
-    version: 'v2'
+  "concept_insights": {
+    "url":      '<url>',
+    "username": '<username>',
+    "password": '<password>',
+    "version": 'v2'
   },
 
   // LinkedIn app credentials: https://www.linkedin.com/developer/apps/new
-  linkedin: {
-    app_key:    '<app_key>',
-    app_secret: '<app_secret>'
+  "linkedin": {
+    "app_key":    '<app_key>',
+    "app_secret": '<app_secret>'
+  },
+
+  "cloudant": {
+    "username": "<username>",
+    "password": "<password>",
+    "host": "<host>",
+    "port": 443,
+    "url": "<url>"
   }
 
 };
@@ -52,6 +58,7 @@ if (env === 'prod') {
   services.mongodb = bluemix.getServiceCreds('mongolab').url;
   services.personality_insights = extend({'version':'v2'}, bluemix.getServiceCreds('personality_insights'));
   services.concept_insights = extend({'version':'v2'}, bluemix.getServiceCreds('concept_insights'));
+  services.cloudant = bluemix.getServiceCreds('cloudantNoSQLDB');
   services.linkedin.app_key = process.env.LINKEDIN_APPKEY;
   services.linkedin.app_secret = process.env.LINKEDIN_APPSECRET;
 } else {

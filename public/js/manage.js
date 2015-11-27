@@ -70,7 +70,7 @@ function loadJobs() {
 
   $.ajax({
       type: 'GET',
-      url: '/db/jobs/?select=concept_id%20title%20code%20requiredConcepts%20concepts&sort=code',
+      url: '/db/jobs/',
       dataType: 'json',
       success: function(data) {
         $('#num-jobs').html(data.length + ' jobs');
@@ -189,7 +189,7 @@ var loadCandidates = function() {
 
   $.ajax({
     type: 'GET',
-    url: '/db/candidates/?select=concept_id%20name%20profile&sort=name',
+    url: '/db/candidates/',
     dataType: 'json',
     success: function(data) {
       $('#num-candidates').html(data.length + ' candidates');
@@ -314,7 +314,7 @@ function submitJob() {
     data: $input,
     dataType: 'json',
     success: function(data) {
-      $input.id = data._id;
+      $input.id = (data._id || data.id);
       $('#job-add-div').hide();
       console.log(data);
       showSuccess("Job " + $input.code + ' added to the database.');

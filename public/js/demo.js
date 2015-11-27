@@ -106,7 +106,7 @@ $(document).ready(function () {
 		});
 
 		// check candidate
-		var candidate = getCandidate($user.id);
+		var candidate = getCandidate(($user.id || $user._id));
 
 
 		if (!candidate) {

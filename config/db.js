@@ -30,7 +30,10 @@ cradle.setup({
     forceSave: true
   });
 
-var connection = new(cradle.Connection)(config.services.cloudant.host, config.services.cloudant.port, {
+console.log(JSON.stringify(config.services.cloudant));
+
+var connection = new(cradle.Connection)
+  (config.services.cloudant.host, config.services.cloudant.port, {
       secure: true,
       cache: true,
       raw: false,

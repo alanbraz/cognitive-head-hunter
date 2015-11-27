@@ -41,11 +41,11 @@
 		"serve-favicon": "*",
 		"watson-developer-cloud": "*",
 		"request": "*",
-		"cradle": "0.6.7",
+		"cradle": "^0.6.9",
 		"underscore": "1.6.0"
 	},
 	"engines": {
-		"node": "0.10.*"
+		"node": "0.12.*"
 	},
 	"readmeFilename": "README.md"
 }

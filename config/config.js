@@ -65,6 +65,7 @@ if (env === 'prod') {
   services = JSON.parse(fs.readFileSync(__dirname + '/local.json', 'utf8'));
 }
 
+console.log(env);
 console.log(services);
 
 module.exports = {

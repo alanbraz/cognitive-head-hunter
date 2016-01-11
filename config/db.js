@@ -16,7 +16,7 @@
  'use strict';
 
 // Module dependencies
-var express    = require('express'),
+var express = require('express'),
     extend = require('util')._extend,
     _ = require("underscore"),
     config  = require('./config'),
@@ -46,45 +46,32 @@ var connection = new(cradle.Connection)
 
 var dbJobs = connection.database('jobs');
 var dbCandidates = connection.database('candidates');
-
+  
 dbJobs.exists(function (err, exists) {
   if (err) {
     console.log('error', err);
   } else if (exists) {
     console.log('the jobs db is already here.');
   } else {
-    console.log('jobs database does not exists.');
-    db.create();
-    db.save('_design/design', {
-      views: {
-        'by-code': {
-          map: 'function (doc) {  emit(doc.code, 1); }'
-        },
-        'by-title': {
-          map: 'function (doc) {  emit(doc.title, 1); }'
-        }
-      }
+    console.log('jobs database does not exists. Creating it...');
+    dbJobs.create(function(err) {
+      if(!err) createJobsViews();
     });
   }
-});
+ });
 
-dbCandidates.exists(function (err, exists) {
+ dbCandidates.exists(function (err, exists) {
   if (err) {
     console.log('error', err);
   } else if (exists) {
     console.log('the candidates db is already here.');
   } else {
-    console.log('candidates database does not exists.');
-    db.create();
-    db.save('_design/design', {
-      views: {
-        'by-name': {
-          map: 'function (doc) {  emit(doc.name.toLowerCase(), 1); }'
-        }
-      }
+    console.log('candidates database does not exists. Creating it...');
+    dbCandidates.create(function(err) {
+      if(!err) createCandidatesViews();
     });
   }
-});
+ });
 
 module.exports = function (app) {
 
@@ -98,7 +85,7 @@ module.exports = function (app) {
       db.view("design/"+view, { "key": req.params.keyValue.toLowerCase(), "include_docs": true }, function (err, docs) {
         if (err) {
           console.log(err);
-          res.status(500).json(error);
+          res.status(500).json(err);
         } else {
           res.status(200).json(_.map(docs, function(d) { return d.doc; }));
         }
@@ -110,7 +97,7 @@ module.exports = function (app) {
       db.get( req.params.id, function (err, doc) {
         if (err) {
           console.log(err);
-          return res.status(500).json(error);
+          return res.status(500).json(err);
         }
         return res.status(200).json(doc);
       });
@@ -121,7 +108,7 @@ module.exports = function (app) {
       db.view("design/"+view, { "include_docs": true }, function (err, docs) {
         if (err) {
           console.log(err);
-          return res.status(500).json(error);
+          return res.status(500).json(err);
         }
         var jobs = _.compact(
           _.map(docs, function(d) {
@@ -137,23 +124,24 @@ module.exports = function (app) {
       db.get( req.params.id, function (err, doc) {
         if (err) {
           console.log(err);
-          return res.status(500).json(error);
+          return res.status(500).json(err);
         }
-        db.remove(doc._id, doc._rev, function (error, doc) {
+        db.remove(doc._id, doc._rev, function (err, doc) {
           if (err) {
             console.log(err);
-            return res.status(500).json(error);
+            return res.status(500).json(err);
           }
           return res.status(200).json(doc);
         });
       });
     });
+    
     app.post('/db/'+name, function (req, res) {
       console.log("post to " + name + "/n" + JSON.stringify(req.body));
       db.save( req.body, function (err, doc) {
         if (err) {
           console.log(err);
-          res.status(500).json(error);
+          res.status(500).json(err);
         } else {
           res.status(200).json(doc);
         }
@@ -162,3 +150,39 @@ module.exports = function (app) {
   };
 
 };
+
+/*
+* Functions to create database views
+*/
+ function createJobsViews() {
+   console.log('jobs db views does not exists. Creating it...');
+   dbJobs.view('_design/design', function (err, res) {
+     if(err) {
+       dbJobs.save('_design/design', {
+        views: {
+            'by-code': {
+              map: function(doc) { emit(doc.code, 1); }
+            },
+            'by-title': {
+              map: function(doc) { emit(doc.title, 1); }
+            }
+        }
+       });
+     }
+   });
+ }
+
+ function createCandidatesViews() {
+   console.log('candidates db views does not exists. Creating it...');
+   dbCandidates.view('_design/design', function (err, res) {
+     if(err) {
+       dbCandidates.save('_design/design', {
+        views: {
+            'by-name': { 
+                map: function(doc) { emit(doc.name.toLowerCase(), 1); }
+            }
+        }
+       });
+     }
+   });
+ }

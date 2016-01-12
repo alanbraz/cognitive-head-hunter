@@ -4,7 +4,7 @@ declared-services:
     plan: standard
   Personality Insights CHH:
     label: personality_insights
-    plan: standard
+    plan: tiered
   Cloudant NoSQL CHH: 
     label: cloudantNoSQLDB
     plan: Shared

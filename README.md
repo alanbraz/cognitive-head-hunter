@@ -14,7 +14,7 @@ Click on the buttom bellow to deploy your own copy of Cognitive Head Hunter into
 
 [![Deploy to Bluemix](https://bluemix.net/deploy/button.png)][deploy-to-Bluemix]
 
-And that's about it! You successfully just created a `Node.js` application in Bluemix together with a `Concept Insights`, `Personality Insights` and `Mongo Lab` services required to this project.
+And that's about it! You successfully just created a `Node.js` application in Bluemix together with a `Concept Insights`, `Personality Insights` and `Cloudant NoSQL DB` services required to this project.
 
 Now it's time to configure your project.
 
@@ -32,9 +32,9 @@ Now it's time to configure your project.
 
 6. Include a [Personality Insights][personality-insights] service in your application.
 
-7. Include a `MongoLab` service in your application.
+7. Include a [cloudant][Cloudant NoSQL DB] service in your application. No database or view need to be created now, it will be done by the app on start-up.
 
-8. Create two `USER_DEFINED` Environment Variables in your bluemix app named `LINKEDIN_APPKEY` and `LINKEDIN_APPSECRET`, initially with no values.
+8. Create two `USER_DEFINED` Environment Variables in your bluemix app named `LINKEDIN_APPKEY` and `LINKEDIN_APPSECRET`, initially with no values. (Continue reading to know how to create one)
 
 9. Restart your application.
 
@@ -58,9 +58,9 @@ Watch the live demo video at https://vimeo.com/ibmwatson/review/130135189/c27aa6
 
 # Name and email for the distributor or programmer
 
-- Alan Braz - <alanbraz@br.ibm.com>
-- Paulo Cavoto - <pcavoto@br.ibm.com>
-- Paulo Caldeira - <pmcjr@br.ibm.com>
+- [Alan Braz](https://github.com/alanbraz) - <alanbraz@br.ibm.com>
+- [Paulo Cavoto](https://github.com/cavoto) - <pcavoto@br.ibm.com>
+- [Paulo Caldeira](https://github.com/pmcjunior) - <pmcjr@br.ibm.com>
 
 # Troubleshooting
 
@@ -92,5 +92,5 @@ Find more open source projects on the [IBM Github Page](http://ibm.github.io/)
 [deploy-to-Bluemix]: https://bluemix.net/deploy?repository=
 [concept-insights]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/concept-insights.html
 [personality-insights]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html
-[mongolab]: http://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/personality-insights.html
+[cloudant]: https://console.ng.bluemix.net/catalog/services/cloudant-nosql-db/
 [vcap_environment]: https://www.ibm.com/smarterplanet/us/en/ibmwatson/developercloud/doc/getting_started/#VcapEnvVar

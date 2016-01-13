@@ -32,7 +32,7 @@ Now it's time to configure your project.
 
 6. Include a [Personality Insights][personality-insights] service in your application.
 
-7. Include a [cloudant][Cloudant NoSQL DB] service in your application. No database or view need to be created now, it will be done by the app on start-up.
+7. Include a [Cloudant NoSQL DB][cloudant] service in your application. No database or view need to be created now, it will be done by the app on start-up.
 
 8. Create two `USER_DEFINED` Environment Variables in your bluemix app named `LINKEDIN_APPKEY` and `LINKEDIN_APPSECRET`, initially with no values. (Continue reading to know how to create one)
 

@@ -55,7 +55,7 @@ var services = {
 
 // Get the service
 if (env === 'prod') {
-  services.mongodb = bluemix.getServiceCreds('mongolab').url;
+//   services.mongodb = bluemix.getServiceCreds('mongolab').url;
   services.personality_insights = extend({'version':'v2'}, bluemix.getServiceCreds('personality_insights'));
   services.concept_insights = extend({'version':'v2'}, bluemix.getServiceCreds('concept_insights'));
   services.cloudant = bluemix.getServiceCreds('cloudantNoSQLDB');

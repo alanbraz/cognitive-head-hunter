@@ -137,8 +137,8 @@ function submitJob() {
 		//alert(JSON.stringify(con));
 
 		$.ajax({
-			type: "PUT",
-			url: '/db/jobs/' + $('#job_id').html(),
+			type: "POST",
+			url: '/db/jobs/' + $('#job_id').val(),
 			data: {
 				requiredConcepts: con
 			},

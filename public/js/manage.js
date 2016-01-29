@@ -341,7 +341,7 @@ function submitJob() {
 function addJobConcept(job) {
 
   $.ajax({
-    type: "PUT",
+    type: "POST",
     url: '/ci/jobs',
     data: job,
     async: false,
@@ -399,7 +399,7 @@ function getJob(id) {
 
 function updateJob(job) {
   $.ajax({
-    type: "PUT",
+    type: "POST",
     url: '/db/jobs/' + job.id,
     data: job,
     dataType: 'json',

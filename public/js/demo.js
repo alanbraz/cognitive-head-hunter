@@ -268,7 +268,8 @@ $(document).ready(function () {
 		}
 		for( var j=0; j < conceptsToShow.length; j++) {
 			var c = conceptsToShow[j];
-			var percentage = (c.weight*100)/conceptsToShow[0].weight;
+			var rawPercentage = (c.weight*100)/conceptsToShow[0].weight;
+      var percentage = rawPercentage > 100 ? 100 : rawPercentage; 
 			var conceptPie = $('#concept' + (j+1));
 			conceptPie.attr("data-percent", percentage);
 			conceptPie.attr("data-text", Math.round(percentage)+"%");

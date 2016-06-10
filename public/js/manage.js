@@ -400,7 +400,7 @@ function getJob(id) {
 function updateJob(job) {
   $.ajax({
     type: "POST",
-    url: '/db/jobs/' + job.id,
+    url: '/db/jobs/',
     data: job,
     dataType: 'json',
     success: function(data) {

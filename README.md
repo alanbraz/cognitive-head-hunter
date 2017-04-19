@@ -1,3 +1,6 @@
+
+> Application not working anymore due to [#13 Migrate Concept Insights to AlchemyLanguage](https://github.com/alanbraz/cognitive-head-hunter/issues/13)
+
 # Cognitive Head Hunter - GBS Watson Challenge Application
 
   Cognitive Head Hunter is a cognitive based system to designed to help both a candidate and a HR professional make a good match more quickly and more reliably using Watson to read and extract cognitive information from the both the candidates providing a better match between them, not only by analyzing keywords but also by understanding the concepts outlined within a resume or a job posting.
